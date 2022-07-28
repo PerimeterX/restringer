@@ -201,7 +201,8 @@ class REstringer {
 	 * @returns {boolean} true if targetNode exists and is unchanged in current AST; false otherwise.
 	 */
 	_isInAst(targetNode) {
-		const matches = this._ast.filter(n => n.nodeId === targetNode.nodeId);
+		const targetNodeId = targetNode.nodeId;
+		const matches = this._ast.filter(n => n.nodeId === targetNodeId);
 		if (matches && matches.length) {
 			return matches[0].src === targetNode.src;
 		}
@@ -389,28 +390,28 @@ class REstringer {
 						if (!relevantNode.init) {
 							assignments.push(...relevantNode.id.references.filter(r =>
 								r.parentNode.type === 'AssignmentExpression' &&
-								r.parentNode.left.nodeId === r.nodeId));
+								r.parentKey === 'left'));
 						} else {
 							// Collect references found in init
 							references.push(...this._getDescendants(relevantNode.init).filter(n =>
 								n.type === 'Identifier' &&
 								n.declNode &&
 								(n.parentNode.type !== 'MemberExpression' ||
-									n.parentNode.object.nodeId === n.nodeId))
+									n.parentKey === 'object'))
 								.map(n => n.declNode));
 						}
 						// Collect assignments to variable properties
 						assignments.push(...relevantNode.id.references.filter(r =>
 							r.parentNode.type === 'MemberExpression' &&
 							((r.parentNode.parentNode.type === 'AssignmentExpression' &&
-									r.parentNode.parentNode.left.nodeId === r.parentNode.nodeId) ||
-								(r.parentNode.object.nodeId === r.nodeId &&
+									r.parentNode.parentKey === 'left') ||
+								(r.parentKey === 'object' &&
 									propertiesThatModifyContent.includes(r.parentNode.property?.value || r.parentNode.property.name))))
 							.map(r => r.parentNode.parentNode));
 						// Find augmenting functions
 						references.push(...relevantNode.id.references.filter(r =>
 							r.parentNode.type === 'CallExpression' &&
-							r.parentNode.arguments.filter(a => a.nodeId === r.nodeId).length)
+							r.parentKey === 'arguments')
 							.map(r => r.parentNode));
 						break;
 					case 'AssignmentExpression':
@@ -544,11 +545,11 @@ class REstringer {
 	 */
 	_areReferencesModified(refs) {
 		// Verify no reference is on the left side of an assignment
-		return Boolean(refs.filter(r => r.parentNode.type === 'AssignmentExpression' && r.nodeId === r.parentNode.left.nodeId).length ||
+		return Boolean(refs.filter(r => r.parentNode.type === 'AssignmentExpression' && r.parentKey === 'left').length ||
 			// Verify no reference is part of an update expression
 			refs.filter(r => r.parentNode.type === 'UpdateExpression').length ||
 			// Verify no variable with the same name is declared in a subscope
-			refs.filter(r => r.parentNode.type === 'VariableDeclarator' && r.parentNode.id.nodeId === r.nodeId).length ||
+			refs.filter(r => r.parentNode.type === 'VariableDeclarator' && r.parentKey === 'id').length ||
 			// Verify there are no member expressions among the references which are being assigned to
 			refs.filter(r => r.type === 'MemberExpression' &&
 				(this._ast.filter(n => n.type === 'AssignmentExpression' && n.left.src === r.src &&
@@ -677,7 +678,7 @@ class REstringer {
 			!skipProperties.includes(n.property?.name || n.property?.value));
 		for (const c of candidates) {
 			// If this member expression is the callee of a call expression - skip it
-			if (c.parentNode.type === 'CallExpression' && c.parentNode.callee.nodeId === c.nodeId) continue;
+			if (c.parentNode.type === 'CallExpression' && c.parentKey === 'callee') continue;
 			// If this member expression is a part of another member expression - get the first parentNode
 			// which has a declaration in the code;
 			// E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be selected;
@@ -686,7 +687,7 @@ class REstringer {
 			if (relevantIdentifier && relevantIdentifier.declNode) {
 				// Skip if the relevant identifier is on the left side of an assignment.
 				if (relevantIdentifier.parentNode.parentNode.type === 'AssignmentExpression' &&
-					relevantIdentifier.parentNode.nodeId === relevantIdentifier.parentNode.parentNode.left.nodeId) continue;
+					relevantIdentifier.parentNode.parentKey === 'left') continue;
 				const declNode = relevantIdentifier.declNode;
 				// Skip if the identifier was declared as a function's parameter.
 				if (/Function/.test(declNode.parentNode.type) &&
@@ -736,13 +737,14 @@ class REstringer {
 			const prop = c.property?.value || c.property?.name;
 			const valueUses = c.object.declNode.references.filter(n =>
 				n.parentNode.type === 'MemberExpression' &&
-				n.parentNode.property.computed ? n.parentNode.property?.value === prop : n.parentNode.property?.name === prop &&
-					// n.parentNode.src === c.src &&
-					n.parentNode.nodeId !== c.nodeId)
+				(n.parentNode.property.computed ?
+					n.parentNode.property?.value === prop :
+					n.parentNode.property?.name === prop) &&
+				n.parentNode.nodeId !== c.nodeId)
 				.map(n => n.parentNode);
 			if (valueUses.length) {
 				// Skip if the value is reassigned
-				if (valueUses.filter(n => n.parentNode.type === 'AssignmentExpression' && n.parentNode.left.nodeId === n.nodeId).length) continue;
+				if (valueUses.filter(n => n.parentNode.type === 'AssignmentExpression' && n.parentKey === 'left').length) continue;
 				const replacementNode = c.parentNode.right;
 				valueUses.forEach(n => this._markNode(n, replacementNode));
 			}
@@ -805,7 +807,7 @@ class REstringer {
 				Object.is(parseInt(n.property), NaN).length).length) {
 				for (const ref of refs) {
 					if ((ref.parentNode.type === 'AssignmentExpression' &&
-							ref.parentNode.left.nodeId === ref.nodeId) ||
+							ref.parentKey === 'left') ||
 						ref.type !== 'MemberExpression') continue;
 					try {
 						this._markNode(ref, c.init.elements[parseInt(ref.property.value)]);
@@ -1025,7 +1027,7 @@ class REstringer {
 			((n.callee.declNode.parentNode.type === 'VariableDeclarator' &&
 					['ArrowFunctionExpression', 'FunctionExpression'].includes(n.callee.declNode.parentNode?.init?.type)) ||
 				(n.callee.declNode.parentNode.type === 'FunctionDeclaration' &&
-					n.callee.declNode.nodeId === n.callee.declNode.parentNode?.id?.nodeId)));
+					n.callee.declNode.parentKey === 'id')));
 		for (const c of candidates) {
 			const declBody = c.callee.declNode.parentNode?.init?.body || c.callee.declNode.parentNode?.body;
 			if (!Array.isArray(declBody)) {
@@ -1217,7 +1219,7 @@ class REstringer {
 				this._getMainDeclaredObjectOfMemberExpression(r.parentNode.left).nodeId === r.nodeId).length === 1 &&
 			!n.references.filter(r =>
 				(/For.*Statement/.exec(r.parentNode.type) &&
-					r.parentNode?.left?.nodeId === r.nodeId) ||
+					r.parentKey === 'left') ||
 				// This covers cases like:
 				// let a; b === c ? (b++, a = 1) : a = 2
 				[
@@ -1234,7 +1236,7 @@ class REstringer {
 			const refs = c.references.filter(r => r.nodeId !== assignmentNode.nodeId);
 			if (!this._areReferencesModified(refs)) {
 				for (const ref of refs) {
-					if (ref.parentNode.type === 'CallExpression' && ref.parentNode.callee.nodeId === ref.nodeId) continue;
+					if (ref.parentNode.type === 'CallExpression' && ref.parentKey === 'callee') continue;
 					this._markNode(ref, valueNode);
 				}
 			}
