@@ -1078,8 +1078,7 @@ class REstringer {
 				// Skip call expressions with problematic values
 				if (skipIdentifiers.includes(callee.name) ||
 					(callee.type === 'ArrayExpression' && !callee.elements.length) ||
-					!!(callee.arguments || []).filter(a => skipIdentifiers.includes(a) || a?.type === 'ThisExpression').length ||
-					(declNode && this._areReferencesModified(declNode.references))) continue;
+					!!(callee.arguments || []).filter(a => skipIdentifiers.includes(a) || a?.type === 'ThisExpression').length) continue;
 				if (declNode) {
 					// Verify the declNode isn't a simple wrapper for an identifier
 					if (declNode.parentNode.type === 'FunctionDeclaration' &&
