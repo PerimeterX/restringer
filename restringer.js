@@ -855,6 +855,28 @@ class REstringer {
 	}
 
 	/**
+	 * Resolve unary expressions on values which aren't numbers such as +true, -false, +[], +[...], etc,
+	 * as well as binary expressions around the + operator. These usually resolve to string values,
+	 * which can be used to obfuscate code in schemes such as JSFuck
+	 */
+	_resolveMinimalAlphabet() {
+		const candidates = this._ast.filter(n =>
+			(n.type === 'UnaryExpression' &&
+				((n.argument.type === 'Literal' && /^\D/.exec(n.argument.raw[0])) ||
+					n.argument.type === 'ArrayExpression')) ||
+			(n.type === 'BinaryExpression' &&
+				n.operator === '+' &&
+				(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
+				![n.left?.type, n.right?.type].includes('ThisExpression')));
+		for (const c of candidates) {
+			const newNode = this._evalInVm(c.src);
+			if (newNode !== this.badValue) {
+				this._markNode(c, newNode);
+			}
+		}
+	}
+
+	/**
 	 * Remove redundant block statements which have another block statement as their body.
 	 * E.g.
 	 * if (a) {{do_a();}} ===> if (a) {do_a();}
@@ -1423,6 +1445,7 @@ class REstringer {
 	 */
 	_unsafeDeobfuscationMethods() {
 		return [
+			this._resolveMinimalAlphabet,
 			this._resolveAugmentedFunctionWrappedArrayReplacements,
 			this._resolveMemberExpressionsLocalReferences,
 			this._resolveDefiniteMemberExpressions,
