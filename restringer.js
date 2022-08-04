@@ -37,7 +37,8 @@ class REstringer {
 		this.normalize = normalize;
 		this.modified = false;
 		this.obfuscationName = 'Generic';
-		this._cache = {};     // Cache for eval result
+		this._cache = {};            // Generic cache
+		this._evalCache = {};        // Sticky cache for eval results
 		this.cyclesCounter = 0;      // Used for logging
 		this.totalChangesCounter = 0;
 		// Required to avoid infinite loops, but it's good to keep the number high
@@ -574,8 +575,8 @@ class REstringer {
 			sandbox: {...disableObjects},
 		};
 		const cacheName = `eval-${stringToEval}`;
-		if (this._cache[cacheName] === undefined) {
-			this._cache[cacheName] = this.badValue;
+		if (this._evalCache[cacheName] === undefined) {
+			this._evalCache[cacheName] = this.badValue;
 			try {
 				// Break known trap strings
 				for (const ts of trapStrings) {
@@ -586,14 +587,14 @@ class REstringer {
 					// To exclude results based on randomness or timing, eval again and compare results
 					const res2 = (new VM(vmOptions)).run(stringToEval);
 					if (JSON.stringify(res) === JSON.stringify(res2)) {
-						this._cache[cacheName] = this._createNewNode(res);
+						this._evalCache[cacheName] = this._createNewNode(res);
 					}
 				}
 			} catch (e) {
 				debugErr(`[-] Error in _evalInVm: ${e}`, 1);
 			}
 		}
-		return this._cache[cacheName];
+		return this._evalCache[cacheName];
 	}
 
 	/**
@@ -604,7 +605,7 @@ class REstringer {
 	 */
 	_evalWithDom(stringToEval, injectjQuery = false) {
 		const cacheName = `evalWithDom-${stringToEval}`;
-		if (!this._cache[cacheName]) {
+		if (!this._evalCache[cacheName]) {
 			let out = '';
 			const vm = new NodeVM({
 				console: 'redirect',
@@ -635,9 +636,9 @@ class REstringer {
 			} catch (e) {
 				debugErr(`[-] Error in _evalWithDom: ${e}`, 1);
 			}
-			this._cache[cacheName] = out;
+			this._evalCache[cacheName] = out;
 		}
-		return this._cache[cacheName];
+		return this._evalCache[cacheName];
 	}
 
 	// * * * * * * Main Deobfuscation Methods * * * * * * * * //
