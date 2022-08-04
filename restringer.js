@@ -22,6 +22,9 @@ const {
 	propertiesThatModifyContent,
 } = require(__dirname + '/helpers/config');
 
+// Silence asyc errors
+process.on('uncaughtException', () => {});
+
 class REstringer {
 	static __version__ = version;
 	jQuerySrc = '';
