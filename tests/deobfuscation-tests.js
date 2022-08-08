@@ -130,6 +130,12 @@ if (d) {
 	},
 	{
 		enabled: true,
+		name: 'Replace Function Evals in Call Expressions - eval(string)(args)',
+		source: 'eval("atob")("c3VjY2Vzcw==");',
+		expected: `'success';`,
+	},
+	{
+		enabled: true,
 		name: 'Replace Identifier With Fixed Assigned Value',
 		source: `const a = 'value'; function v(arg) {console.log(a, a[0], a.indexOf('e'));}`,
 		expected: `const a = 'value';
