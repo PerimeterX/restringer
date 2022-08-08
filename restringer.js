@@ -1146,7 +1146,18 @@ class REstringer {
 					};
 					this._cache[cacheName] = body;
 				}
-				this._markNode(c, this._cache[cacheName]);
+				let replacementNode = this._cache[cacheName];
+				let targetNode = c;
+				// Edge case where the eval call renders an identifier which is then used in a call expression:
+				// eval('Function')('alert("hacked!")');
+				if (c.parentKey === 'callee') {
+					targetNode = c.parentNode;
+					if (replacementNode.type === 'ExpressionStatement' && replacementNode.expression.type === 'Identifier') {
+						replacementNode = replacementNode.expression;
+					}
+					replacementNode = {...c.parentNode, callee: replacementNode};
+				}
+				this._markNode(targetNode, replacementNode);
 			} catch (e) {
 				debugErr(`[-] Unable to replace eval's body with call expression: ${e}`, 1);
 			}
