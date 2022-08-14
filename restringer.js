@@ -976,8 +976,13 @@ class REstringer {
 			const relevantIdentifier = this._getMainDeclaredObjectOfMemberExpression(c.id)?.declNode || c.id;
 			const refs = relevantIdentifier.references || [];
 			const replacementNode = c.init;
+			const replacementMainIdentifier = this._getMainDeclaredObjectOfMemberExpression(c.init)?.declNode;
+			if (replacementMainIdentifier && replacementMainIdentifier.nodeId === relevantIdentifier.nodeId) continue;
+			const decendants = this._getDescendants(c).map(n => n.nodeId);
 			if (refs.length && !this._areReferencesModified(refs) && !this._areReferencesModified([replacementNode])) {
 				for (const ref of refs) {
+					// Exclude changes in the identifier's own init
+					if (decendants.includes(ref.nodeId)) continue;
 					this._markNode(ref, replacementNode);
 				}
 			}
