@@ -1234,7 +1234,8 @@ class REstringer {
 	 */
 	_replaceIdentifierWithFixedAssignedValue() {
 		const candidates = this._ast.filter(n =>
-			n?.declNode?.parentNode?.init?.type === 'Literal');
+			n?.declNode?.parentNode?.init?.type === 'Literal' &&
+			!(n.parentKey === 'property' && n.parentNode.type === 'ObjectExpression'));
 		for (const c of candidates) {
 			const valueNode = c.declNode.parentNode.init;
 			const refs = c.declNode.references;
