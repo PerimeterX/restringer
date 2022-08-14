@@ -2,7 +2,9 @@
 Deobfuscate Javascript and reconstruct strings.
 Simplify cumbersome logic where possible while adhering to scope limitations.
 
-Try it online @ [restringer.tech](https://restringer.tech)
+Try it online @ [restringer.tech](https://restringer.tech).
+
+For comments and suggestions feel free to open an issue or find me on Twitter - [@ctrl__esc](https://twitter.com/ctrl__esc) 
 
 ## Table of Contents
 * [Installation](#installation)
