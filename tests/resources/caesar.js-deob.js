@@ -1,3 +1,13 @@
+function hh(text) {
+  if (text.length == 0)
+    return 0;
+  var hash = 0;
+  for (var i = 0; i < text.length; i++) {
+    hash = (hash << 5) - hash + text.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return hash % 255;
+}
 var body = window.rCw.toString().replace(/[^a-zA-Z0-9\-"]+/g, '');
 var crc = body.match(/b2id53hpr66awehqqnxn5pjph([\w\d\-]+)"/g)[0].replace('b2id53hpr66awehqqnxn5pjph', '');
 crc = crc.substr(0, crc.length - 1);

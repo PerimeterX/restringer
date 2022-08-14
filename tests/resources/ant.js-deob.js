@@ -288,30 +288,30 @@ if (typeof window.ant_zero == 'undefined') {
       var _0x9149x21 = document.querySelectorAll(_0x9149x1c[_0x9149x9]);
       for (var _0x9149x22 = 0; _0x9149x22 < _0x9149x21.length; _0x9149x22++) {
         var _0x9149x1e = _0x9149x21[_0x9149x22];
-        if (!_0x9149x35.includes(_0x9149x1e)) {
-          _0x9149x35.push(_0x9149x1e);
+        if (!_0x9149x35.includes(_0x9149x21[_0x9149x22])) {
+          _0x9149x35.push(_0x9149x21[_0x9149x22]);
         }
       }
     }
     for (var _0x9149x9 = 0; _0x9149x9 < _0x9149x35.length; _0x9149x9++) {
       var _0x9149x1e = _0x9149x35[_0x9149x9];
-      var _0x9149x36 = _0x9149x1e.getAttribute('ant_check');
+      var _0x9149x36 = _0x9149x35[_0x9149x9].getAttribute('ant_check');
       if (_0x9149x36 == '1') {
         continue;
       }
-      _0x9149x1e.addEventListener('click', function () {
+      _0x9149x35[_0x9149x9].addEventListener('click', function () {
         try {
           ant_main();
         } catch (err) {
         }
       });
-      _0x9149x1e.addEventListener('mousedown', function () {
+      _0x9149x35[_0x9149x9].addEventListener('mousedown', function () {
         try {
           ant_main();
         } catch (err) {
         }
       });
-      _0x9149x1e.setAttribute('ant_check', '1');
+      _0x9149x35[_0x9149x9].setAttribute('ant_check', '1');
     }
   }
   function ant_load() {
