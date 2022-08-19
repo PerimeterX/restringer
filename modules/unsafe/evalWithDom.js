@@ -26,7 +26,7 @@ function evalWithDom(stringToEval, injectjQuery = false, logger = {debugErr: () 
 		});
 		try {
 			// Set up the DOM, and allow script to run wild: <img src='I_too_like_to_run_scripts_dangerously.jpg'/>
-			let runString = 'const dom = new jsdom(`<html><head></head><body></body></html>`, {runScripts: \'dangerously\'}); ' +
+			let runString = 'const dom = new JSDOM(`<html><head></head><body></body></html>`, {runScripts: \'dangerously\'}); ' +
 				'const window = dom.window; ' +
 				'const document = window.document; ';
 			// Lazy load the jQuery when needed, and inject it to the head
