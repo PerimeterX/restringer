@@ -2,8 +2,6 @@
 // noinspection JSValidateJSDoc,JSUnresolvedVariable,JSValidateTypes,HtmlRequiredLangAttribute,HtmlRequiredTitleElement,JSAnnotator
 
 const fs = require('fs');
-const {NodeVM} = require('vm2');
-const jsdom = require('jsdom').JSDOM;
 const version = require(__dirname + '/package').version;
 const detectObfuscation = require('obfuscation-detector');
 const processors = require(__dirname + '/processors/processors');
@@ -565,85 +563,6 @@ class REstringer {
 				r.parentNode.parentNode.type === 'CallExpression' &&
 				r.parentNode.parentNode.callee?.object?.nodeId === r.nodeId &&
 				propertiesThatModifyContent.includes(r.parentNode.property?.value || r.parentNode.property?.name)).length);
-	}
-
-	// * * * * * * Evals * * * * * * * * //
-
-	// /**
-	//  * Eval a string in a ~safe~ VM environment
-	//  * @param {string} stringToEval
-	//  * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
-	//  */
-	// _evalInVm(stringToEval) {
-	// 	const vmOptions = {
-	// 		timeout: 5 * 1000,
-	// 		sandbox: {...disableObjects},
-	// 	};
-	// 	const cacheName = `eval-${stringToEval}`;
-	// 	if (this._evalCache[cacheName] === undefined) {
-	// 		this._evalCache[cacheName] = this.badValue;
-	// 		try {
-	// 			// Break known trap strings
-	// 			for (const ts of trapStrings) {
-	// 				stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
-	// 			}
-	// 			const res = (new VM(vmOptions)).run(stringToEval);
-	// 			if (!res.VMError && !badTypes.includes(this._getType(res))) {
-	// 				// To exclude results based on randomness or timing, eval again and compare results
-	// 				const res2 = (new VM(vmOptions)).run(stringToEval);
-	// 				if (JSON.stringify(res) === JSON.stringify(res2)) {
-	// 					this._evalCache[cacheName] = this._createNewNode(res);
-	// 				}
-	// 			}
-	// 		} catch (e) {
-	// 			debugErr(`[-] Error in _evalInVm: ${e}`, 1);
-	// 		}
-	// 	}
-	// 	return this._evalCache[cacheName];
-	// }
-
-	/**
-	 * Place a string into a file and evaluate it with a simulated browser environment.
-	 * @param {string} stringToEval
-	 * @param {boolean} injectjQuery Inject jQuery into the VM if true.
-	 * @return {string} The output string if successful; empty string otherwise.
-	 */
-	_evalWithDom(stringToEval, injectjQuery = false) {
-		const cacheName = `evalWithDom-${stringToEval}`;
-		if (!this._evalCache[cacheName]) {
-			let out = '';
-			const vm = new NodeVM({
-				console: 'redirect',
-				timeout: 100 * 1000,
-				sandbox: {jsdom},
-			});
-			try {
-				// Set up the DOM, and allow script to run wild: <img src='I_too_like_to_run_scripts_dangerously.jpg'/>
-				let runString = 'const dom = new jsdom(`<html><head></head><body></body></html>`, {runScripts: \'dangerously\'}); ' +
-					'const window = dom.window; ' +
-					'const document = window.document; ';
-				// Lazy load the jQuery when needed, and inject it to the head
-				if (injectjQuery) {
-					this.jQuerySrc = this.jQuerySrc || fs.readFileSync(__dirname + '/../tools/jquery.slim.min.js');
-					runString += 'const jqueryScript = document.createElement(\'script\'); ' +
-						'jqueryScript.src = ' + this.jQuerySrc + '; ' +
-						'document.head.appendChild(jqueryScript);';
-				}
-				// Inject the string to eval as a script into the body
-				runString += 'const script = document.createElement(\'script\'); ' +
-					'script.src = ' + stringToEval + '; ' +
-					'document.body.appendChild(script);';
-				// Catch and save the console.log's message
-				vm.on('console.log', function (msg) {
-					out = msg;
-				});
-				vm.run(runString);
-			} catch (e) {
-				debugErr(`[-] Error in _evalWithDom: ${e}`, 1);
-			}
-			this._evalCache[cacheName] = out;
-		}
-		return this._evalCache[cacheName];
 	}
 
 	// * * * * * * Main Deobfuscation Methods * * * * * * * * //
