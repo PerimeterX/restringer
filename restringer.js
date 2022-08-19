@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// noinspection JSValidateJSDoc
+// noinspection JSValidateJSDoc,JSUnresolvedVariable,JSValidateTypes,HtmlRequiredLangAttribute,HtmlRequiredTitleElement,JSAnnotator
 
 const fs = require('fs');
-const {VM, NodeVM} = require('vm2');
+const {NodeVM} = require('vm2');
 const jsdom = require('jsdom').JSDOM;
 const version = require(__dirname + '/package').version;
 const detectObfuscation = require('obfuscation-detector');
@@ -11,10 +11,12 @@ const {generateFlatAST, parseCode, generateCode, Arborist} = require('flast');
 const safeImplementations = require(__dirname + '/helpers/safeImplementations');
 const {debugLog, debugErr, DEBUGMODEON} = require(__dirname + '/helpers/debugHelper');
 const {
-	badTypes,
-	trapStrings,
+	unsafe: {
+		evalInVm,
+	}
+} = require('./modules');
+const {
 	skipProperties,
-	disableObjects,
 	skipIdentifiers,
 	badArgumentTypes,
 	skipBuiltinFunctions,
@@ -39,7 +41,7 @@ class REstringer {
 		this.script = script;
 		this.normalize = normalize;
 		this.modified = false;
-		this.obfuscationName = 'Generic';
+		this.obfuscationName = 'Gener_ic';
 		this._cache = {};            // Generic cache
 		this._evalCache = {};        // Sticky cache for eval results
 		this.cyclesCounter = 0;      // Used for logging
@@ -55,7 +57,7 @@ class REstringer {
 
 	// * * * * * * Determining Obfuscation Type * * * * * * * * //
 	/**
-	 * Determine the type of the obfuscation, and populate the appropriate pre and post processors.
+	 * Determine the type of the obfuscation, and populate the appropriate pre- and post- processors.
 	 */
 	determineObfuscationType() {
 		const detectedObfuscationType = detectObfuscation(this.script, false).slice(-1)[0];
@@ -150,7 +152,7 @@ class REstringer {
 			n.operator === '!');
 		for (const c of candidates) {
 			if (this._canUnaryExpressionBeResolved(c.argument)) {
-				const newNode = this._evalInVm(c.src);
+				const newNode = evalInVm(c.src, {debugErr});
 				this._markNode(c, newNode);
 			}
 		}
@@ -332,7 +334,7 @@ class REstringer {
 	 * @return {string}
 	 */
 	_getType(unknownObject) {
-		const match = ({}).toString.call(unknownObject).match(/\[object (.*)\]/);
+		const match = ({}).toString.call(unknownObject).match(/\[object (.*)]/);
 		return match ? match[1] : '';
 	}
 
@@ -396,7 +398,7 @@ class REstringer {
 								r.parentNode.type === 'AssignmentExpression' &&
 								r.parentKey === 'left'));
 						} else {
-							// Collect references found in init
+							// Collect all references found in init
 							references.push(...this._getDescendants(relevantNode.init).filter(n =>
 								n.type === 'Identifier' &&
 								n.declNode &&
@@ -467,9 +469,9 @@ class REstringer {
 	 * If this member expression is a part of another member expression - return the first parentNode
 	 * which has a declaration in the code.
 	 * E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be returned.
-	 * a.b.c.d --> if the candidate is c.d, the a identifier will be returned.
+	 * a.b.c.d --> if the candidate is c.d, the 'a' identifier will be returned.
 	 * @param {ASTNode} memberExpression
-	 * @return {ASTNode} The main object object with an available declaration
+	 * @return {ASTNode} The main object with an available declaration
 	 */
 	_getMainDeclaredObjectOfMemberExpression(memberExpression) {
 		let mainObject = memberExpression;
@@ -567,38 +569,38 @@ class REstringer {
 
 	// * * * * * * Evals * * * * * * * * //
 
-	/**
-	 * Eval a string in a ~safe~ VM environment
-	 * @param {string} stringToEval
-	 * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
-	 */
-	_evalInVm(stringToEval) {
-		const vmOptions = {
-			timeout: 5 * 1000,
-			sandbox: {...disableObjects},
-		};
-		const cacheName = `eval-${stringToEval}`;
-		if (this._evalCache[cacheName] === undefined) {
-			this._evalCache[cacheName] = this.badValue;
-			try {
-				// Break known trap strings
-				for (const ts of trapStrings) {
-					stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
-				}
-				const res = (new VM(vmOptions)).run(stringToEval);
-				if (!res.VMError && !badTypes.includes(this._getType(res))) {
-					// To exclude results based on randomness or timing, eval again and compare results
-					const res2 = (new VM(vmOptions)).run(stringToEval);
-					if (JSON.stringify(res) === JSON.stringify(res2)) {
-						this._evalCache[cacheName] = this._createNewNode(res);
-					}
-				}
-			} catch (e) {
-				debugErr(`[-] Error in _evalInVm: ${e}`, 1);
-			}
-		}
-		return this._evalCache[cacheName];
-	}
+	// /**
+	//  * Eval a string in a ~safe~ VM environment
+	//  * @param {string} stringToEval
+	//  * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
+	//  */
+	// _evalInVm(stringToEval) {
+	// 	const vmOptions = {
+	// 		timeout: 5 * 1000,
+	// 		sandbox: {...disableObjects},
+	// 	};
+	// 	const cacheName = `eval-${stringToEval}`;
+	// 	if (this._evalCache[cacheName] === undefined) {
+	// 		this._evalCache[cacheName] = this.badValue;
+	// 		try {
+	// 			// Break known trap strings
+	// 			for (const ts of trapStrings) {
+	// 				stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
+	// 			}
+	// 			const res = (new VM(vmOptions)).run(stringToEval);
+	// 			if (!res.VMError && !badTypes.includes(this._getType(res))) {
+	// 				// To exclude results based on randomness or timing, eval again and compare results
+	// 				const res2 = (new VM(vmOptions)).run(stringToEval);
+	// 				if (JSON.stringify(res) === JSON.stringify(res2)) {
+	// 					this._evalCache[cacheName] = this._createNewNode(res);
+	// 				}
+	// 			}
+	// 		} catch (e) {
+	// 			debugErr(`[-] Error in _evalInVm: ${e}`, 1);
+	// 		}
+	// 	}
+	// 	return this._evalCache[cacheName];
+	// }
 
 	/**
 	 * Place a string into a file and evaluate it with a simulated browser environment.
@@ -616,7 +618,7 @@ class REstringer {
 				sandbox: {jsdom},
 			});
 			try {
-				// Setup the DOM, and allow script to run wild: <img src='I_too_like_to_run_scripts_dangerously.jpg'/>
+				// Set up the DOM, and allow script to run wild: <img src='I_too_like_to_run_scripts_dangerously.jpg'/>
 				let runString = 'const dom = new jsdom(`<html><head></head><body></body></html>`, {runScripts: \'dangerously\'}); ' +
 					'const window = dom.window; ' +
 					'const document = window.document; ';
@@ -659,7 +661,7 @@ class REstringer {
 			['ArrayExpression', 'Literal'].includes(n.object.type) &&
 			(n.object?.value?.length || n.object?.elements?.length));
 		for (const c of candidates) {
-			const newValue = this._evalInVm(c.src);
+			const newValue = evalInVm(c.src, {debugErr});
 			this._markNode(c, newValue);
 		}
 	}
@@ -686,7 +688,7 @@ class REstringer {
 			// If this member expression is a part of another member expression - get the first parentNode
 			// which has a declaration in the code;
 			// E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be selected;
-			// a.b.c.d --> if the candidate is c.d, the a identifier will be selected;
+			// a.b.c.d --> if the candidate is c.d, the 'a' identifier will be selected;
 			let relevantIdentifier = this._getMainDeclaredObjectOfMemberExpression(c);
 			if (relevantIdentifier && relevantIdentifier.declNode) {
 				// Skip if the relevant identifier is on the left side of an assignment.
@@ -699,7 +701,7 @@ class REstringer {
 				const context = this._createOrderedSrc(this._getDeclarationWithContext(relevantIdentifier.declNode.parentNode));
 				if (context) {
 					const src = `${context}\n${c.src}`;
-					const newNode = this._evalInVm(src);
+					const newNode = evalInVm(src, {debugErr});
 					if (newNode !== this.badValue) {
 						let isEmptyReplacement = false;
 						switch (newNode.type) {
@@ -723,6 +725,7 @@ class REstringer {
 		}
 	}
 
+	// noinspection GrazieInspection
 	/**
 	 * Resolve the value of member expressions to objects which hold literals that were directly assigned to the expression.
 	 * E.g.
@@ -784,7 +787,7 @@ class REstringer {
 					]),
 				];
 				const src = `${this._createOrderedSrc([...context, ...refContext])}\n${ref.src}`;
-				const newNode = this._evalInVm(src);
+				const newNode = evalInVm(src, {debugErr});
 				this._markNode(ref, newNode);
 			}
 		}
@@ -835,7 +838,7 @@ class REstringer {
 			n.type === 'BinaryExpression' &&
 			this._doesBinaryExpressionContainOnlyLiterals(n));
 		for (const c of candidates) {
-			const newNode = this._evalInVm(c.src);
+			const newNode = evalInVm(c.src, {debugErr});
 			this._markNode(c, newNode);
 		}
 	}
@@ -873,7 +876,7 @@ class REstringer {
 				(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
 				![n.left?.type, n.right?.type].includes('ThisExpression')));
 		for (const c of candidates) {
-			const newNode = this._evalInVm(c.src);
+			const newNode = evalInVm(c.src, {debugErr});
 			if (newNode !== this.badValue) {
 				this._markNode(c, newNode);
 			}
@@ -1020,7 +1023,7 @@ class REstringer {
 						this._markNode(c, this._createNewNode(tempValue));
 					}
 				} else {
-					const newNode = this._evalInVm(c.src);
+					const newNode = evalInVm(c.src, {debugErr});
 					this._markNode(c, newNode);
 				}
 			} catch {}
@@ -1037,7 +1040,7 @@ class REstringer {
 			n.type === 'ConditionalExpression' &&
 			n.test.type === 'Literal');
 		for (const c of candidates) {
-			const newNode = this._evalInVm(`!!(${c.test.src});`);
+			const newNode = evalInVm(`!!(${c.test.src}, {debugErr});`);
 			if (newNode.type === 'Literal') {
 				this._markNode(c, newNode.value ? c.consequent : c.alternate);
 			}
@@ -1119,7 +1122,7 @@ class REstringer {
 			}
 			const context = this._cache[cacheName];
 			const src = context ? `${context}\n${c.src}` : c.src;
-			const newNode = this._evalInVm(src);
+			const newNode = evalInVm(src, {debugErr});
 			if (newNode !== this.badValue && newNode.type !== 'FunctionDeclaration') {
 				this._markNode(c, newNode);
 				modifiedRanges.push(c.range);
@@ -1182,7 +1185,7 @@ class REstringer {
 		for (const c of candidates) {
 			const argument = c.arguments[0];
 			const src = `var __a_ = ${argument.src}\n;__a_`;
-			const newNode = this._evalInVm(src);
+			const newNode = evalInVm(src, {debugErr});
 			const targetNode = c.parentNode.type === 'ExpressionStatement' ? c.parentNode : c;
 			let replacementNode = newNode;
 			try {
@@ -1376,7 +1379,7 @@ class REstringer {
 								!skipScopes.includes(n.scope.scopeId));
 							for (const rc of replacementCandidates) {
 								const src = `${context}\n${rc.src}`;
-								const newNode = this._evalInVm(src);
+								const newNode = evalInVm(src, {debugErr});
 								this._markNode(rc, newNode);
 							}
 						}
@@ -1497,7 +1500,7 @@ class REstringer {
 
 	/**
 	 * Entry point for this class.
-	 * Determine obfuscation type and run the pre and post processors accordingly.
+	 * Determine obfuscation type and run the pre- and post- processors accordingly.
 	 * Run the deobfuscation methods in a loop until nothing more is changed.
 	 * Normalize script to make it more readable.
 	 * @param {boolean} clean (optional) Remove dead nodes after deobfuscation. Defaults to false.

@@ -1,3 +1,5 @@
+const {unsafe: {evalInVm}, utils: {badValue}} = require(__dirname + '/../modules');
+
 /**
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
@@ -22,8 +24,8 @@ function parseArray() {
 		n.id?.references.filter(r =>
 			r.parentNode.type === 'MemberExpression').length === n.id?.references.length);
 	for (const c of candidates) {
-		const newNode = this._evalInVm(c.init.src);
-		if (newNode !== this.badValue) {
+		const newNode = evalInVm(c.init.src);
+		if (newNode !== badValue) {
 			this._markNode(c.init, newNode);
 		}
 	}

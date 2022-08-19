@@ -1,3 +1,5 @@
+const {unsafe: {evalInVm}, utils: {badValue}} = require(__dirname + '/../modules');
+
 /**
  * Augmented Array Replacements
  * The obfuscated script uses a shuffled array,
@@ -35,8 +37,8 @@ function augmentAndReplaceArray() {
 		const context = `var ${relevantArrayIdentifier.declNode.parentNode.src}\n!${this._createOrderedSrc(this._getDeclarationWithContext(candidate))}`;
 		// By adding the name of the array after the context, the un-shuffled array is procured.
 		const src = `${context};\n${relevantArrayIdentifier.name};`;
-		const newNode = this._evalInVm(src);  // The new node will hold the un-shuffled array's assignment
-		if (newNode !== this.badValue) {
+		const newNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
+		if (newNode !== badValue) {
 			let candidateExpression = candidate;
 			while (candidateExpression && candidateExpression.type !== 'ExpressionStatement') {
 				candidateExpression = candidateExpression?.parentNode;
