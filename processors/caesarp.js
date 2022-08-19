@@ -1,6 +1,7 @@
+const {unsafe: {evalWithDom}} = require(__dirname + '/../modules');
 /**
  * Caesar+ Deobfuscator
- * The Caesar+ obfuscation is comprised of two layers:
+ * The Caesar+ obfuscation comprises two layers:
  * 1. The outer layer builds the inner layer by using HTMLElements to manipulate strings,
  *    creating elements, concatenating strings to their innerHTML properties, base64 decoding and concatenating again,
  *    it assigns the resulting string to a variable's toString method and then implicitly invokes it.
@@ -33,7 +34,7 @@ function extractInnerLayer(script) {
 	const innerLayerVarMatches = variableContainingTheInnerLayerRegex.exec(lineToReplace);
 	const variableContainingTheInnerLayer = innerLayerVarMatches ? innerLayerVarMatches[0] : matches[2];
 	script = script.replace(lineToReplace, `console.log(${variableContainingTheInnerLayer}.toString());})();\n`);
-	const evald_script = this._evalWithDom(script);
+	const evald_script = evalWithDom(script);
 	if (evald_script) this.script = evald_script;
 }
 
