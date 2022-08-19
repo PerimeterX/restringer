@@ -1,6 +1,6 @@
 const {generateCode, parseCode} = require('flast');
 
-const badValue = '--BAD-VAL--';
+const badValue = '--BAD-VAL--';   // Internal value used to indicate eval failed
 
 /**
  * @param {*} unknownObject

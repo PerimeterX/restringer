@@ -14,6 +14,7 @@ const {
 	},
 	utils: {
 		createNewNode,
+		badValue,
 	},
 } = require('./modules');
 const {
@@ -30,7 +31,6 @@ process.on('uncaughtException', () => {});
 
 class REstringer {
 	static __version__ = version;
-	badValue = '--BAD-VAL--';   // Internal value used to indicate eval failed
 	validIdentifierBeginning = /^[A-Za-z$_]/;
 
 	/**
@@ -179,7 +179,7 @@ class REstringer {
 	 * @param replacementNode If exists, replace the target node with this node.
 	 */
 	_markNode(targetNode, replacementNode) {
-		if (replacementNode !== this.badValue) {
+		if (replacementNode !== badValue) {
 			if (this._isInAst(targetNode) && !this._isMarked(targetNode)) {
 				this._arborist.markNode(targetNode, replacementNode);
 				this._ast = this._arborist.ast;
@@ -526,7 +526,7 @@ class REstringer {
 				if (context) {
 					const src = `${context}\n${c.src}`;
 					const newNode = evalInVm(src, {debugErr});
-					if (newNode !== this.badValue) {
+					if (newNode !== badValue) {
 						let isEmptyReplacement = false;
 						switch (newNode.type) {
 							case 'ArrayExpression':
@@ -701,7 +701,7 @@ class REstringer {
 				![n.left?.type, n.right?.type].includes('ThisExpression')));
 		for (const c of candidates) {
 			const newNode = evalInVm(c.src, {debugErr});
-			if (newNode !== this.badValue) {
+			if (newNode !== badValue) {
 				this._markNode(c, newNode);
 			}
 		}
@@ -947,7 +947,7 @@ class REstringer {
 			const context = this._cache[cacheName];
 			const src = context ? `${context}\n${c.src}` : c.src;
 			const newNode = evalInVm(src, {debugErr});
-			if (newNode !== this.badValue && newNode.type !== 'FunctionDeclaration') {
+			if (newNode !== badValue && newNode.type !== 'FunctionDeclaration') {
 				this._markNode(c, newNode);
 				modifiedRanges.push(c.range);
 			}
