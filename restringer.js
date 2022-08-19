@@ -11,7 +11,10 @@ const {debugLog, debugErr, DEBUGMODEON} = require(__dirname + '/helpers/debugHel
 const {
 	unsafe: {
 		evalInVm,
-	}
+	},
+	utils: {
+		createNewNode,
+	},
 } = require('./modules');
 const {
 	skipProperties,
@@ -27,7 +30,6 @@ process.on('uncaughtException', () => {});
 
 class REstringer {
 	static __version__ = version;
-	jQuerySrc = '';
 	badValue = '--BAD-VAL--';   // Internal value used to indicate eval failed
 	validIdentifierBeginning = /^[A-Za-z$_]/;
 
@@ -41,7 +43,6 @@ class REstringer {
 		this.modified = false;
 		this.obfuscationName = 'Gener_ic';
 		this._cache = {};            // Generic cache
-		this._evalCache = {};        // Sticky cache for eval results
 		this.cyclesCounter = 0;      // Used for logging
 		this.totalChangesCounter = 0;
 		// Required to avoid infinite loops, but it's good to keep the number high
@@ -238,103 +239,7 @@ class REstringer {
 		return output;
 	}
 
-	/**
-	 * Create a node from a value by its type.
-	 * @returns {ASTNode|string} The created node if successful; badValue string otherwise
-	 */
-	_createNewNode(value) {
-		let newNode = this.badValue;
-		try {
-			if (![undefined, null].includes(value) && value.__proto__.constructor.name === 'Node') value = generateCode(value);
-			switch (this._getType(value)) {
-				case 'String':
-				case 'Number':
-				case 'Boolean':
-					if (['-', '+', '!'].includes(String(value)[0]) && String(value).length > 1) {
-						newNode = {
-							type: 'UnaryExpression',
-							operator: String(value)[0],
-							argument: this._createNewNode(String(value).substring(1)),
-						};
-					} else if (['Infinity', 'NaN'].includes(String(value))) {
-						newNode = {
-							type: 'Identifier',
-							name: String(value),
-						};
-					} else {
-						newNode = {
-							type: 'Literal',
-							value: value,
-							raw: String(value),
-						};
-					}
-					break;
-				case 'Array': {
-					const elements = [];
-					for (const el of Array.from(value)) {
-						elements.push(this._createNewNode(el));
-					}
-					newNode = {
-						type: 'ArrayExpression',
-						elements,
-					};
-					break;
-				}
-				case 'Object': {
-					const properties = [];
-					for (const [k, v] of Object.entries(value)) {
-						const key = this._createNewNode(k);
-						const val = this._createNewNode(v);
-						if ([key, val].includes(this.badValue)) {
-							// noinspection ExceptionCaughtLocallyJS
-							throw Error();
-						}
-						properties.push({
-							type: 'Property',
-							key,
-							value: val,
-						});
-					}
-					newNode = {
-						type: 'ObjectExpression',
-						properties,
-					};
-					break;
-				}
-				case 'Undefined':
-					newNode = {
-						type: 'Identifier',
-						name: 'undefined',
-					};
-					break;
-				case 'Null':
-					newNode = {
-						type: 'Literal',
-						raw: 'null',
-					};
-					break;
-				case 'Function': // Covers functions and classes
-					try {
-						newNode = parseCode(value).body[0];
-					} catch {}  // Probably a native function
-			}
-		} catch (e) {
-			debugErr(`[-] Unable to create a new node: ${e}`, 1);
-		}
-		return newNode;
-	}
-
 	// * * * * * * Getters * * * * * * * * //
-
-	/**
-	 * Extract and return the type of whatever object is provided
-	 * @param {*} unknownObject
-	 * @return {string}
-	 */
-	_getType(unknownObject) {
-		const match = ({}).toString.call(unknownObject).match(/\[object (.*)]/);
-		return match ? match[1] : '';
-	}
 
 	/**
 	 * @param {ASTNode} callExpression
@@ -776,7 +681,7 @@ class REstringer {
 				newStringLiteral += c.quasis[i].value.raw + c.expressions[i].value;
 			}
 			newStringLiteral += c.quasis.slice(-1)[0].value.raw;
-			this._markNode(c, this._createNewNode(newStringLiteral));
+			this._markNode(c, createNewNode(newStringLiteral, {debugErr}));
 		}
 	}
 
@@ -939,7 +844,7 @@ class REstringer {
 					const args = c.arguments.map(a => a.value);
 					const tempValue = safeImplementation(...args);
 					if (tempValue) {
-						this._markNode(c, this._createNewNode(tempValue));
+						this._markNode(c, createNewNode(tempValue, {debugErr}));
 					}
 				} else {
 					const newNode = evalInVm(c.src, {debugErr});
