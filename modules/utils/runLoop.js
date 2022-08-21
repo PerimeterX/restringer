@@ -28,7 +28,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 				try {
 					logger.log(`\t[!] Running ${func.name}...`, 1);
 					arborist = func(arborist);
-					const numberOfNewChanges = Object.keys(arborist.markedForReplacement).length + arborist.markedForDeletion.length;
+					const numberOfNewChanges = (Object.keys(arborist.markedForReplacement).length + arborist.markedForDeletion.length) || !arborist.ast[0].scriptHash;
 					if (numberOfNewChanges > lastNumberOfChanges) {
 						logger.log(`\t[+] ${func.name} committed ${numberOfNewChanges - lastNumberOfChanges} new changes!`);
 						lastNumberOfChanges = numberOfNewChanges;
@@ -40,7 +40,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 						`${((+new Date() - funcStartTime) / 1000).toFixed(3)} seconds`, 1);
 				}
 			}
-			const changesMade = arborist.applyChanges() || 0;
+			const changesMade = arborist.applyChanges() || !arborist.ast[0].scriptHash;   // If the hash doesn't exist it means the Arborist was replaced
 			if (changesMade) {
 				script = generateCode(arborist.ast[0]);
 			}
