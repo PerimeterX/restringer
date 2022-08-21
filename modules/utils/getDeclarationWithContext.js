@@ -1,5 +1,6 @@
 const isNodeMarked = require(__dirname + '/isNodeMarked');
 const getDescendants = require(__dirname + '/getDescendants');
+const isNodeInRanges = require(__dirname + '/isNodeInRanges');
 const {propertiesThatModifyContent} = require(__dirname + '/../config');
 
 const cache = {};
@@ -11,9 +12,11 @@ const cache = {};
  * the context of the origin node.
  */
 function getDeclarationWithContext(originNode) {
-	const cacheNameId = `context-${originNode.nodeId}`;
+	const scriptHash = originNode.scriptHash;
+	if (!cache[scriptHash]) cache[scriptHash] = {};
+	const cacheNameId = `context-${originNode.nodeId}-${originNode.src}`;
 	const cacheNameSrc = `context-${originNode.src}`;
-	let cached = cache[cacheNameId] || cache[cacheNameSrc];
+	let cached = cache[scriptHash][cacheNameId] || cache[scriptHash][cacheNameSrc];
 	if (!cached) {
 		const collectedContext = [originNode];
 		const examineStack = [originNode];
@@ -80,7 +83,7 @@ function getDeclarationWithContext(originNode) {
 				.concat(references)
 				.map(ref => ref.type === 'Identifier' ? ref.parentNode : ref);
 			for (const rn of contextToCollect) {
-				if (rn && !collectedContextIds.includes(rn.nodeId) && !this._isNodeInRanges(rn, collectedRanges)) {
+				if (rn && !collectedContextIds.includes(rn.nodeId) && !isNodeInRanges(rn, collectedRanges)) {
 					collectedRanges.push(rn.range);
 					collectedContextIds.push(rn.nodeId);
 					collectedContext.push(rn);
@@ -97,8 +100,8 @@ function getDeclarationWithContext(originNode) {
 			'MemberExpression',
 		];
 		cached = collectedContext.filter(n => !skipCollectionTypes.includes(n.type));
-		cache[cacheNameId] = cached;        // Caching context for the same node
-		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
+		cache[scriptHash][cacheNameId] = cached;        // Caching context for the same node
+		cache[scriptHash][cacheNameSrc] = cached;       // Caching context for a different node with similar content
 	}
 	return cached;
 }

@@ -11,6 +11,8 @@ const cache = {};
  * @return {Arborist}
  */
 function replaceEvalCallsWithLiteralContent(arb) {
+	const scriptHash = arb.ast[0].scriptHash;
+	if (!cache[scriptHash]) cache[scriptHash] = {};
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.name === 'eval' &&
@@ -18,7 +20,7 @@ function replaceEvalCallsWithLiteralContent(arb) {
 	for (const c of candidates) {
 		const cacheName = `replaceEval-${c.src}}`;
 		try {
-			if (!cache[cacheName]) {
+			if (!cache[scriptHash][cacheName]) {
 				let body;
 				if (c.arguments[0].value) {
 					body = generateFlatAST(c.arguments[0].value, {detailed: false})[1];
@@ -26,9 +28,9 @@ function replaceEvalCallsWithLiteralContent(arb) {
 					type: 'Literal',
 					value: c.arguments[0].value,
 				};
-				cache[cacheName] = body;
+				cache[scriptHash][cacheName] = body;
 			}
-			let replacementNode = cache[cacheName];
+			let replacementNode = cache[scriptHash][cacheName];
 			let targetNode = c;
 			// Edge case where the eval call renders an identifier which is then used in a call expression:
 			// eval('Function')('alert("hacked!")');

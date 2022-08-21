@@ -6,10 +6,10 @@
 function doesBinaryExpressionContainOnlyLiterals(binaryExpression) {
 	switch (binaryExpression.type) {
 		case 'BinaryExpression':
-			return this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.left) &&
-				this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.right);
+			return doesBinaryExpressionContainOnlyLiterals(binaryExpression.left) &&
+				doesBinaryExpressionContainOnlyLiterals(binaryExpression.right);
 		case 'UnaryExpression':
-			return this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.argument);
+			return doesBinaryExpressionContainOnlyLiterals(binaryExpression.argument);
 		case 'Literal':
 			return true;
 	}

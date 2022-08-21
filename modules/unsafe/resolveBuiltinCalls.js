@@ -24,7 +24,7 @@ function resolveBuiltinCalls(arb) {
 		!n.callee.object.declNode &&
 		!skipIdentifiers.includes(n.callee.object?.name) &&
 		!skipProperties.includes(n.callee.property?.name || n.callee.property?.value)));
-	candidates.push(...this._ast.filter(n =>
+	candidates.push(...arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		availableSafeImplementations.includes((n.callee.name))));
 	for (const c of candidates) {

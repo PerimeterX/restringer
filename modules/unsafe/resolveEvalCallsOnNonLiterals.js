@@ -10,7 +10,7 @@ const logger = require(__dirname + '/../utils/logger');
  * @return {Arborist}
  */
 function resolveEvalCallsOnNonLiterals(arb) {
-	const candidates = this._ast.filter(n =>
+	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee.name === 'eval' &&
 		n.arguments.length === 1 &&

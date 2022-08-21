@@ -1,5 +1,6 @@
 const {defaultMaxIterations} = require(__dirname + '/../config');
 const {Arborist, generateFlatAST, generateCode} = require('flast');
+const generateScriptHash = require(__dirname + '/generateScriptHash');
 
 /**
  * Run functions which modify the script in a loop until they are no long effective or the maximum number of cycles is reached.
@@ -17,9 +18,10 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = {
 		while (scriptSnapshot !== script && iterationsCounter < maxIterations) {
 			const cycleStartTime = Date.now();
 			scriptSnapshot = script;
+			const scriptHash = generateScriptHash(script);
+			arborist.ast.forEach(n => n.scriptHash = scriptHash);   // Mark each node with the script hash to distinguish cache of different scripts.
 			let lastNumberOfChanges = 0;
 			// eslint-disable-next-line no-unused-vars
-			const cache = {};
 			for (const func of funcs) {
 				const funcStartTime = +new Date();
 				try {
