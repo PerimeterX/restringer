@@ -64,7 +64,7 @@ class REstringer {
 	}
 
 	/**
-	 * Determine the type of the obfuscation, and populate the appropriate pre and post processors.
+	 * Determine the type of the obfuscation, and populate the appropriate pre- and post- processors.
 	 */
 	determineObfuscationType() {
 		const detectedObfuscationType = detectObfuscation(this.script, false).slice(-1)[0];
@@ -146,7 +146,7 @@ class REstringer {
 
 	/**
 	 * Entry point for this class.
-	 * Determine obfuscation type and run the pre and post processors accordingly.
+	 * Determine obfuscation type and run the pre- and post- processors accordingly.
 	 * Run the deobfuscation methods in a loop until nothing more is changed.
 	 * Normalize script to make it more readable.
 	 * @param {boolean} clean (optional) Remove dead nodes after deobfuscation. Defaults to false.
