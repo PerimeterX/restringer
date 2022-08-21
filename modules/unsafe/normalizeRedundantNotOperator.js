@@ -1,4 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
+const {badValue} = require(__dirname + '/../config');
 const canUnaryExpressionBeResolved = require(__dirname + '/../utils/canUnaryExpressionBeResolved');
 
 /**
@@ -16,7 +17,7 @@ function normalizeRedundantNotOperator(arb, logger = {error: () => {}}) {
 	for (const c of candidates) {
 		if (canUnaryExpressionBeResolved(c.argument)) {
 			const newNode = evalInVm(c.src, logger);
-			arb.markNode(c, newNode);
+			if (newNode !== badValue) arb.markNode(c, newNode);
 		}
 	}
 	return arb;

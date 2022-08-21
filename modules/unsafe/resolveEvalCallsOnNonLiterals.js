@@ -1,5 +1,6 @@
 const {parseCode} = require('flast');
 const evalInVm = require(__dirname + '/evalInVm');
+const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
 
 /**
@@ -32,7 +33,7 @@ function resolveEvalCallsOnNonLiterals(arb) {
 				}
 			}
 		} catch {}
-		arb.markNode(targetNode, replacementNode);
+		if (replacementNode !== badValue) arb.markNode(targetNode, replacementNode);
 	}
 	return arb;
 }

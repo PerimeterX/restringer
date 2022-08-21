@@ -1,4 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
+const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
 const getDescendants = require(__dirname + '/../utils/getDescendants');
 
@@ -51,7 +52,7 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb) {
 						for (const rc of replacementCandidates) {
 							const src = `${context}\n${rc.src}`;
 							const newNode = evalInVm(src, logger);
-							arb.markNode(rc, newNode);
+							if (newNode !== badValue) arb.markNode(rc, newNode);
 						}
 					}
 				}

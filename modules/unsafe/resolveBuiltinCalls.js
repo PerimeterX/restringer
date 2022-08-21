@@ -1,4 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
+const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
@@ -39,7 +40,7 @@ function resolveBuiltinCalls(arb) {
 				}
 			} else {
 				const newNode = evalInVm(c.src, logger);
-				arb.markNode(c, newNode);
+				if (newNode !== badValue) arb.markNode(c, newNode);
 			}
 		} catch {}
 	}

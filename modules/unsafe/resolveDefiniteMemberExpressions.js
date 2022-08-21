@@ -1,4 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
+const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
 
 /**
@@ -16,8 +17,8 @@ function resolveDefiniteMemberExpressions(arb) {
 		['ArrayExpression', 'Literal'].includes(n.object.type) &&
 		(n.object?.value?.length || n.object?.elements?.length));
 	for (const c of candidates) {
-		const newValue = evalInVm(c.src, logger);
-		arb.markNode(c, newValue);
+		const newNode = evalInVm(c.src, logger);
+		if (newNode !== badValue) arb.markNode(c, newNode);
 	}
 	return arb;
 }
