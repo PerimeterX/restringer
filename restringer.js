@@ -261,7 +261,7 @@ class REstringer {
 						collectedContextIds.push(rn.nodeId);
 						collectedContext.push(rn);
 						examineStack.push(rn);
-						for (const cn of (rn.chileNodes || [])) {
+						for (const cn of (rn.childNodes || [])) {
 							examineStack.push(cn);
 						}
 					}
