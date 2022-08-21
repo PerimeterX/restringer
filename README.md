@@ -63,7 +63,6 @@ if (restringer.deobfuscate()) {
 
 ## Read More
 * [Processors](processors/README.md)
-* [Helpers](helpers/README.md)
 * [Tests](tests/README.md)
 * [Contribution guide](CONTRIBUTING.md)
 * [Obfuscation Detector](https://github.com/PerimeterX/obfuscation-detector/blob/main/README.md)
