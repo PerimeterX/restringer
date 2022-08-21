@@ -17,7 +17,7 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 ***
 
 ## Installation 
-Requires Node 17 or newer.
+Requires Node 16 or newer.
 ```bash
 git clone git@github.com:PerimeterX/restringer.git
 cd restringer
