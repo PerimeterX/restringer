@@ -1,3 +1,4 @@
+const defaultLogger = require(__dirname + '/../utils/logger');
 const {defaultMaxIterations} = require(__dirname + '/../config');
 const {Arborist, generateFlatAST, generateCode} = require('flast');
 const generateScriptHash = require(__dirname + '/generateScriptHash');
@@ -10,7 +11,7 @@ const generateScriptHash = require(__dirname + '/generateScriptHash');
  * @param {number?} maxIterations (optional) Stop the loop after this many iterations at most.
  * @return {string} The possibly modified script.
  */
-function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = {log: () => {}, error: () => {}}) {
+function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = defaultLogger) {
 	let scriptSnapshot = '';
 	let iterationsCounter = 0;
 	try {
