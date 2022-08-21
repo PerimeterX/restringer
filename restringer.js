@@ -4,12 +4,7 @@
 const fs = require('fs');
 const version = require(__dirname + '/package').version;
 const detectObfuscation = require('obfuscation-detector');
-const processors = require(__dirname + '/processors/processors');
-const {generateFlatAST, generateCode, Arborist} = require('flast');
-const {debugLog, debugErr, DEBUGMODEON} = require(__dirname + '/helpers/debugHelper');
-const {
-	propertiesThatModifyContent,
-} = require(__dirname + '/helpers/config');
+const processors = require(__dirname + '/processors');
 const {
 	utils: {
 		runLoop: staticRunLoop,

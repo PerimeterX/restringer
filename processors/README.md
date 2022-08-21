@@ -5,7 +5,7 @@ and performing any required modifications before (preprocessors) or after (postp
 The processors are created when necessary and are lazily loaded when a specific obfuscation type was detected
 which requires these additional processes.
 
-The mapping of obfuscation type to their processors can be found in the [processors.js](processors.js) file.
+The mapping of obfuscation type to their processors can be found in the [index.js](index.js) file.
 
 ## Available Processors
 Processor specifics can always be found in comments in the code.
