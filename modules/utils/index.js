@@ -7,6 +7,7 @@ module.exports = {
 	doesNodeContainRanges: require(__dirname + '/doesNodeContainRanges'),
 	generateScriptHash: require(__dirname + '/generateScriptHash'),
 	getCalleeName: require(__dirname + '/getCalleeName'),
+	getDeclarationWithContext: require(__dirname + '/getDeclarationWithContext'),
 	getDescendants: require(__dirname + '/getDescendants'),
 	getMainDeclaredObjectOfMemberExpression: require(__dirname + '/getMainDeclaredObjectOfMemberExpression'),
 	getObjType: require(__dirname + '/getObjType'),
