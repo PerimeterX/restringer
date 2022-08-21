@@ -4,9 +4,6 @@ const {unsafe: {evalInVm}, utils: {badValue}} = require(__dirname + '/../modules
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
-function replaceFunctionWithArray() {
-	return this.runLoop([parseArray]);
-}
 
 /**
  * Run the generating function and replace it with the actual array.
@@ -15,9 +12,11 @@ function replaceFunctionWithArray() {
  *   function getArr() {return ['One', 'Two', 'Three']};
  *   const a = getArr();
  *   console.log(`${a[0]} + ${a[1]} = ${a[2]}`);
+ * @param {Arborist} arb
+ * @return {Arborist}
  */
-function parseArray() {
-	const candidates = this._ast.filter(n =>
+function replaceFunctionWithArray(arb) {
+	const candidates = arb.ast.filter(n =>
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'CallExpression' &&
 		n.id?.references &&
@@ -26,9 +25,10 @@ function parseArray() {
 	for (const c of candidates) {
 		const newNode = evalInVm(c.init.src);
 		if (newNode !== badValue) {
-			this._markNode(c.init, newNode);
+			arb.markNode(c.init, newNode);
 		}
 	}
+	return arb;
 }
 
 module.exports = {

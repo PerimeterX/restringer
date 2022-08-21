@@ -435,12 +435,7 @@ class REstringer {
 	 * @param {Array<Function|string>} processors An array of either imported deobfuscation methods or the name of internal methods.
 	 */
 	_runProcessors(processors) {
-		const procs = [];
-		processors.forEach(proc => {
-			// Correctly bind references from the processors to REstringer methods.
-			procs.push(typeof proc === 'string' ? this[proc] : () => proc.bind(this)(this.script, this));
-		});
-		this.runLoop(procs, true);
+		processors.forEach(proc => this.script = staticRunLoop(this.script, [proc], 1));
 	}
 }
 
