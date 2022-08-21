@@ -1,5 +1,5 @@
 module.exports = {
-	utils: require('./utils'),
-	safe: require('./safe'),
-	unsafe: require('./unsafe'),
+	safe: require(__dirname + '/safe'),
+	unsafe: require(__dirname + '/unsafe'),
+	utils: require(__dirname + '/utils'),
 };

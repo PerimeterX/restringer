@@ -1,22 +1,12 @@
 const {generateCode, parseCode} = require('flast');
-
-const badValue = '--BAD-VAL--';   // Internal value used to indicate eval failed
-
-/**
- * @param {*} unknownObject
- * @return {string} The type of whatever object is provided if possible; empty string otherwise.
- */
-function getObjType(unknownObject) {
-	const match = ({}).toString.call(unknownObject).match(/\[object (.*)]/);
-	return match ? match[1] : '';
-}
-
+const {badValue} = require(__dirname + '/../config');
+const getObjType = require(__dirname + '/getObjType');
 
 /**
  * Create a node from a value by its type.
  * @param {*} value The value to be parsed into an ASTNode.
- * @param {object} logger (optional) logging functions.
- * @returns {ASTNode|string} The newly created node if successful; badValue string otherwise.
+ * @param {object?} logger (optional) logging functions.
+ * @returns {ASTNode|badValue} The newly created node if successful; badValue string otherwise.
  */
 function createNewNode(value, logger = {debugErr: () => {}}) {
 	let newNode = badValue;
@@ -100,8 +90,4 @@ function createNewNode(value, logger = {debugErr: () => {}}) {
 	return newNode;
 }
 
-module.exports = {
-	badValue,
-	getObjType,
-	createNewNode,
-};
+module.exports = createNewNode;

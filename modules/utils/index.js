@@ -1,0 +1,18 @@
+module.exports = {
+	areReferencesModified: require(__dirname + '/areReferencesModified'),
+	canUnaryExpressionBeResolved: require(__dirname + '/canUnaryExpressionBeResolved'),
+	createNewNode: require(__dirname + '/createNewNode'),
+	createOrderedSrc: require(__dirname + '/createOrderedSrc'),
+	doesBinaryExpressionContainOnlyLiterals: require(__dirname + '/doesBinaryExpressionContainOnlyLiterals'),
+	doesNodeContainRanges: require(__dirname + '/doesNodeContainRanges'),
+	getCalleeName: require(__dirname + '/getCalleeName'),
+	getDescendants: require(__dirname + '/getDescendants'),
+	getMainDeclaredObjectOfMemberExpression: require(__dirname + '/getMainDeclaredObjectOfMemberExpression'),
+	getObjType: require(__dirname + '/getObjType'),
+	isNodeInRanges: require(__dirname + '/isNodeInRanges'),
+	isNodeMarked: require(__dirname + '/isNodeMarked'),
+	logger: require(__dirname + '/logger'),
+	normalizeScript: require(__dirname + '/normalizeScript'),
+	runLoop: require(__dirname + '/runLoop'),
+	safeImplementations: require(__dirname + '/safeImplementations'),
+};
