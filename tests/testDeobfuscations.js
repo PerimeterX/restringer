@@ -31,12 +31,7 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {
-			try {
-				testCodeSample(`[${moduleName}] ${test.name}`.padEnd(90, '.'), test.source, test.expected);
-			} catch (e) {
-				console.log(e.message);
-				process.exit(1);
-			}
+			testCodeSample(`[${moduleName}] ${test.name}`.padEnd(90, '.'), test.source, test.expected);
 		} else {
 			skippedTests++;
 			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
