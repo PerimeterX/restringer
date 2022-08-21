@@ -14,7 +14,7 @@
     "vm2": "^3.9.5"
   },
   "scripts": {
-    "test": "node tests/testRestringer.js"
+    "test": "node --trace-warnings tests/testRestringer.js"
   },
   "repository": {
     "type": "git",
