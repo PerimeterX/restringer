@@ -19,7 +19,7 @@ function testCodeSample(testName, source, expected) {
 	assert((restringer.script === expected ||
 			restringer.script.replace(/'/g, '"') === expected.replace(/'/g, '"') ||
 			restringer.script.replace(/"/g, `'`) === expected.replace(/"/g, `'`)),
-	`FAIL: deobfuscation result !== expected:\n-------------\n${restringer.script}\n\t!==\n${expected}\n-------------`);
+	`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${restringer.script}\n\t!==\n${expected}\n-------------`);
 	console.timeEnd('PASS');
 }
 
@@ -31,7 +31,12 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {
-			testCodeSample(`[${moduleName}] ${test.name}`.padEnd(90, '.'), test.source, test.expected);
+			try {
+				testCodeSample(`[${moduleName}] ${test.name}`.padEnd(90, '.'), test.source, test.expected);
+			} catch (e) {
+				console.log(e.message);
+				process.exit(1);
+			}
 		} else {
 			skippedTests++;
 			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
