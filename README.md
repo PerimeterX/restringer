@@ -17,7 +17,7 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 ***
 
 ## Installation 
-Requires Node 17 or newer.
+Requires Node 16 or newer.
 ```bash
 git clone git@github.com:PerimeterX/restringer.git
 cd restringer
@@ -27,7 +27,7 @@ npm install
 ***
 
 ## Usage
-The [restringer.js](restringer.js) uses generic deobfuscation methods that reconstruct and restore obfuscated strings and simplifies redundant logic meant only to encumber.
+The [restringer.js](src/restringer.js) uses generic deobfuscation methods that reconstruct and restore obfuscated strings and simplifies redundant logic meant only to encumber.
 REstringer employs the [Obfuscation Detector](https://github.com/PerimeterX/obfuscation-detector/blob/main/README.md) to identify specific types of obfuscation for which
 there's a need to apply specific deobfuscation methods in order to circumvent anti-debugging mechanisms or other code traps
 preventing the script from being deobfuscated.   
@@ -47,14 +47,15 @@ log output. The default level is an arbitrary 50, simply to leave space for othe
 
 Level 1 is most verbose, level 2 is a good value to use for debugging.
 ### Use as a Module
+
 ```javascript
-const REstringer = require('restringer');
+const {REstringer} = require('restringer');
 
 const restringer = new REstringer('"RE" + "stringer"');
 if (restringer.deobfuscate()) {
-    console.log(restringer.script);
+  console.log(restringer.script);
 } else {
-    console.log('Nothing was deobfuscated :/');
+  console.log('Nothing was deobfuscated :/');
 }
 // Output: 'REstringer';
 ```
@@ -62,8 +63,7 @@ if (restringer.deobfuscate()) {
 ***
 
 ## Read More
-* [Processors](processors/README.md)
-* [Helpers](helpers/README.md)
+* [Processors](src/processors/README.md)
 * [Tests](tests/README.md)
 * [Contribution guide](CONTRIBUTING.md)
 * [Obfuscation Detector](https://github.com/PerimeterX/obfuscation-detector/blob/main/README.md)

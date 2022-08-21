@@ -20,15 +20,15 @@ The tests themselves are also divided into two categories:
    since they're targeting specific methods that should modify the code during the run.
 2. [Deobfuscating samples tests](obfuscated-samples.js). <br/>
    More like end-to-end testing, these tests run against different kinds of obfuscated scripts 
-   and verify all of the different deobfuscation methods are working well together and that the end result is properly deobfuscated.
+   and verify all the different deobfuscation methods are working well together and that the end result is properly deobfuscated.
 
-The [main test file](testRestringer.js) runs all of the tests, but it is also possible to run only one of the test types
+The [main test file](testRestringer.js) runs all the tests, but it is also possible to run only one of the test types
 by running either [testDeobfuscations.js](testDeobfuscations.js) or [testObfuscatedSamples.js](testObfuscatedSamples.js) to save time
 during development.
 
 ### testRestringer.js
 As stated above, [testRestringer.js](testRestringer.js) is the main test file, which loads the two tests files described below.
-It starts a timer to later report how long all of the tests took, and prints out the name of the test being run.
+It starts a timer to later report how long all the tests took, and prints out the name of the test being run.
 
 ### testDeobfuscations.js
 The [testDeobfuscations.js](testDeobfuscations.js) file contains the logic for testing specific deobfuscation methods.

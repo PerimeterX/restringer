@@ -1,5 +1,5 @@
 const assert = require('assert');
-const REstringer = require(__dirname + '/../restringer');
+const {REstringer} = require(__dirname + '/..');
 
 const tests = {
 	newTests: __dirname + '/deobfuscation-tests',
@@ -19,7 +19,7 @@ function testCodeSample(testName, source, expected) {
 	assert((restringer.script === expected ||
 			restringer.script.replace(/'/g, '"') === expected.replace(/'/g, '"') ||
 			restringer.script.replace(/"/g, `'`) === expected.replace(/"/g, `'`)),
-	`FAIL: deobfuscation result !== expected:\n-------------\n${restringer.script}\n\t!==\n${expected}\n-------------`);
+	`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${restringer.script}\n\t!==\n${expected}\n-------------`);
 	console.timeEnd('PASS');
 }
 
