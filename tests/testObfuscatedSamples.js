@@ -1,7 +1,7 @@
 const fs = require('fs');
 const assert = require('assert');
 const obfuscatedSamples = require(__dirname + '/obfuscated-samples');
-const REstringer = require(__dirname + '/../restringer');
+const {REstringer} = require(__dirname + '/..');
 
 
 const resourcePath = __dirname + '/resources';

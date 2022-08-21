@@ -1,5 +1,5 @@
 const assert = require('assert');
-const REstringer = require(__dirname + '/../restringer');
+const {REstringer} = require(__dirname + '/..');
 
 const tests = {
 	newTests: __dirname + '/deobfuscation-tests',

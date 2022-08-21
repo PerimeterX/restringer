@@ -2,7 +2,7 @@
 // noinspection JSValidateJSDoc
 
 const fs = require('fs');
-const version = require(__dirname + '/package').version;
+const version = require(__dirname + '/../package').version;
 const detectObfuscation = require('obfuscation-detector');
 const processors = require(__dirname + '/processors');
 const {
