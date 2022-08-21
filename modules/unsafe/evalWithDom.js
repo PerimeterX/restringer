@@ -3,6 +3,7 @@
 const fs = require('fs');
 const {NodeVM} = require('vm2');
 const {JSDOM} = require('jsdom');
+const defaultLogger = require(__dirname + '/../utils/logger');
 
 let jQuerySrc = '';
 
@@ -15,7 +16,7 @@ const cache = {};
  * @param {object} logger (optional) logging functions.
  * @return {string} The output string if successful; empty string otherwise.
  */
-function evalWithDom(stringToEval, injectjQuery = false, logger = {debugErr: () => {}}) {
+function evalWithDom(stringToEval, injectjQuery = false, logger = defaultLogger) {
 	const cacheName = `evalWithDom-${stringToEval}`;
 	if (!cache[cacheName]) {
 		let out = '';
@@ -46,7 +47,7 @@ function evalWithDom(stringToEval, injectjQuery = false, logger = {debugErr: () 
 			});
 			vm.run(runString);
 		} catch (e) {
-			logger.debugErr(`[-] Error in _evalWithDom: ${e}`, 1);
+			logger.error(`[-] Error in evalWithDom: ${e}`, 1);
 		}
 		cache[cacheName] = out;
 	}

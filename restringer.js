@@ -14,6 +14,7 @@ const {
 	utils: {
 		runLoop: staticRunLoop,
 		normalizeScript,
+		logger,
 	},
 	safe: {
 		normalizeEmptyStatements,
@@ -87,7 +88,7 @@ class REstringer {
 			if (relevantProcessors?.postprocessors?.length) this._postprocessors = relevantProcessors.postprocessors;
 			this.obfuscationName = detectedObfuscationType;
 		}
-		debugLog(`[+] Obfuscation type is ${this.obfuscationName}`);
+		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
 		return this.obfuscationName;
 	}
 
@@ -448,21 +449,21 @@ if (require.main === module) {
 			let content = fs.readFileSync(inputFilename, 'utf-8');
 			const startTime = Date.now();
 			const originalInputLength = content.length;
-			debugLog(`[!] Attempting to deobfuscate ${inputFilename} (length: ${originalInputLength})\n`);
+			logger.log(`[!] Attempting to deobfuscate ${inputFilename} (length: ${originalInputLength})\n`);
 
 			const restringer = new REstringer(content);
 			restringer.deobfuscate(argv[3] === '--clean');
 			const outputFilename = `${inputFilename}-${restringer.obfuscationName}-deob.js`;
 			if (restringer.modified) {
-				debugLog(`[+] Output saved to ${outputFilename}\n\tLength: ${restringer.script.length} ` +
+				logger.log(`[+] Output saved to ${outputFilename}\n\tLength: ${restringer.script.length} ` +
 					`(difference is ${restringer.script.length - content.length})\n\tChanges: ${restringer.totalChangesCounter}`);
-				debugLog(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds`);
-				if (DEBUGMODEON) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
+				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds`);
+				if (logger.isDebugModeOn) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
-			} else debugLog(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
+			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
 		} else console.log('Usage:\n\trestringer.js obfuscated.js \t\t# Print deobfuscated file to stdout\n\t' +
 			'restringer.js obfuscated.js --clean \t# Print deobfuscated file to stdout and remove dead nodes');
 	} catch (e) {
-		debugErr(`[-] Critical Error: ${e}`);
+		logger.error(`[-] Critical Error: ${e}`);
 	}
 }

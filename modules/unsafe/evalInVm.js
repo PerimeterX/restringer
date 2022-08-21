@@ -1,5 +1,6 @@
 const {VM} = require('vm2');
 const {badValue} = require(__dirname + '/../config');
+const defaultLogger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 
@@ -40,7 +41,7 @@ const cache = {};
  * @param {object} logger (optional) logging functions.
  * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
  */
-function evalInVm(stringToEval, logger = {error: () => {}}) {
+function evalInVm(stringToEval, logger = defaultLogger) {
 	const cacheName = `eval-${stringToEval}`;
 	if (cache[cacheName] === undefined) {
 		cache[cacheName] = badValue;
