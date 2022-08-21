@@ -2,27 +2,23 @@
 // noinspection JSValidateJSDoc
 
 const fs = require('fs');
-const {VM} = require('vm2');
 const version = require(__dirname + '/package').version;
 const detectObfuscation = require('obfuscation-detector');
 const processors = require(__dirname + '/processors/processors');
-const {generateFlatAST, parseCode, generateCode, Arborist} = require('flast');
+const {generateFlatAST, generateCode, Arborist} = require('flast');
 const {debugLog, debugErr, DEBUGMODEON} = require(__dirname + '/helpers/debugHelper');
 const {
-	badTypes,
-	trapStrings,
-	disableObjects,
-	badIdentifierCharsRegex,
 	propertiesThatModifyContent,
 } = require(__dirname + '/helpers/config');
 const {
 	utils: {
 		runLoop: staticRunLoop,
-		logger,
+		normalizeScript,
 	},
 	safe: {
 		normalizeEmptyStatements,
 		consolidateNestedBlockStatements,
+		removeDeadNodes,
 		resolveRedundantLogicalExpressions,
 		resolveMemberExpressionReferencesToArrayIndex,
 		resolveMemberExpressionsWithDirectAssignment,
@@ -57,7 +53,6 @@ process.on('uncaughtException', () => {});
 class REstringer {
 	static __version__ = version;
 	badValue = '--BAD-VAL--';   // Internal value used to indicate eval failed
-	validIdentifierBeginning = /^[A-Za-z$_]/;
 
 	/**
 	 * @param {string} script The target script to be deobfuscated
@@ -69,7 +64,6 @@ class REstringer {
 		this.modified = false;
 		this.obfuscationName = 'Generic';
 		this._cache = {};            // Generic cache
-		this._evalCache = {};        // Sticky cache for eval results
 		this.cyclesCounter = 0;      // Used for logging
 		this.totalChangesCounter = 0;
 		// Required to avoid infinite loops, but it's good to keep the number high
@@ -98,107 +92,6 @@ class REstringer {
 	}
 
 	// * * * * * * Helper Methods * * * * * * * * //
-
-	/**
-	 * Make the script more readable without actually deobfuscating or affecting its functionality.
-	 */
-	_normalizeScript() {
-		debugLog(`[!] Started script normalization...`, 2);
-		const startTime = Date.now();
-		this.runLoop([
-			this._normalizeComputed,
-			this._normalizeRedundantNotOperator,
-			this._normalizeEmptyStatements,
-		]);
-		debugLog(`[!] --> Normalization took ${(Date.now() - startTime) / 1000} seconds`, 2);
-	}
-
-	/**
-	 * Change all member expressions and class methods which has a property which can support it - to non-computed.
-	 * E.g.
-	 *   console['log'] -> console.log
-	 */
-	_normalizeComputed() {
-		const candidates = this._ast.filter(n =>
-			n.computed &&   // This will keep only member expressions using bracket notation
-			// Ignore member expressions with properties which can't be non-computed, like arr[2] or window['!obj']
-			// or those having another variable reference as their property like window[varHoldingFuncName]
-			(n.type === 'MemberExpression' &&
-				n.property.type === 'Literal' &&
-				this.validIdentifierBeginning.test(n.property.value) &&
-				!badIdentifierCharsRegex.exec(n.property.value)) ||
-			/**
-			 * Ignore the same cases for method names and object properties, for example
-			 * class A {
-			 *  ['!hello']() {} // Can't change the name of this method
-			 *  ['miao']() {}   // This can be changed to 'miao() {}'
-			 *  }
-			 *  const obj = {
-			 *    ['!hello']: 1,  // Will be ignored
-			 *    ['miao']: 4     // Will be changed to 'miao: 4'
-			 *  };
-			 */
-			(['MethodDefinition', 'Property'].includes(n.type) &&
-				n.key.type === 'Literal' &&
-				this.validIdentifierBeginning.test(n.key.value) &&
-				!badIdentifierCharsRegex.exec(n.key.value)));
-		for (const c of candidates) {
-			const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';
-			const nonComputed = Object.assign({}, c);
-			nonComputed.computed = false;
-			nonComputed[relevantProperty] = {
-				type: 'Identifier',
-				name: c[relevantProperty].value,
-			};
-			this._markNode(c, nonComputed);
-		}
-	}
-
-	/**
-	 * Remove unrequired empty statements.
-	 */
-	_normalizeEmptyStatements() {
-		const candidates = this._ast.filter(n => n.type === 'EmptyStatement');
-		for (const c of candidates) {
-			// A for loop is sometimes used to assign variables without providing a loop body, just an empty statement.
-			// If we delete that empty statement the syntax breaks
-			// e.g. for (var i = 0, b = 8;;); - this is a valid for statement.
-			if (!/For.*Statement/.test(c.parentNode.type)) this._markNode(c);
-		}
-	}
-
-	/**
-	 * Replace redundant not operators with actual value (e.g. !true -> false)
-	 */
-	_normalizeRedundantNotOperator() {
-		const relevantNodeTypes = ['Literal', 'ArrayExpression', 'ObjectExpression', 'UnaryExpression'];
-		const candidates = this._ast.filter(n =>
-			n.type === 'UnaryExpression' &&
-			relevantNodeTypes.includes(n.argument.type) &&
-			n.operator === '!');
-		for (const c of candidates) {
-			if (this._canUnaryExpressionBeResolved(c.argument)) {
-				const newNode = this._evalInVm(c.src);
-				this._markNode(c, newNode);
-			}
-		}
-	}
-
-	/**
-	 * Remove nodes code which is only declared but never used.
-	 * NOTE: This is a dangerous operation which shouldn't run by default, invokations of the so-called dead code
-	 * may be dynamically built during execution. Handle with care.
-	 */
-	removeDeadNodes() {
-		const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'FunctionDeclaration', 'ClassDeclaration'];
-		const candidates = this._ast.filter(n =>
-			n.type === 'Identifier' &&
-			relevantParents.includes(n.parentNode.type) &&
-			(!n?.declNode?.references?.length && !n?.references?.length)).map(n => n.parentNode);
-		for (const c of candidates) {
-			this._markNode(c);
-		}
-	}
 
 	/**
 	 * A wrapper for Arborist's markNode method that verifies replacement isn't a bad value before marking.
@@ -266,112 +159,7 @@ class REstringer {
 		return output;
 	}
 
-	/**
-	 * Create a node from a value by its type.
-	 * @returns {ASTNode|string} The created node if successful; badValue string otherwise
-	 */
-	_createNewNode(value) {
-		let newNode = this.badValue;
-		try {
-			if (![undefined, null].includes(value) && value.__proto__.constructor.name === 'Node') value = generateCode(value);
-			switch (this._getType(value)) {
-				case 'String':
-				case 'Number':
-				case 'Boolean':
-					if (['-', '+', '!'].includes(String(value)[0]) && String(value).length > 1) {
-						newNode = {
-							type: 'UnaryExpression',
-							operator: String(value)[0],
-							argument: this._createNewNode(String(value).substring(1)),
-						};
-					} else if (['Infinity', 'NaN'].includes(String(value))) {
-						newNode = {
-							type: 'Identifier',
-							name: String(value),
-						};
-					} else {
-						newNode = {
-							type: 'Literal',
-							value: value,
-							raw: String(value),
-						};
-					}
-					break;
-				case 'Array': {
-					const elements = [];
-					for (const el of Array.from(value)) {
-						elements.push(this._createNewNode(el));
-					}
-					newNode = {
-						type: 'ArrayExpression',
-						elements,
-					};
-					break;
-				}
-				case 'Object': {
-					const properties = [];
-					for (const [k, v] of Object.entries(value)) {
-						const key = this._createNewNode(k);
-						const val = this._createNewNode(v);
-						if ([key, val].includes(this.badValue)) {
-							// noinspection ExceptionCaughtLocallyJS
-							throw Error();
-						}
-						properties.push({
-							type: 'Property',
-							key,
-							value: val,
-						});
-					}
-					newNode = {
-						type: 'ObjectExpression',
-						properties,
-					};
-					break;
-				}
-				case 'Undefined':
-					newNode = {
-						type: 'Identifier',
-						name: 'undefined',
-					};
-					break;
-				case 'Null':
-					newNode = {
-						type: 'Literal',
-						raw: 'null',
-					};
-					break;
-				case 'Function': // Covers functions and classes
-					try {
-						newNode = parseCode(value).body[0];
-					} catch {}  // Probably a native function
-			}
-		} catch (e) {
-			debugErr(`[-] Unable to create a new node: ${e}`, 1);
-		}
-		return newNode;
-	}
-
 	// * * * * * * Getters * * * * * * * * //
-
-	/**
-	 * Extract and return the type of whatever object is provided
-	 * @param {*} unknownObject
-	 * @return {string}
-	 */
-	_getType(unknownObject) {
-		const match = ({}).toString.call(unknownObject).match(/\[object (.*)\]/);
-		return match ? match[1] : '';
-	}
-
-	/**
-	 * @param {ASTNode} callExpression
-	 * @return {string} The name of the identifier / value of the literal at the base of the call expression.
-	 */
-	_getCalleeName(callExpression) {
-		const callee = callExpression.callee?.object?.object || callExpression.callee?.object || callExpression.callee;
-		return callee.name || callee.value;
-	}
 
 	/**
 	 * @param {ASTNode} targetNode
@@ -491,59 +279,7 @@ class REstringer {
 		return cached;
 	}
 
-	/**
-	 * If this member expression is a part of another member expression - return the first parentNode
-	 * which has a declaration in the code.
-	 * E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be returned.
-	 * a.b.c.d --> if the candidate is c.d, the a identifier will be returned.
-	 * @param {ASTNode} memberExpression
-	 * @return {ASTNode} The main object object with an available declaration
-	 */
-	_getMainDeclaredObjectOfMemberExpression(memberExpression) {
-		let mainObject = memberExpression;
-		while (mainObject && !mainObject.declNode && mainObject.type === 'MemberExpression') mainObject = mainObject.object;
-		return mainObject;
-	}
-
 	// * * * * * * Booleans * * * * * * * * //
-
-	/**
-	 *
-	 * @param {ASTNode} binaryExpression
-	 * @return {boolean} true if ultimately the binary expression contains only literals; false otherwise
-	 */
-	_doesBinaryExpressionContainOnlyLiterals(binaryExpression) {
-		switch (binaryExpression.type) {
-			case 'BinaryExpression':
-				return this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.left) &&
-					this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.right);
-			case 'UnaryExpression':
-				return this._doesBinaryExpressionContainOnlyLiterals(binaryExpression.argument);
-			case 'Literal':
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @param argument
-	 * @return {boolean} true if unary expression's argument can be resolved (i.e. independent of other identifier); false otherwise.
-	 */
-	_canUnaryExpressionBeResolved(argument) {
-		switch (argument.type) {                    // Examples for each type of argument which can be resolved:
-			case 'ArrayExpression':
-				return !argument.elements.length;       // ![]
-			case 'ObjectExpression':
-				return !argument.properties.length;     // !{}
-			case 'Identifier':
-				return argument.name === 'undefined';   // !undefined
-			case 'TemplateLiteral':
-				return !argument.expressions.length;    // !`template literals with no expressions`
-			case 'UnaryExpression':
-				return this._canUnaryExpressionBeResolved(argument.argument);
-		}
-		return true;
-	}
 
 	/**
 	 * @param {ASTNode} targetNode
@@ -556,76 +292,6 @@ class REstringer {
 			if (nodeStart >= rangeStart && nodeEnd <= rangeEnd) return true;
 		}
 		return false;
-	}
-
-	/**
-	 * @param {ASTNode} targetNode
-	 * @param {number[][]} ranges
-	 * @return {boolean} true if any of the ranges provided is contained by the target node; false otherwise.
-	 */
-	_doesNodeContainRanges(targetNode, ranges) {
-		const [nodeStart, nodeEnd] = targetNode.range;
-		for (const [rangeStart, rangeEnd] of ranges) {
-			if (nodeStart <= rangeStart && nodeEnd >= rangeEnd) return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @param {ASTNode[]} refs
-	 * @return {boolean} true if any of the references might modify the original value; false otherwise.
-	 */
-	_areReferencesModified(refs) {
-		// Verify no reference is on the left side of an assignment
-		return Boolean(refs.filter(r => r.parentNode.type === 'AssignmentExpression' && r.parentKey === 'left').length ||
-			// Verify no reference is part of an update expression
-			refs.filter(r => r.parentNode.type === 'UpdateExpression').length ||
-			// Verify no variable with the same name is declared in a subscope
-			refs.filter(r => r.parentNode.type === 'VariableDeclarator' && r.parentKey === 'id').length ||
-			// Verify there are no member expressions among the references which are being assigned to
-			refs.filter(r => r.type === 'MemberExpression' &&
-				(this._ast.filter(n => n.type === 'AssignmentExpression' && n.left.src === r.src &&
-					([r.object.declNode?.nodeId, r.object?.nodeId].includes(n.left.object.declNode?.nodeId)))).length).length ||
-			// Verify no modifying calls are executed on any of the references
-			refs.filter(r => r.parentNode.type === 'MemberExpression' &&
-				r.parentNode.parentNode.type === 'CallExpression' &&
-				r.parentNode.parentNode.callee?.object?.nodeId === r.nodeId &&
-				propertiesThatModifyContent.includes(r.parentNode.property?.value || r.parentNode.property?.name)).length);
-	}
-
-	// * * * * * * Evals * * * * * * * * //
-
-	/**
-	 * Eval a string in a ~safe~ VM environment
-	 * @param {string} stringToEval
-	 * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
-	 */
-	_evalInVm(stringToEval) {
-		const vmOptions = {
-			timeout: 5 * 1000,
-			sandbox: {...disableObjects},
-		};
-		const cacheName = `eval-${stringToEval}`;
-		if (this._evalCache[cacheName] === undefined) {
-			this._evalCache[cacheName] = this.badValue;
-			try {
-				// Break known trap strings
-				for (const ts of trapStrings) {
-					stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
-				}
-				const res = (new VM(vmOptions)).run(stringToEval);
-				if (!res.VMError && !badTypes.includes(this._getType(res))) {
-					// To exclude results based on randomness or timing, eval again and compare results
-					const res2 = (new VM(vmOptions)).run(stringToEval);
-					if (JSON.stringify(res) === JSON.stringify(res2)) {
-						this._evalCache[cacheName] = this._createNewNode(res);
-					}
-				}
-			} catch (e) {
-				debugErr(`[-] Error in _evalInVm: ${e}`, 1);
-			}
-		}
-		return this._evalCache[cacheName];
 	}
 
 	// * * * * * * Main * * * * * * * * //
@@ -730,12 +396,12 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = staticRunLoop(this.script, this._safeDeobfuscationMethods(), undefined, logger);
+			script = staticRunLoop(this.script, this._safeDeobfuscationMethods());
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
 			}
-			script = staticRunLoop(this.script, this._unsafeDeobfuscationMethods(), 1, logger);
+			script = staticRunLoop(this.script, this._unsafeDeobfuscationMethods(), 1);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -758,8 +424,8 @@ class REstringer {
 		this._runProcessors(this._preprocessors);
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
-		if (this.normalize) this._normalizeScript();
-		if (clean) this.runLoop([this.removeDeadNodes]);
+		if (this.normalize) this.script = normalizeScript(this.script);
+		if (clean) this.script = staticRunLoop(this.script, [removeDeadNodes]);
 		return this.modified;
 	}
 
