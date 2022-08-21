@@ -13,6 +13,9 @@ const skipIdentifiers = [
 	'Promise', 'Error', 'fetch', 'XMLHttpRequest'
 ];
 
+// Types of objects which can't be resolved in the deobfuscation context.
+const badTypes = ['Promise'];
+
 // Builtin functions that shouldn't be resolved in the deobfuscation context.
 const skipBuiltinFunctions = ['Function', 'eval', 'Array', 'Object', 'fetch', 'XMLHttpRequest', 'Promise'];
 
@@ -25,11 +28,36 @@ const skipProperties = [
 	'getMilliseconds', ...propertiesThatModifyContent,
 ];
 
+// APIs that should be disabled when running scripts in eval to avoid inconsistencies.
+const disableObjects = {
+	Date: {},
+	debugger: {},
+};
+
+// Rules for diffusing code traps.
+const trapStrings = [
+	{
+		trap: /while\s*\(\s*(true|1)\s*\)\s*\{\s*\}/gi,
+		replaceWith: 'while (0) {}',
+	},
+	{
+		trap: /debugger/gi,
+		replaceWith: 'debugge_',
+	},
+	{   // TODO: Add as many permutations of this in an efficient manner
+		trap: /["']debu["']\s*\+\s*["']gger["']/gi,
+		replaceWith: `"debu" + "gge_"`,
+	},
+];
+
 module.exports = {
+	badTypes,
 	skipProperties,
+	disableObjects,
 	skipIdentifiers,
 	badArgumentTypes,
 	badIdentifierCharsRegex,
 	skipBuiltinFunctions,
 	propertiesThatModifyContent,
+	trapStrings,
 };
