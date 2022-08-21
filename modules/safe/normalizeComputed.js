@@ -29,7 +29,7 @@ function normalizeComputed(arb) {
 		 */
 		(['MethodDefinition', 'Property'].includes(n.type) &&
 			n.key.type === 'Literal' &&
-			this.validIdentifierBeginning.test(n.key.value) &&
+			validIdentifierBeginning.test(n.key.value) &&
 			!badIdentifierCharsRegex.exec(n.key.value)));
 	for (const c of candidates) {
 		const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';
