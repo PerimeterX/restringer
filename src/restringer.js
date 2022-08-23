@@ -12,6 +12,7 @@ const {
 		logger,
 	},
 	safe: {
+		resolveProxyCalls,
 		normalizeEmptyStatements,
 		consolidateNestedBlockStatements,
 		removeDeadNodes,
@@ -84,6 +85,7 @@ class REstringer {
 	_safeDeobfuscationMethods() {
 		return [
 			normalizeEmptyStatements,
+			resolveProxyCalls,
 			consolidateNestedBlockStatements,
 			resolveRedundantLogicalExpressions,
 			resolveMemberExpressionReferencesToArrayIndex,

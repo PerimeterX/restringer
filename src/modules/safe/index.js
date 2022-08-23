@@ -13,6 +13,7 @@ module.exports = {
 	resolveFunctionConstructorCalls: require(__dirname + '/resolveFunctionConstructorCalls'),
 	resolveMemberExpressionReferencesToArrayIndex: require(__dirname + '/resolveMemberExpressionReferencesToArrayIndex'),
 	resolveMemberExpressionsWithDirectAssignment: require(__dirname + '/resolveMemberExpressionsWithDirectAssignment'),
+	resolveProxyCalls: require(__dirname + '/resolveProxyCalls'),
 	resolveProxyReferences: require(__dirname + '/resolveProxyReferences'),
 	resolveRedundantLogicalExpressions: require(__dirname + '/resolveRedundantLogicalExpressions'),
 	unwrapFunctionShells: require(__dirname + '/unwrapFunctionShells'),
