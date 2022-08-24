@@ -15,9 +15,10 @@ let iterationsCounter = 0;
  */
 function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = defaultLogger) {
 	let scriptSnapshot = '';
+	let currentIteration = 0;
 	try {
 		let arborist = new Arborist(generateFlatAST(script), logger.log);
-		while (scriptSnapshot !== script && iterationsCounter < maxIterations) {
+		while (scriptSnapshot !== script && currentIteration < maxIterations) {
 			const cycleStartTime = Date.now();
 			scriptSnapshot = script;
 			const scriptHash = generateScriptHash(script);
@@ -45,6 +46,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 			if (changesMade) {
 				script = generateCode(arborist.ast[0]);
 			}
+			++currentIteration;
 			++iterationsCounter;
 			logger.log(`[+] ==> Cycle ${iterationsCounter} completed in ${(Date.now() - cycleStartTime) / 1000} seconds` +
 				` with ${changesMade ? changesMade : 'no'} changes (${arborist.ast.length} nodes)`);
