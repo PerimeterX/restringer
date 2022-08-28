@@ -22,10 +22,12 @@ function replaceCallExpressionsWithUnwrappedIdentifier(arb) {
 				for (const ref of c.callee.declNode.references) {
 					arb.markNode(ref.parentNode, declBody);
 				}
+			} else if (declBody.type === 'BlockStatement' && declBody.body.length === 1 && declBody.body[0].type === 'ReturnStatement') {
+				const arg = declBody.body[0].argument;
+				if (arg.type === 'Identifier' || (arg.type === 'CallExpression' && !arg.arguments.length)) {
+					arb.markNode(c, arg);
+				}
 			}
-		} else if (declBody.length === 1) {
-			// TODO: complete
-			//       Cases where there's only a single return statement in the block statement
 		}
 	}
 	return arb;
