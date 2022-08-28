@@ -42,12 +42,18 @@ module.exports = [
 		expected: `var b = 12;\nconsole.log(b);`,
 	},
 	{
-		enabled: false,
-		reason: 'TODO: Implement',
+		enabled: true,
 		name: 'replaceCallExpressionsWithUnwrappedIdentifier - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceCallExpressionsWithUnwrappedIdentifier',
-		source: 'function f1(a, b) {return f2(a, b)}\nfunction f2(c, d) {return c + d;}\nf1(2, 3)',
-		expected: `function a() {return String}\nString(val);`,
+		source: `const a = () => btoa; a()('yo');`,
+		expected: `const a = () => btoa;\nbtoa('yo');`,
+	},
+	{
+		enabled: true,
+		name: 'replaceCallExpressionsWithUnwrappedIdentifier - TP-2',
+		func: __dirname + '/../src/modules/safe/replaceCallExpressionsWithUnwrappedIdentifier',
+		source: `function a() {return btoa;} a()('yo');`,
+		expected: `function a() {\n  return btoa;\n}\nbtoa('yo');`,
 	},
 	{
 		enabled: true,
