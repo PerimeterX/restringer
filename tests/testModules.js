@@ -5,20 +5,24 @@ const tests = {
 	modulesTests: __dirname + '/modules-tests',
 };
 
+const defaultPrepTest = c => [new Arborist(generateFlatAST(c))];
+const defaultPrepRes = arb => {arb.applyChanges(); return generateCode(arb.ast[0]);};
+
 /**
  * Generic function for verifying source code is deobfuscated as expected.
  * @param testName {string} - The name of the test to be displayed.
  * @param testFunc {function} - The tested function.
  * @param source {string}   - The source code to be deobfuscated.
  * @param expected {string} - The expected output.
+ * @param prepTest {function} - (optional) Function for preparing the test input.
+ * @param prepRes {function} - (optional) Function for parsing the test output.
  */
-function testModule(testName, testFunc, source, expected) {
+function testModule(testName, testFunc, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
 	process.stdout.write(`Testing ${testName}... `);
 	console.time('PASS');
-	const arborist = new Arborist(generateFlatAST(source));
-	testFunc(arborist);
-	arborist.applyChanges();
-	const result = generateCode(arborist.ast[0]);
+	const testInput = prepTest(source);
+	const rawRes = testFunc(...testInput);
+	const result = prepRes(rawRes);
 	assert((result === expected ||
 			result.replace(/'/g, '"') === expected.replace(/'/g, '"') ||
 			result.replace(/"/g, `'`) === expected.replace(/"/g, `'`)),
@@ -34,7 +38,7 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {
-			testModule(`[${moduleName}] ${test.name}`.padEnd(90, '.'), require(test.func), test.source, test.expected);
+			testModule(`[${moduleName}] ${test.name}`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;
 			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
