@@ -6,7 +6,7 @@ const logger = require(__dirname + '/../utils/logger');
 /**
  * Resolve eval call expressions where the argument isn't a literal.
  * E.g.
- * eval(function() {return 'value'})() // <-- will be resolved into 'value'
+ * eval(function() {return 'atob'}()); // <-- will be resolved into 'atob'
  * @param {Arborist} arb
  * @return {Arborist}
  */
