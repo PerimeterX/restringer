@@ -46,6 +46,6 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	}
 }
 if (skippedTests > 0) {
-	process.stdout.write(`Completed ${allTests - skippedTests}/${allTests} (${skippedTests} skipped) deobfuscation `);
-} else process.stdout.write(`Completed ${allTests} deobfuscation `);
+	process.stdout.write(`Completed ${allTests - skippedTests}/${allTests} (${skippedTests} skipped) modules `);
+} else process.stdout.write(`Completed ${allTests} modules `);
 console.timeEnd('tests in');
