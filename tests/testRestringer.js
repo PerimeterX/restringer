@@ -1,5 +1,5 @@
 const availableTests = {
-	'Modules': __dirname + '/testModules',
+	Modules: __dirname + '/testModules',
 	Deobfuscation: __dirname + '/testDeobfuscations',
 	'Obfuscated Sample': __dirname + '/testObfuscatedSamples',
 };
