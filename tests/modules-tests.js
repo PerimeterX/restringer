@@ -1,3 +1,5 @@
+const {generateFlatAST} = require('flast');
+
 module.exports = [
 	// Safe
 	{
@@ -322,7 +324,45 @@ module.exports = [
 		enabled: true,
 		name: 'resolveMinimalAlphabet - TN-1',
 		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
-		source: `-false; -[]; +{}; -{}; -'a'; ~{}; -['']; +[1, 2]; +this; +[this]`,
+		source: `-false; -[]; +{}; -{}; -'a'; ~{}; -['']; +[1, 2]; +this; +[this];`,
 		expected: `-false;\n-[];\n+{};\n-{};\nNaN;\n~{};\n-[''];\nNaN;\n+this;\n+[this];`,
+	},
+
+	// Utils
+	{
+		enabled: true,
+		name: 'areReferencesModified - TP-1',
+		func: __dirname + '/../src/modules/utils/areReferencesModified',
+		prepareTest: src => {
+			const ast = generateFlatAST(src);
+			return [ast, ast.find(n => n.src === 'a = 1').id.references];
+		},
+		prepareResult: b => b,
+		source: `let a = 1; let b = 2 + a, c = a + 3; a++;`,
+		expected: true,
+	},
+	{
+		enabled: true,
+		name: 'areReferencesModified - TP-2',
+		func: __dirname + '/../src/modules/utils/areReferencesModified',
+		prepareTest: src => {
+			const ast = generateFlatAST(src);
+			return [ast, ast.find(n => n.src === 'a = 1').id.references];
+		},
+		prepareResult: b => b,
+		source: `let a = 1; let b = 2 + a, c = (a += 2) + 3;`,
+		expected: true,
+	},
+	{
+		enabled: true,
+		name: 'areReferencesModified - TN-1',
+		func: __dirname + '/../src/modules/utils/areReferencesModified',
+		prepareTest: src => {
+			const ast = generateFlatAST(src);
+			return [ast, ast.find(n => n.src === 'a = 1').id.references];
+		},
+		prepareResult: b => b,
+		source: `const a = 1; let b = 2 + a, c = a + 3;`,
+		expected: false,
 	},
 ];
