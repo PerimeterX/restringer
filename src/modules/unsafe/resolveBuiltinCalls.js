@@ -31,6 +31,7 @@ function resolveBuiltinCalls(arb) {
 	for (const c of candidates) {
 		try {
 			const callee = c.callee;
+			if (callee?.declNode) continue;
 			const safeImplementation = safeImplementations[callee.name];
 			if (safeImplementation) {
 				const args = c.arguments.map(a => a.value);
