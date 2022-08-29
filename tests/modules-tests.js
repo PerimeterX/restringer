@@ -305,11 +305,24 @@ module.exports = [
 		expected: `btoa('a');`,
 	},
 	{
-		enabled: false,
-		reason: 'TODO: Implement',
+		enabled: true,
 		name: 'resolveMinimalAlphabet - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
-		source: `btoa('a');`,
-		expected: ``,
+		source: `+true; -true; +false; +[]; ~true; ~false; ~[]; +[3]; +['']; -[4]; ![]; +[[]];`,
+		expected: `1;\n-'1';\n0;\n0;\n-'2';\n-'1';\n-'1';\n3;\n0;\n-'4';\nfalse;\n0;`,
+	},
+	{
+		enabled: true,
+		name: 'resolveMinimalAlphabet - TP-2',
+		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
+		source: `[] + []; [+[]]; (![]+[]); +[!+[]+!+[]];`,
+		expected: `'';\n[0];\n'false';\n2;`,
+	},
+	{
+		enabled: true,
+		name: 'resolveMinimalAlphabet - TN-1',
+		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
+		source: `-false; -[]; +{}; -{}; -'a'; ~{}; -['']; +[1, 2]; +this; +[this]`,
+		expected: `-false;\n-[];\n+{};\n-{};\nNaN;\n~{};\n-[''];\nNaN;\n+this;\n+[this];`,
 	},
 ];
