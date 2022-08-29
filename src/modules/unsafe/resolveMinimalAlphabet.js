@@ -1,9 +1,10 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
+const getDescendants = require(__dirname + '/../utils/getDescendants');
 
 /**
- * Resolve unary expressions on values which aren't numbers such as +true, -false, +[], +[...], etc,
+ * Resolve unary expressions on values which aren't numbers such as +true, +[], +[...], etc,
  * as well as binary expressions around the + operator. These usually resolve to string values,
  * which can be used to obfuscate code in schemes such as JSFuck.
  * @param {Arborist} arb
@@ -19,6 +20,7 @@ function resolveMinimalAlphabet(arb) {
 			(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
 			![n.left?.type, n.right?.type].includes('ThisExpression')));
 	for (const c of candidates) {
+		if (getDescendants(c).find(n => n.type === 'ThisExpression')) continue;
 		const newNode = evalInVm(c.src, logger);
 		if (newNode !== badValue) {
 			arb.markNode(c, newNode);
