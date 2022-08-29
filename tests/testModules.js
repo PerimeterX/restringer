@@ -23,10 +23,8 @@ function testModule(testName, testFunc, source, expected, prepTest = defaultPrep
 	const testInput = prepTest(source);
 	const rawRes = testFunc(...testInput);
 	const result = prepRes(rawRes);
-	assert((result === expected ||
-			result.replace(/'/g, '"') === expected.replace(/'/g, '"') ||
-			result.replace(/"/g, `'`) === expected.replace(/"/g, `'`)),
-	`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${result}\n\t!==\n${expected}\n-------------`);
+	assert(result === expected,
+		`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${result}\n\t!==\n${expected}\n-------------`);
 	console.timeEnd('PASS');
 }
 
