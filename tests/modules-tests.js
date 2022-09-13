@@ -110,6 +110,14 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveMemberExpressionReferencesToArrayIndex - TN-1',
+		func: __dirname + '/../src/modules/safe/resolveMemberExpressionReferencesToArrayIndex',
+		source: `const a = [1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,3];  b = a['indexOf']; c = a['length'];`,
+		expected: `const a = [\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,
+  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  3\n];\nb = a['indexOf'];\nc = a['length'];`,
+	},
+	{
+		enabled: true,
 		name: 'resolveMemberExpressionsWithDirectAssignment - TP-1',
 		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
 		source: `function a() {} a.b = 3; a.c = '5'; console.log(a.b + a.c);`,
