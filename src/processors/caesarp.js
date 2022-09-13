@@ -11,13 +11,17 @@ const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;
  *    creating elements, concatenating strings to their innerHTML properties, base64 decoding and concatenating again,
  *    it assigns the resulting string to a variable's toString method and then implicitly invokes it.
  *    E.g.
- *    const a = document.createElement('div');
- *    const b = 'Y29uc29sZS5sb2co';
- *    const c = 'IlJFc3RyaW5nZXIiKQ==';
- *    a.innerHTML = b + c;
- *    var d = {};
- *    d.toString = ''.constructor.constructor(atob(a.innerHTML))
- *    d = d + "this will execute d's toString method";
+ *    (function() {
+ *      const a = document.createElement('div');
+ *     const b = 'Y29uc29sZS5sb2co';
+ *     const c = 'IlJFc3RyaW5nZXIiKQ==';
+ *     a.innerHTML = b + c;
+ *     const atb = window.atob || function (val) {return Buffer.from(val, 'base64').toString()};
+ *     let dbt = {};
+ *     const abc = a.innerHTML;
+ *     dbt['toString'] = ''.constructor.constructor(atb(abc));
+ *     dbt = dbt + "this will execute dbt's toString method";
+ *    })();
  *
  * 2. The inner layer contains a cnc check and other run-time limiters,
  *    but also the original target code, still obfuscated.
