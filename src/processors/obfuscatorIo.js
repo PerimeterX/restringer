@@ -4,6 +4,8 @@
  */
 const augmentedArrayProcessors = require(__dirname + '/augmentedArray');
 
+const freezeReplacementString = 'function () {return "bypassed!"}';
+
 /**
  * The debug protection in this case revolves around detecting the script has been beautified by testing a function's
  * toString against a regex. If the text fails the script creates an infinte loop which prevents the script from running.
@@ -12,7 +14,6 @@ const augmentedArrayProcessors = require(__dirname + '/augmentedArray');
  * @return {Arborist}
  */
 function freezeUnbeautifiedValues(arb) {
-	const replacementString = 'function () {return "bypassed!"}';
 	const candidates = arb.ast.filter(n =>
 		n.type === 'Literal' && ['newState', 'removeCookie'].includes(n.value));
 	for (const c of candidates) {
@@ -30,8 +31,8 @@ function freezeUnbeautifiedValues(arb) {
 		if (targetNode) {
 			arb.markNode(targetNode, {
 				type: 'Literal',
-				value: replacementString,
-				raw: `"${replacementString}"`,
+				value: freezeReplacementString,
+				raw: `"${freezeReplacementString}"`,
 			});
 		}
 	}
