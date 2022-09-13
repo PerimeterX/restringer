@@ -17,18 +17,13 @@ function resolveMemberExpressionReferencesToArrayIndex(arb, logger) {
 		n.init.elements.length > minArrayLength);
 	for (const c of candidates) {
 		const refs = c.id.references.map(n => n.parentNode);
-		if (!refs.filter(n =>
-			(n.property && n.property?.type !== 'Literal') ||
-			Number.isNaN(parseInt(n.property)).length).length) {
-			for (const ref of refs) {
-				if ((ref.parentNode.type === 'AssignmentExpression' &&
-						ref.parentKey === 'left') ||
-					ref.type !== 'MemberExpression') continue;
-				try {
-					arb.markNode(ref, c.init.elements[parseInt(ref.property.value)]);
-				} catch (e) {
-					logger.error(`[-] Unable to mark node for replacement: ${e}`, 1);
-				}
+		for (const ref of refs) {
+			if ((ref.parentNode.type === 'AssignmentExpression' && ref.parentKey === 'left') || ref.type !== 'MemberExpression') continue;
+			else if ((ref.property && ref.property.type !== 'Literal') || Number.isNaN(parseInt(ref.property?.value))) continue;
+			try {
+				arb.markNode(ref, c.init.elements[parseInt(ref.property.value)]);
+			} catch (e) {
+				logger.error(`[-] Unable to mark node for replacement: ${e}`, 1);
 			}
 		}
 	}
