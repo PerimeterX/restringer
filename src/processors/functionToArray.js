@@ -1,4 +1,15 @@
-const {unsafe: {evalInVm}, utils: {badValue}} = require(__dirname + '/../modules');
+const {
+	unsafe: {
+		evalInVm,
+	},
+	utils: {
+		createOrderedSrc,
+		getDeclarationWithContext,
+	},
+	config: {
+		badValue,
+	}
+} = require(__dirname + '/../modules');
 
 /**
  * Function To Array Replacements
@@ -20,10 +31,11 @@ function replaceFunctionWithArray(arb) {
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'CallExpression' &&
 		n.id?.references &&
-		n.id?.references.filter(r =>
-			r.parentNode.type === 'MemberExpression').length === n.id?.references.length);
+		n.id?.references.filter(r => r.parentNode.type === 'MemberExpression').length === n.id?.references.length);
 	for (const c of candidates) {
-		const newNode = evalInVm(c.init.src);
+		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
+		const src = createOrderedSrc(getDeclarationWithContext(targetNode).concat(c.init));
+		const newNode = evalInVm(src);
 		if (newNode !== badValue) {
 			arb.markNode(c.init, newNode);
 		}
