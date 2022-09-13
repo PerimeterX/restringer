@@ -2,7 +2,7 @@ const assert = require('assert');
 const {REstringer} = require(__dirname + '/..');
 
 const tests = {
-	newTests: __dirname + '/deobfuscation-tests',
+	genericDeobfuscationTests: __dirname + '/deobfuscation-tests',
 };
 
 /**
