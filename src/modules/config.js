@@ -18,12 +18,12 @@ const skipBuiltinFunctions = ['Function', 'eval', 'Array', 'Object', 'fetch', 'X
 // Identifiers that shouldn't be touched since they're either session-based or resolve inconsisstently.
 const skipIdentifiers = [
 	'window', 'this', 'self', 'document', 'module', '$', 'jQuery', 'navigator', 'typeof', 'new', 'Date', 'Math',
-	'Promise', 'Error', 'fetch', 'XMLHttpRequest'
+	'Promise', 'Error', 'fetch', 'XMLHttpRequest', 'performance',
 ];
 
 // Properties that shouldn't be resolved since they're either based on context which can't be determined or resolve inconsistently.
 const skipProperties = [
-	'test', 'exec', 'match', 'length', 'freeze', 'call', 'apply', 'create', 'getTime',
+	'test', 'exec', 'match', 'length', 'freeze', 'call', 'apply', 'create', 'getTime', 'now',
 	'getMilliseconds', ...propertiesThatModifyContent,
 ];
 
