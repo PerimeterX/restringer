@@ -1,4 +1,4 @@
 tests/resources
-helpers/jquery*.js
+jquery*.js
 *tmp*.*
 *tmp*/
