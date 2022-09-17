@@ -7,7 +7,8 @@ const availableTests = {
 console.time('\nAll tests completed in');
 let exception = '';
 for (const [testName, testFile] of Object.entries(availableTests)) {
-	console.log(`\n----------> ${testName} <----------`);
+	const padLength = Math.floor((120 - testName.length - 4) / 2);
+	console.log(`\n${'>'.padStart(padLength, '-')} ${testName} ${'<'.padEnd(padLength, '-')}`);
 	try {
 		require(testFile);
 	} catch (e) {
