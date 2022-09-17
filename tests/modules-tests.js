@@ -11,6 +11,20 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'consolidateNestedBlockStatements - TP-2',
+		func: __dirname + '/../src/modules/safe/consolidateNestedBlockStatements',
+		source: `if (a) {{do_a();}{do_b();}}`,
+		expected: `if (a) {\n  do_a();\n  do_b();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'consolidateNestedBlockStatements - TP-3',
+		func: __dirname + '/../src/modules/safe/consolidateNestedBlockStatements',
+		source: `if (a) {{do_a();}{do_b(); do_c();}{do_d();}}`,
+		expected: `if (a) {\n  do_a();\n  do_b();\n  do_c();\n  do_d();\n}`,
+	},
+	{
+		enabled: true,
 		name: 'normalizeComputed - TP-1',
 		func: __dirname + '/../src/modules/safe/normalizeComputed',
 		source: `hello['world'][0]['%32']['valid']`,
