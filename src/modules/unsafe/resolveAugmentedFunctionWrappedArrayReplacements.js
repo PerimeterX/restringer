@@ -31,7 +31,7 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb) {
 						arrRef = ac.declNode.parentNode?.parentNode || ac.declNode.parentNode;
 					}
 				} else if (ac.declNode.parentNode?.init?.type === 'CallExpression') {
-					arrRef = ac.declNode.parentNode.init.callee.declNode.parentNode;
+					arrRef = ac.declNode.parentNode.init.callee?.declNode?.parentNode;
 				}
 				if (arrRef) {
 					const arrRefId = ac.declNode.nodeId;
