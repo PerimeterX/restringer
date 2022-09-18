@@ -71,9 +71,3 @@ if (restringer.deobfuscate()) {
 * [Contribution guide](CONTRIBUTING.md)
 * [Obfuscation Detector](https://github.com/PerimeterX/obfuscation-detector/blob/main/README.md)
 * [flAST](https://github.com/PerimeterX/flast/blob/main/README.md)
-
-***
-
-## TODO
-- [ ] Replace environment variables with proper program arguments.
-- [ ] Create binary tool that can be installed via `npm install -g restringer`
