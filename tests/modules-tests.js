@@ -88,6 +88,13 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'replaceFunctionShellsWithWrappedValueIIFE - TP-1',
+		func: __dirname + '/../src/modules/safe/replaceFunctionShellsWithWrappedValueIIFE',
+		source: `(function a() {return String}\n)()(val);`,
+		expected: `String(val);`,
+	},
+	{
+		enabled: true,
 		name: 'replaceIdentifierWithFixedAssignedValue - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
 		source: `const a = 3; const b = a * 2; console.log(b + a);`,

@@ -7,6 +7,7 @@ module.exports = {
 	replaceCallExpressionsWithUnwrappedIdentifier: require(__dirname + '/replaceCallExpressionsWithUnwrappedIdentifier'),
 	replaceEvalCallsWithLiteralContent: require(__dirname + '/replaceEvalCallsWithLiteralContent'),
 	replaceFunctionShellsWithWrappedValue: require(__dirname + '/replaceFunctionShellsWithWrappedValue'),
+	replaceFunctionShellsWithWrappedValueIIFE: require(__dirname + '/replaceFunctionShellsWithWrappedValueIIFE'),
 	replaceIdentifierWithFixedAssignedValue: require(__dirname + '/replaceIdentifierWithFixedAssignedValue'),
 	replaceIdentifierWithFixedValueNotAssignedAtDeclaration: require(__dirname + '/replaceIdentifierWithFixedValueNotAssignedAtDeclaration'),
 	resolveDeterministicIfStatements: require(__dirname + '/resolveDeterministicIfStatements'),
