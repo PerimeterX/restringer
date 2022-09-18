@@ -1,4 +1,7 @@
 # Restringer
+[![Node.js CI](https://github.com/PerimeterX/restringer/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/PerimeterX/restringer/actions/workflows/node.js.yml)
+[![Downloads](https://img.shields.io/npm/dm/restringer.svg?maxAge=43200)](https://www.npmjs.com/package/restringer)
+
 Deobfuscate Javascript and reconstruct strings.
 Simplify cumbersome logic where possible while adhering to scope limitations.
 
