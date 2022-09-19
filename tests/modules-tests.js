@@ -123,6 +123,13 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveFunctionConstructorCalls - TN-1',
+		func: __dirname + '/../src/modules/safe/resolveFunctionConstructorCalls',
+		source: `a = Function.constructor('return /" + this + "/')().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');`,
+		expected: `a = Function.constructor('return /" + this + "/')().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');`,
+	},
+	{
+		enabled: true,
 		name: 'resolveMemberExpressionReferencesToArrayIndex - TP-1',
 		func: __dirname + '/../src/modules/safe/resolveMemberExpressionReferencesToArrayIndex',
 		source: `const a = [1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,3];  b = a[0]; c = a[20];`,
