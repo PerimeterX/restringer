@@ -83,6 +83,16 @@ function createNewNode(value, logger = {debugErr: () => {}}) {
 				try {
 					newNode = parseCode(value).body[0];
 				} catch {}  // Probably a native function
+				break;
+			case 'RegExp':
+				newNode = {
+					type: 'Literal',
+					regex: {
+						pattern: value.source,
+						flags: value.flags,
+					},
+				};
+				break;
 		}
 	} catch (e) {
 		logger.debugErr(`[-] Unable to create a new node: ${e}`, 1);
