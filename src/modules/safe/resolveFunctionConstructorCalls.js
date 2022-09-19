@@ -27,7 +27,7 @@ function resolveFunctionConstructorCalls(arb) {
 		// Generate an AST without nodeIds (to avoid duplicates with the rest of the code).
 		// Extract just the function expression from the AST.
 		const codeNode = generateFlatAST(`(function (${args}) {${c.arguments.slice(-1)[0].value}})`, {detailed: false})[2];
-		arb.markNode(c, codeNode);
+		if (codeNode) arb.markNode(c, codeNode);
 	}
 	return arb;
 }
