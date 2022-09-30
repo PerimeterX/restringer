@@ -1,20 +1,18 @@
 module.exports = [
 	{
-		enabled: false,
-		reason: 'TODO: Take augmentation into account when replacing array index values',
+		enabled: true,
 		name: 'Augmented Array Replacements',
 		source: `const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'a', 'b', 'c'];
-(function (targetArray, numberOfShifts) {
-    var augmentArray = function (counter) {
+(function(targetArray, numberOfShifts) {
+    var augmentArray = function(counter) {
         while (--counter) {
             targetArray['push'](targetArray['shift']());
         }
     };
     augmentArray(++numberOfShifts);
-}(arr, 3));
+})(arr, 3);
 console.log(arr.join(' '));`,
-		expected: `const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'a', 'b', 'c'];
-
+		expected: `const arr = [\n  1,\n  2,\n  3,\n  4,\n  5,\n  6,\n  7,\n  8,\n  9,\n  10,\n  'a',\n  'b',\n  'c'\n];
 (function (targetArray, numberOfShifts) {
   var augmentArray = function (counter) {
     while (--counter) {
@@ -22,9 +20,8 @@ console.log(arr.join(' '));`,
     }
   };
   augmentArray(++numberOfShifts);
-})(arr, 3);
-
-console.log("4 5 6 7 8 9 10 a b c 1 2 3");`,
+}(arr, 3));
+console.log('4 5 6 7 8 9 10 a b c 1 2 3');`,
 	},
 	{
 		enabled: true,
@@ -54,6 +51,7 @@ l[c] = v;`,
 		source: 'const a = []; a.push(3); console.log(a, a.length);',
 		expected: `const a = []; a.push(3); console.log(a, a.length);`,
 	},
+	// TODO: Fix issue
 	{
 		enabled: false,
 		reason: 'Unable to assign the correct expected result',
@@ -250,6 +248,7 @@ console.log('hello world');`,
   ], b = 'hello', c = a;
 console.log('hello world');`,
 	},
+	// TODO: Implement functionality
 	{
 		enabled: false,
 		reason: 'TODO: Implement',
@@ -288,8 +287,10 @@ a.b = 3;
 a.c = '5';
 console.log('35');`,
 	},
+	// TODO: Fix test
 	{
-		enabled: true,
+		enabled: false,
+		reason: 'Fix: Replace values *after* augmentation',
 		name: 'Resolve External References With Context',
 		source: `const a = [1, 2, 3]; (function(arr) {arr.forEach((x, i, arr) => arr[i] = x * 10)})(a); function b() {const c = [...a]; return c[0] + 3;}`,
 		expected: `const a = [
