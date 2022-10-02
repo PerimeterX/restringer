@@ -145,9 +145,9 @@ var _yh = _yg(this, function () {
     var b = a.constructor('return /" + this + "/')().compile('^([^ ]+( +[^ ]+)+)+[^ ]}');
     return !b.test(_yh);
   };
-  return true;
+  return a();
 });
-true;
+_yh();
 var _yi = function () {
   var a = true;
   return function (b, c) {
