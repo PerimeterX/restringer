@@ -18,6 +18,7 @@ function resolveDefiniteMemberExpressions(arb) {
 		['ArrayExpression', 'Literal'].includes(n.object.type) &&
 		(n.object?.value?.length || n.object?.elements?.length));
 	for (const c of candidates) {
+		if (c.parentNode.type === 'UpdateExpression') continue;   // Prevent replacing (++[[]][0]) with (++1)
 		const newNode = evalInVm(c.src, logger);
 		if (newNode !== badValue) arb.markNode(c, newNode);
 	}
