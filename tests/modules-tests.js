@@ -281,6 +281,13 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveDefiniteMemberExpressions - TN-1',
+		func: __dirname + '/../src/modules/unsafe/resolveDefiniteMemberExpressions',
+		source: `++[[]][0];`,
+		expected: `++[[]][0];`,
+	},
+	{
+		enabled: true,
 		name: 'resolveDeterministicConditionalExpressions - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveDeterministicConditionalExpressions',
 		source: `(true ? 1 : 2); (false ? 3 : 4);`,
