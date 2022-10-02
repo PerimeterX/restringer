@@ -1,9 +1,14 @@
 const isNodeMarked = require(__dirname + '/isNodeMarked');
-const getDescendants = require(__dirname + '/getDescendants');
 const isNodeInRanges = require(__dirname + '/isNodeInRanges');
+const generateScriptHash = require(__dirname + '/generateScriptHash');
 const {propertiesThatModifyContent} = require(__dirname + '/../config');
 
 const cache = {};
+const skipCollectionTypes = [
+	'Literal',
+	'Identifier',
+	'MemberExpression',
+];
 
 /**
  *
@@ -14,39 +19,34 @@ const cache = {};
 function getDeclarationWithContext(originNode) {
 	const scriptHash = originNode.scriptHash;
 	if (!cache[scriptHash]) cache[scriptHash] = {};
-	const cacheNameId = `context-${originNode.nodeId}-${originNode.src}`;
-	const cacheNameSrc = `context-${originNode.src}`;
+	const srcHash = generateScriptHash(originNode.src);
+	const cacheNameId = `context-${originNode.nodeId}-${srcHash}`;
+	const cacheNameSrc = `context-${srcHash}`;
 	let cached = cache[scriptHash][cacheNameId] || cache[scriptHash][cacheNameSrc];
 	if (!cached) {
 		const collectedContext = [originNode];
 		const examineStack = [originNode];
 		const collectedContextIds = [];
 		const collectedRanges = [];
+		const examinedIds = [];
 		while (examineStack.length) {
 			const relevantNode = examineStack.pop();
+			if (examinedIds.includes(relevantNode.nodeId)) continue;
+			else examinedIds.push(relevantNode.nodeId);
 			if (isNodeMarked(relevantNode)) continue;
 			collectedContextIds.push(relevantNode.nodeId);
 			collectedRanges.push(relevantNode.range);
-			let relevantScope;
+			let relevantScope = relevantNode.scope;
 			const assignments = [];
 			const references = [];
 			switch (relevantNode.type) {
 				case 'VariableDeclarator':
 					relevantScope = relevantNode.init?.scope || relevantNode.id.scope;
-					// Since the variable wasn't initialized, extract value from assignments
-					if (!relevantNode.init) {
-						assignments.push(...relevantNode.id.references.filter(r =>
-							r.parentNode.type === 'AssignmentExpression' &&
-							r.parentKey === 'left'));
-					} else {
-						// Collect all references found in init
-						references.push(...getDescendants(relevantNode.init).filter(n =>
-							n.type === 'Identifier' &&
-							n.declNode &&
-							(n.parentNode.type !== 'MemberExpression' ||
-								n.parentKey === 'object'))
-							.map(n => n.declNode));
-					}
+					// Collect direct assignments
+					assignments.push(...relevantNode.id.references.filter(r =>
+						r.parentNode.type === 'AssignmentExpression' &&
+						r.parentKey === 'left')
+						.map(r => r.parentNode));
 					// Collect assignments to variable properties
 					assignments.push(...relevantNode.id.references.filter(r =>
 						r.parentNode.type === 'MemberExpression' &&
@@ -63,6 +63,7 @@ function getDeclarationWithContext(originNode) {
 					break;
 				case 'AssignmentExpression':
 					relevantScope = relevantNode.right?.scope;
+					examineStack.push(relevantNode.right);
 					break;
 				case 'CallExpression':
 					relevantScope = relevantNode.callee.scope;
@@ -72,16 +73,20 @@ function getDeclarationWithContext(originNode) {
 					relevantScope = relevantNode.object.scope;
 					examineStack.push(relevantNode.property);
 					break;
-				default:
-					relevantScope = relevantNode.scope;
+				case 'Identifier':
+					if (relevantNode.declNode) {
+						relevantScope = relevantNode.declNode.scope;
+						references.push(relevantNode.declNode.parentNode);
+					}
+					break;
 			}
 
-			const contextToCollect = relevantScope.through
-				.map(ref => ref.identifier?.declNode?.parentNode)
-				.filter(ref => !!ref)
-				.concat(assignments)
-				.concat(references)
-				.map(ref => ref.type === 'Identifier' ? ref.parentNode : ref);
+			// noinspection JSUnresolvedVariable
+			const contextToCollect = [...new Set(
+				relevantScope.through.map(ref => ref.identifier?.declNode?.parentNode)
+					.concat(assignments)
+					.concat(references))
+			].map(ref => ref?.declNode ? ref.declNode : ref);
 			for (const rn of contextToCollect) {
 				if (rn && !collectedContextIds.includes(rn.nodeId) && !isNodeInRanges(rn, collectedRanges)) {
 					collectedRanges.push(rn.range);
@@ -94,11 +99,6 @@ function getDeclarationWithContext(originNode) {
 				}
 			}
 		}
-		const skipCollectionTypes = [
-			'Literal',
-			'Identifier',
-			'MemberExpression',
-		];
 		cached = collectedContext.filter(n => !skipCollectionTypes.includes(n.type));
 		cache[scriptHash][cacheNameId] = cached;        // Caching context for the same node
 		cache[scriptHash][cacheNameSrc] = cached;       // Caching context for a different node with similar content
