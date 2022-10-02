@@ -3,7 +3,7 @@ const {badValue} = require(__dirname + '/../config');
 const defaultLogger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
-const hash = require('object-hash');
+const hash = require(__dirname + '/../utils/generateScriptHash')
 
 const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
 	'Promise',
