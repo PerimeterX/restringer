@@ -3,7 +3,7 @@ const {badValue} = require(__dirname + '/../config');
 const defaultLogger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
-const hash = require(__dirname + '/../utils/generateScriptHash')
+const generateScriptHash = require(__dirname + '/../utils/generateScriptHash')
 
 const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
 	'Promise',
@@ -43,7 +43,7 @@ const cache = {};
  * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
  */
 function evalInVm(stringToEval, logger = defaultLogger) {
-	const cacheName = `eval-${hash(stringToEval)}`;
+	const cacheName = `eval-${generateScriptHash(stringToEval)}`;
 	if (cache[cacheName] === undefined) {
 		cache[cacheName] = badValue;
 		try {
