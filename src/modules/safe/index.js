@@ -16,6 +16,7 @@ module.exports = {
 	resolveMemberExpressionsWithDirectAssignment: require(__dirname + '/resolveMemberExpressionsWithDirectAssignment'),
 	resolveProxyCalls: require(__dirname + '/resolveProxyCalls'),
 	resolveProxyReferences: require(__dirname + '/resolveProxyReferences'),
+	resolveProxyVariables: require(__dirname + '/resolveProxyVariables'),
 	resolveRedundantLogicalExpressions: require(__dirname + '/resolveRedundantLogicalExpressions'),
 	unwrapFunctionShells: require(__dirname + '/unwrapFunctionShells'),
 };

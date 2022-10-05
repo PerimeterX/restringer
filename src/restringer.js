@@ -29,6 +29,7 @@ const {
 		replaceIdentifierWithFixedAssignedValue,
 		replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 		resolveFunctionConstructorCalls,
+		resolveProxyVariables,
 		resolveProxyReferences,
 	},
 	unsafe: {
@@ -101,6 +102,7 @@ class REstringer {
 			replaceIdentifierWithFixedAssignedValue,
 			replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 			resolveFunctionConstructorCalls,
+			resolveProxyVariables,
 			resolveProxyReferences,
 		];
 	}
