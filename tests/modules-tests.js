@@ -167,6 +167,13 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveProxyVariables - TP-1',
+		func: __dirname + '/../src/modules/safe/resolveProxyVariables',
+		source: `const a2b = atob; console.log(a2b('NDI='));`,
+		expected: `const a2b = atob;\nconsole.log(atob('NDI='));`,
+	},
+	{
+		enabled: true,
 		name: 'resolveRedundantLogicalExpressions - TP-1',
 		func: __dirname + '/../src/modules/safe/resolveRedundantLogicalExpressions',
 		source: `if (false && true) {} if (false || true) {} if (true && false) {} if (true || false) {}`,
