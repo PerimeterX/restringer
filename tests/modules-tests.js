@@ -102,6 +102,20 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'replaceIdentifierWithFixedAssignedValue - TN-1',
+		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
+		source: `var a = 3; for (a in [1, 2]) console.log(a);`,
+		expected: `var a = 3;\nfor (a in [\n    1,\n    2\n  ])\n  console.log(a);`,
+	},
+	{
+		enabled: true,
+		name: 'replaceIdentifierWithFixedAssignedValue - TN-2',
+		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
+		source: `var a = 3; for (a of [1, 2]) console.log(a);`,
+		expected: `var a = 3;\nfor (a of [\n    1,\n    2\n  ])\n  console.log(a);`,
+	},
+	{
+		enabled: true,
 		name: 'replaceIdentifierWithFixedValueNotAssignedAtDeclaration - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedValueNotAssignedAtDeclaration',
 		source: `let a; a = 3; const b = a * 2; console.log(b + a);`,
