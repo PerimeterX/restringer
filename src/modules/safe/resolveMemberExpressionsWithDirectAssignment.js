@@ -25,7 +25,8 @@ function resolveMemberExpressionsWithDirectAssignment(arb) {
 			.map(n => n.parentNode);
 		if (valueUses.length) {
 			// Skip if the value is reassigned
-			if (valueUses.filter(n => n.parentNode.type === 'AssignmentExpression' && n.parentKey === 'left').length) continue;
+			if (valueUses.find(n => n.parentNode.type === 'AssignmentExpression' && n.parentKey === 'left')) continue;
+			if (valueUses.find(n => n.parentNode.type === 'UpdateExpression')) continue;
 			const replacementNode = c.parentNode.right;
 			valueUses.forEach(n => arb.markNode(n, replacementNode));
 		}
