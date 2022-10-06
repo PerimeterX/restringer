@@ -153,6 +153,20 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveMemberExpressionsWithDirectAssignment - TN-1',
+		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
+		source: `const a = {}; a.b = ''; a.b = 3;`,
+		expected: `const a = {};\na.b = '';\na.b = 3;`,
+	},
+	{
+		enabled: true,
+		name: 'resolveMemberExpressionsWithDirectAssignment - TN-2',
+		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
+		source: `const a = {}; a.b = 0; ++a.b + 2;`,
+		expected: `const a = {};\na.b = 0;\n++a.b + 2;`,
+	},
+	{
+		enabled: true,
 		name: 'resolveProxyCalls - TP-1',
 		func: __dirname + '/../src/modules/safe/resolveProxyCalls',
 		source: `function call1(a, b) {return a + b;} function call2(c, d) {return call1(c, d);} function call3(e, f) {return call2(e, f);}`,
