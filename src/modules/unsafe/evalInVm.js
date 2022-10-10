@@ -3,7 +3,7 @@ const {badValue} = require(__dirname + '/../config');
 const defaultLogger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
-const generateScriptHash = require(__dirname + '/../utils/generateScriptHash')
+const generateScriptHash = require(__dirname + '/../utils/generateScriptHash');
 
 const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
 	'Promise',
@@ -34,7 +34,8 @@ const vmOptions = {
 	sandbox: {...disableObjects},
 };
 
-const cache = {};
+let cache = {};
+const maxCacheSize = 100;
 
 /**
  * Eval a string in a ~safe~ VM environment
@@ -45,6 +46,7 @@ const cache = {};
 function evalInVm(stringToEval, logger = defaultLogger) {
 	const cacheName = `eval-${generateScriptHash(stringToEval)}`;
 	if (cache[cacheName] === undefined) {
+		if (Object.keys(cache).length >= maxCacheSize) cache = {};
 		cache[cacheName] = badValue;
 		try {
 			// Break known trap strings
