@@ -1,12 +1,11 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const logger = require(__dirname + '/../utils/logger');
+const getCache = require(__dirname + '/../utils/getCache');
 const getCalleeName = require(__dirname + '/../utils/getCalleeName');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const doesNodeContainRanges = require(__dirname + '/../utils/doesNodeContainRanges');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
-
-const cache = {};
 
 /**
  * Collect all available context on call expressions where the callee is defined in the script and attempt
@@ -15,9 +14,7 @@ const cache = {};
  * @return {Arborist}
  */
 function resolveLocalCalls(arb) {
-	const scriptHash = arb.ast[0].scriptHash;
-	if (!cache[scriptHash]) cache[scriptHash] = {};
-
+	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		(n.callee?.declNode ||
@@ -51,7 +48,7 @@ function resolveLocalCalls(arb) {
 				[returnArg.callee.property?.name, returnArg.callee.property?.value].includes('apply')) continue;    // Unwrap function shells
 		}
 		const cacheName = `rlc-${callee.name || callee.value}-${declNode?.nodeId}`;
-		if (!cache[scriptHash][cacheName]) {
+		if (!cache[cacheName]) {
 			// Skip call expressions with problematic values
 			if (skipIdentifiers.includes(callee.name) ||
 				(callee.type === 'ArrayExpression' && !callee.elements.length) ||
@@ -61,10 +58,10 @@ function resolveLocalCalls(arb) {
 				if (declNode.parentNode.type === 'FunctionDeclaration' &&
 					declNode.parentNode?.body?.body?.length &&
 					['Identifier', 'Literal'].includes(declNode.parentNode.body.body[0]?.argument?.type)) continue;
-				cache[scriptHash][cacheName] = createOrderedSrc(getDeclarationWithContext(declNode.parentNode));
+				cache[cacheName] = createOrderedSrc(getDeclarationWithContext(declNode.parentNode));
 			}
 		}
-		const context = cache[scriptHash][cacheName];
+		const context = cache[cacheName];
 		const src = context ? `${context}\n${c.src}` : c.src;
 		const newNode = evalInVm(src, logger);
 		if (newNode !== badValue && newNode.type !== 'FunctionDeclaration') {
