@@ -39,10 +39,10 @@ function resolveLocalCalls(arb) {
 		if (doesNodeContainRanges(c, modifiedRanges)) continue;
 		const callee = c.callee?.object || c.callee;
 		const declNode = c.callee?.declNode || c.callee?.object?.declNode;
-		if (declNode?.parentNode?.body?.body?.length === 1 && declNode.parentNode?.body?.body[0].type === 'ReturnStatement') {
+		if (declNode?.parentNode?.body?.body?.length && declNode.parentNode?.body?.body[0].type === 'ReturnStatement') {
 			// Leave this replacement to a safe function
 			const returnArg = declNode.parentNode.body.body[0].argument;
-			if (['Literal', 'Identifier'].includes(returnArg.type)) continue;   // Unwrap identifier
+			if (['Literal', 'Identifier'].includes(returnArg.type) || /Function/.exec(returnArg.type)) continue;   // Unwrap identifier
 			else if (returnArg.type === 'CallExpression' &&
 				returnArg.callee?.object?.type === 'FunctionExpression' &&
 				(returnArg.callee.property?.name || returnArg.callee.property?.value) === 'apply') continue;    // Unwrap function shells
