@@ -16,7 +16,7 @@ function resolveProxyReferences(arb) {
 		(n.type === 'VariableDeclarator' &&
 			['Identifier', 'MemberExpression'].includes(n.id.type) &&
 			['Identifier', 'MemberExpression'].includes(n.init?.type)) &&
-		!/For.*Statement/.test(n.parentNode.parentNode.type));
+		!/For.*Statement/.test(n.parentNode?.parentNode?.type));
 	for (const c of candidates) {
 		const relevantIdentifier = getMainDeclaredObjectOfMemberExpression(c.id)?.declNode || c.id;
 		const refs = relevantIdentifier.references || [];
