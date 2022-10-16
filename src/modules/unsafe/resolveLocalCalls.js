@@ -45,7 +45,7 @@ function resolveLocalCalls(arb) {
 			if (['Literal', 'Identifier'].includes(returnArg.type)) continue;   // Unwrap identifier
 			else if (returnArg.type === 'CallExpression' &&
 				returnArg.callee?.object?.type === 'FunctionExpression' &&
-				[returnArg.callee.property?.name, returnArg.callee.property?.value].includes('apply')) continue;    // Unwrap function shells
+				(returnArg.callee.property?.name || returnArg.callee.property?.value) === 'apply') continue;    // Unwrap function shells
 		}
 		const cacheName = `rlc-${callee.name || callee.value}-${declNode?.nodeId}`;
 		if (!cache[cacheName]) {

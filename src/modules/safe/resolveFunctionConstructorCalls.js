@@ -10,7 +10,7 @@ function resolveFunctionConstructorCalls(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.type === 'MemberExpression' &&
-		[n.callee.property?.name, n.callee.property?.value].includes('constructor') &&
+		(n.callee.property?.name || n.callee.property?.value) === 'constructor' &&
 		n.arguments.length && n.arguments.slice(-1)[0].type === 'Literal');
 	for (const c of candidates) {
 		// TODO: Without the next line we get an anonymous function. Is that bad?

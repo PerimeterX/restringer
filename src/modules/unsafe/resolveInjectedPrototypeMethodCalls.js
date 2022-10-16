@@ -16,7 +16,7 @@ function resolveInjectedPrototypeMethodCalls(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'AssignmentExpression' &&
 		n.left.type === 'MemberExpression' &&
-		[n.left.object.property?.name, n.left.object.property?.value].includes('prototype') &&
+		(n.left.object.property?.name || n.left.object.property?.value) === 'prototype' &&
 		n.operator === '=' &&
 		(/FunctionExpression/.test(n.right?.type) || n.right?.type === 'Identifier'));
 	for (const c of candidates) {
@@ -25,7 +25,7 @@ function resolveInjectedPrototypeMethodCalls(arb) {
 		const references = arb.ast.filter(n =>
 			n.type === 'CallExpression' &&
 			n.callee.type === 'MemberExpression' &&
-			[n.callee.property?.name, n.callee.property?.value].includes(methodName));
+			(n.callee.property?.name || n.callee.property?.value) === methodName);
 		for (const ref of references) {
 			const refContext = [
 				...new Set([

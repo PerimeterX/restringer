@@ -15,8 +15,11 @@ function areReferencesModified(ast, refs) {
 		refs.find(r => r.parentNode.type === 'VariableDeclarator' && r.parentKey === 'id') ||
 		// Verify there are no member expressions among the references which are being assigned to
 		refs.find(r => r.type === 'MemberExpression' &&
-			ast.find(n => n.type === 'AssignmentExpression' && n.left.src === r.src &&
-				([r.object.declNode?.nodeId, r.object?.nodeId].includes(n.left.object.declNode?.nodeId)))) ||
+			ast.find(n => n.type === 'AssignmentExpression' &&
+				n.left.type === 'MemberExpression' &&
+				n.left.object?.name === r.object?.name &&
+				(n.left.property?.name || n.left.property?.value === r.property?.name || r.property?.value) &&
+				(n.left.object.declNode?.nodeId && (r.object.declNode?.nodeId || r.object?.nodeId) === n.left.object.declNode.nodeId))) ||
 		// Verify no modifying calls are executed on any of the references
 		refs.find(r => r.parentNode.type === 'MemberExpression' &&
 			r.parentNode.parentNode.type === 'CallExpression' &&
