@@ -2,8 +2,6 @@ const {Arborist} = require('flast');
 const generateHash = require(__dirname + '/generateHash');
 const defaultLogger = require(__dirname + '/../utils/logger');
 const {defaultMaxIterations} = require(__dirname + '/../config');
-const {Arborist, generateFlatAST, generateCode} = require('flast');
-const generateScriptHash = require(__dirname + '/generateScriptHash');
 
 let iterationsCounter = 0;
 
@@ -21,8 +19,8 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 	try {
 		let scriptHash = generateHash(script);
 		let changesCounter = 0;
-		let arborist = new Arborist(generateFlatAST(script), logger.log);
-		while (scriptSnapshot !== script && currentIteration < maxIterations) {
+		let arborist = new Arborist(script, logger.log);
+		while (arborist.ast.length && scriptSnapshot !== script && currentIteration < maxIterations) {
 			const cycleStartTime = Date.now();
 			scriptSnapshot = script;
 			arborist.ast.forEach(n => n.scriptHash = scriptHash);   // Mark each node with the script hash to distinguish cache of different scripts.
@@ -31,8 +29,9 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 				try {
 					logger.log(`\t[!] Running ${func.name}...`, 1);
 					arborist = func(arborist);
+					if (!arborist.ast.length) break;
 					// If the hash doesn't exist it means the Arborist was replaced
-					const numberOfNewChanges = ((Object.keys(arborist.markedForReplacement).length + arborist.markedForDeletion.length)) || +!arborist.ast[0].scriptHash;
+					const numberOfNewChanges = arborist.getNumberOfChanges() + +!arborist.ast[0].scriptHash;
 					if (numberOfNewChanges) {
 						changesCounter += numberOfNewChanges;
 						logger.log(`\t[+] ${func.name} committed ${numberOfNewChanges} new changes!`);
@@ -54,7 +53,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 				` with ${changesCounter ? changesCounter : 'no'} changes (${arborist.ast.length} nodes)`);
 			if (maxIterations) break;
 		}
-		if (changesCounter) script = generateCode(arborist.ast[0]);
+		if (changesCounter) script = arborist.script;
 	} catch (e) {
 		logger.error(`[-] Error on loop #${iterationsCounter}: ${e}\n${e.stack}`);
 	}
