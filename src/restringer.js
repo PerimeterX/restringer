@@ -29,6 +29,7 @@ const {
 		replaceIdentifierWithFixedAssignedValue,
 		replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 		resolveFunctionConstructorCalls,
+		resolveProxyVariables,
 		resolveProxyReferences,
 	},
 	unsafe: {
@@ -86,22 +87,23 @@ class REstringer {
 	_safeDeobfuscationMethods() {
 		return [
 			normalizeEmptyStatements,
-			resolveProxyCalls,
 			consolidateNestedBlockStatements,
 			resolveRedundantLogicalExpressions,
+			resolveProxyCalls,
+			resolveProxyVariables,
+			resolveProxyReferences,
 			resolveMemberExpressionReferencesToArrayIndex,
 			resolveMemberExpressionsWithDirectAssignment,
 			parseTemplateLiteralsIntoStringLiterals,
 			resolveDeterministicIfStatements,
-			unwrapFunctionShells,
-			replaceFunctionShellsWithWrappedValue,
-			replaceFunctionShellsWithWrappedValueIIFE,
 			replaceCallExpressionsWithUnwrappedIdentifier,
 			replaceEvalCallsWithLiteralContent,
 			replaceIdentifierWithFixedAssignedValue,
 			replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 			resolveFunctionConstructorCalls,
-			resolveProxyReferences,
+			replaceFunctionShellsWithWrappedValue,
+			replaceFunctionShellsWithWrappedValueIIFE,
+			unwrapFunctionShells,
 		];
 	}
 
@@ -115,10 +117,10 @@ class REstringer {
 			resolveAugmentedFunctionWrappedArrayReplacements,
 			resolveMemberExpressionsLocalReferences,
 			resolveDefiniteMemberExpressions,
-			resolveLocalCalls,
 			resolveBuiltinCalls,
 			resolveDeterministicConditionalExpressions,
 			resolveInjectedPrototypeMethodCalls,
+			resolveLocalCalls,
 			resolveEvalCallsOnNonLiterals,
 		];
 	}

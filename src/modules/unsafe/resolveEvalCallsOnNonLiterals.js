@@ -30,10 +30,13 @@ function resolveEvalCallsOnNonLiterals(arb) {
 					// Edge case for broken scripts that can be solved
 					// by adding a newline after closing brackets except if part of a regexp
 					replacementNode = parseCode(newNode.value.replace(/([)}])(?!\/)/g, '$1\n'));
+				} finally {
+					// If when parsed the newNode results in an empty program - use the unparsed newNode.
+					if (!replacementNode.body.length) replacementNode = newNode;
 				}
 			}
 		} catch {}
-		if (replacementNode !== badValue) arb.markNode(targetNode, replacementNode);
+		if (replacementNode !== badValue) {arb.markNode(targetNode, replacementNode);}
 	}
 	return arb;
 }

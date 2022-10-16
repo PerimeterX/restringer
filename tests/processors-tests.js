@@ -33,7 +33,7 @@ module.exports = [
 	dbt['toString'] = ''.constructor.constructor(atb(abc));
 	dbt = dbt + "this will execute dbt's toString method";
 })();`,
-		expected: `console.log('REstringer');`,
+		expected: `console.log("REstringer")`,
 	},
 	{
 		enabled: true,
@@ -60,7 +60,7 @@ module.exports = [
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `function getArr() {return ['One', 'Two', 'Three']} console.log(getArr()[0] + ' + ' + getArr()[1] + ' = ' + getArr()[2]);`,
-		expected: `function getArr() {\n  return [\n    'One',\n    'Two',\n    'Three'\n  ];\n}\nconsole.log(getArr()[0] + ' + ' + getArr()[1] + ' = ' + getArr()[2]);`,
+		expected: `function getArr() {return ['One', 'Two', 'Three']} console.log(getArr()[0] + ' + ' + getArr()[1] + ' = ' + getArr()[2]);`,
 	},
 	{
 		enabled: true,

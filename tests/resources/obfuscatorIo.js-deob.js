@@ -87,7 +87,7 @@ var _yb = function (a, b) {
     _yb.ZICOwj = true;
   }
   var d = _yb.SUNniA[a];
-  if (d === undefined) {
+  if (_yb.SUNniA[a] === undefined) {
     var e = function (f) {
       this.WiEbYW = f;
       this.zUfMuq = [
@@ -121,7 +121,7 @@ var _yb = function (a, b) {
     c = _yb.iYlyGP(c);
     _yb.SUNniA[a] = c;
   } else {
-    c = d;
+    c = _yb.SUNniA[a];
   }
   return c;
 };

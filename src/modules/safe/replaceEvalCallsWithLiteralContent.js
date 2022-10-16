@@ -1,7 +1,7 @@
 const {generateFlatAST} = require('flast');
 const logger = require(__dirname + '/../utils/logger');
-
-const cache = {};
+const getCache = require(__dirname + '/../utils/getCache');
+const generateHash = require(__dirname + '/../utils/generateHash');
 
 /**
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.
@@ -11,26 +11,31 @@ const cache = {};
  * @return {Arborist}
  */
 function replaceEvalCallsWithLiteralContent(arb) {
-	const scriptHash = arb.ast[0].scriptHash;
-	if (!cache[scriptHash]) cache[scriptHash] = {};
+	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.name === 'eval' &&
 		n.arguments[0]?.type === 'Literal');
 	for (const c of candidates) {
-		const cacheName = `replaceEval-${c.src}}`;
+		const cacheName = `replaceEval-${generateHash(c.src)}`;
 		try {
-			if (!cache[scriptHash][cacheName]) {
+			if (!cache[cacheName]) {
 				let body;
 				if (c.arguments[0].value) {
-					body = generateFlatAST(c.arguments[0].value, {detailed: false})[1];
+					body = generateFlatAST(c.arguments[0].value, {detailed: false})[0].body;
+					if (body.length > 1) {
+						body = {
+							type: 'BlockStatement',
+							body,
+						};
+					} else body = body[0];
 				} else body = {
 					type: 'Literal',
 					value: c.arguments[0].value,
 				};
-				cache[scriptHash][cacheName] = body;
+				cache[cacheName] = body;
 			}
-			let replacementNode = cache[scriptHash][cacheName];
+			let replacementNode = cache[cacheName];
 			let targetNode = c;
 			// Edge case where the eval call renders an identifier which is then used in a call expression:
 			// eval('Function')('alert("hacked!")');
@@ -40,6 +45,9 @@ function replaceEvalCallsWithLiteralContent(arb) {
 					replacementNode = replacementNode.expression;
 				}
 				replacementNode = {...c.parentNode, callee: replacementNode};
+			}
+			if (targetNode.parentNode.type === 'ExpressionStatement' && replacementNode.type === 'BlockStatement') {
+				targetNode = targetNode.parentNode;
 			}
 			arb.markNode(targetNode, replacementNode);
 		} catch (e) {

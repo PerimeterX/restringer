@@ -15,10 +15,7 @@ function unwrapFunctionShells(arb) {
 		['FunctionDeclaration', 'FunctionExpression'].includes(n.type) &&
 		n.body?.body?.length === 1 &&
 		n.body.body[0].type === 'ReturnStatement' &&
-		[
-			n.body.body[0].argument?.callee?.property?.name,
-			n.body.body[0].argument?.callee?.property?.value,
-		].includes('apply') &&
+		(n.body.body[0].argument?.callee?.property?.name || n.body.body[0].argument?.callee?.property?.value) === 'apply' &&
 		n.body.body[0].argument.arguments?.length === 2 &&
 		n.body.body[0].argument.callee.object.type === 'FunctionExpression');
 	for (const c of candidates) {

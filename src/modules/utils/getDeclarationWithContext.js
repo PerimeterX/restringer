@@ -1,9 +1,9 @@
+const getCache = require(__dirname + '/getCache');
+const generateHash = require(__dirname + '/generateHash');
 const isNodeMarked = require(__dirname + '/isNodeMarked');
 const isNodeInRanges = require(__dirname + '/isNodeInRanges');
-const generateScriptHash = require(__dirname + '/generateScriptHash');
 const {propertiesThatModifyContent} = require(__dirname + '/../config');
 
-const cache = {};
 const skipCollectionTypes = [
 	'Literal',
 	'Identifier',
@@ -17,12 +17,11 @@ const skipCollectionTypes = [
  * the context of the origin node.
  */
 function getDeclarationWithContext(originNode) {
-	const scriptHash = originNode.scriptHash;
-	if (!cache[scriptHash]) cache[scriptHash] = {};
-	const srcHash = generateScriptHash(originNode.src);
+	const cache = getCache(originNode.scriptHash);
+	const srcHash = generateHash(originNode.src);
 	const cacheNameId = `context-${originNode.nodeId}-${srcHash}`;
 	const cacheNameSrc = `context-${srcHash}`;
-	let cached = cache[scriptHash][cacheNameId] || cache[scriptHash][cacheNameSrc];
+	let cached = cache[cacheNameId] || cache[cacheNameSrc];
 	if (!cached) {
 		const collectedContext = [originNode];
 		const examineStack = [originNode];
@@ -100,8 +99,8 @@ function getDeclarationWithContext(originNode) {
 			}
 		}
 		cached = collectedContext.filter(n => !skipCollectionTypes.includes(n.type));
-		cache[scriptHash][cacheNameId] = cached;        // Caching context for the same node
-		cache[scriptHash][cacheNameSrc] = cached;       // Caching context for a different node with similar content
+		cache[cacheNameId] = cached;        // Caching context for the same node
+		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
 	}
 	return cached;
 }

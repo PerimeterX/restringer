@@ -5,8 +5,8 @@ const tests = {
 	processorsTests: __dirname + '/processors-tests',
 };
 
-const defaultPrepTest = c => [new Arborist(generateFlatAST(c))];
-const defaultPrepRes = arb => {arb.applyChanges(); return generateCode(arb.ast[0]);};
+const defaultPrepTest = c => [new Arborist(c)];
+const defaultPrepRes = arb => {arb.applyChanges(); return arb.script;};
 
 /**
  * Generic function for verifying source code is deobfuscated as expected.

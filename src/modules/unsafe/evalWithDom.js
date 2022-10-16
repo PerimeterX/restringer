@@ -4,10 +4,12 @@ const fs = require('fs');
 const {NodeVM} = require('vm2');
 const {JSDOM} = require('jsdom');
 const defaultLogger = require(__dirname + '/../utils/logger');
+const generateHash = require(__dirname + '/../utils/generateHash');
 
 let jQuerySrc = '';
 
-const cache = {};
+let cache = {};
+const maxCacheSize = 100;
 
 /**
  * Place a string into a file and evaluate it with a simulated browser environment.
@@ -17,8 +19,9 @@ const cache = {};
  * @return {string} The output string if successful; empty string otherwise.
  */
 function evalWithDom(stringToEval, injectjQuery = false, logger = defaultLogger) {
-	const cacheName = `evalWithDom-${stringToEval}`;
+	const cacheName = `evalWithDom-${generateHash(stringToEval)}`;
 	if (!cache[cacheName]) {
+		if (Object.keys(cache).length >= maxCacheSize) cache = {};
 		let out = '';
 		const vm = new NodeVM({
 			console: 'redirect',

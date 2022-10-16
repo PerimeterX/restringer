@@ -32,9 +32,9 @@ const validIdentifierBeginning = /^[A-Za-z$_]/;
 
 module.exports = {
 	badArgumentTypes,
-	defaultMaxIterations,
-	badValue,
 	badIdentifierCharsRegex,
+	badValue,
+	defaultMaxIterations,
 	propertiesThatModifyContent,
 	skipBuiltinFunctions,
 	skipIdentifiers,

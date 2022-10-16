@@ -1,5 +1,5 @@
 const {unsafe: {evalWithDom}, safe: {removeDeadNodes}} = require(__dirname + '/../modules');
-const {generateCode, generateFlatAST, Arborist} = require('flast');
+const {generateCode, Arborist} = require('flast');
 
 const lineWithFinalAssignmentRegex = /(\w{3})\[.*]\s*=.*\((\w{3})\).*=\s*\1\s*\+\s*['"]/ms;
 const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;
@@ -45,7 +45,7 @@ function extractInnerLayer(arb) {
 		const variableContainingTheInnerLayer = innerLayerVarMatches ? innerLayerVarMatches[0] : matches[2];
 		script = script.replace(lineToReplace, `console.log(${variableContainingTheInnerLayer}.toString());})();\n`);
 		script = evalWithDom(script);
-		if (script) arb = new Arborist(generateFlatAST(script));
+		if (script) arb = new Arborist(script);
 	}
 	return arb;
 }

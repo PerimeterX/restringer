@@ -77,7 +77,21 @@ module.exports = [
 		name: 'replaceEvalCallsWithLiteralContent - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
 		source: `eval('console.log("hello world")');`,
-		expected: `console.log('hello world');\n;`,
+		expected: `console.log('hello world');;`,
+	},
+	{
+		enabled: true,
+		name: 'replaceEvalCallsWithLiteralContent - TP-2',
+		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
+		source: `eval('a; b;');`,
+		expected: `{\n  a;\n  b;\n}`,
+	},
+	{
+		enabled: true,
+		name: 'replaceEvalCallsWithLiteralContent - TP-3',
+		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
+		source: `function q() {return (eval('a; b;'));}`,
+		expected: `function q() {\n  return {\n    a;\n    b;\n  };\n}`,
 	},
 	{
 		enabled: true,
@@ -99,6 +113,20 @@ module.exports = [
 		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
 		source: `const a = 3; const b = a * 2; console.log(b + a);`,
 		expected: `const a = 3;\nconst b = 3 * 2;\nconsole.log(b + 3);`,
+	},
+	{
+		enabled: true,
+		name: 'replaceIdentifierWithFixedAssignedValue - TN-1',
+		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
+		source: `var a = 3; for (a in [1, 2]) console.log(a);`,
+		expected: `var a = 3; for (a in [1, 2]) console.log(a);`,
+	},
+	{
+		enabled: true,
+		name: 'replaceIdentifierWithFixedAssignedValue - TN-2',
+		func: __dirname + '/../src/modules/safe/replaceIdentifierWithFixedAssignedValue',
+		source: `var a = 3; for (a of [1, 2]) console.log(a);`,
+		expected: `var a = 3; for (a of [1, 2]) console.log(a);`,
 	},
 	{
 		enabled: true,
@@ -141,8 +169,7 @@ module.exports = [
 		name: 'resolveMemberExpressionReferencesToArrayIndex - TN-1',
 		func: __dirname + '/../src/modules/safe/resolveMemberExpressionReferencesToArrayIndex',
 		source: `const a = [1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,3];  b = a['indexOf']; c = a['length'];`,
-		expected: `const a = [\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,\n  1,
-  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  2,\n  3\n];\nb = a['indexOf'];\nc = a['length'];`,
+		expected: `const a = [1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,3];  b = a['indexOf']; c = a['length'];`,
 	},
 	{
 		enabled: true,
@@ -150,6 +177,20 @@ module.exports = [
 		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
 		source: `function a() {} a.b = 3; a.c = '5'; console.log(a.b + a.c);`,
 		expected: `function a() {\n}\na.b = 3;\na.c = '5';\nconsole.log(3 + '5');`,
+	},
+	{
+		enabled: true,
+		name: 'resolveMemberExpressionsWithDirectAssignment - TN-1',
+		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
+		source: `const a = {}; a.b = ''; a.b = 3;`,
+		expected: `const a = {}; a.b = ''; a.b = 3;`,
+	},
+	{
+		enabled: true,
+		name: 'resolveMemberExpressionsWithDirectAssignment - TN-2',
+		func: __dirname + '/../src/modules/safe/resolveMemberExpressionsWithDirectAssignment',
+		source: `const a = {}; a.b = 0; ++a.b + 2;`,
+		expected: `const a = {}; a.b = 0; ++a.b + 2;`,
 	},
 	{
 		enabled: true,
@@ -164,6 +205,20 @@ module.exports = [
 		func: __dirname + '/../src/modules/safe/resolveProxyReferences',
 		source: `const a = ['']; const b = a; const c = b[0];`,
 		expected: `const a = [''];\nconst b = a;\nconst c = a[0];`,
+	},
+	{
+		enabled: true,
+		name: 'resolveProxyVariables - TP-1',
+		func: __dirname + '/../src/modules/safe/resolveProxyVariables',
+		source: `const a2b = atob; console.log(a2b('NDI='));`,
+		expected: `console.log(atob('NDI='));`,
+	},
+	{
+		enabled: true,
+		name: 'resolveProxyVariables - TP-2',
+		func: __dirname + '/../src/modules/safe/resolveProxyVariables',
+		source: `const a2b = atob, a = 3; console.log(a2b('NDI='));`,
+		expected: `const a = 3;\nconsole.log(atob('NDI='));`,
 	},
 	{
 		enabled: true,
@@ -263,7 +318,7 @@ module.exports = [
 		name: 'resolveBuiltinCalls - TN-3',
 		func: __dirname + '/../src/modules/unsafe/resolveBuiltinCalls',
 		source: `function atob() {return 1;} atob('test');`,
-		expected: `function atob() {\n  return 1;\n}\natob('test');`,
+		expected: `function atob() {return 1;} atob('test');`,
 	},
 	{
 		enabled: true,
@@ -298,7 +353,7 @@ module.exports = [
 		name: 'resolveDeterministicConditionalExpressions - TN-1',
 		func: __dirname + '/../src/modules/unsafe/resolveDeterministicConditionalExpressions',
 		source: `({} ? 1 : 2); ([].length ? 3 : 4);`,
-		expected: `({} ? 1 : 2);\n[].length ? 3 : 4;`,
+		expected: `({} ? 1 : 2); ([].length ? 3 : 4);`,
 	},
 	{
 		enabled: true,
@@ -306,6 +361,13 @@ module.exports = [
 		func: __dirname + '/../src/modules/unsafe/resolveEvalCallsOnNonLiterals',
 		source: `eval(function() {return 'atob'}());`,
 		expected: `atob;`,
+	},
+	{
+		enabled: true,
+		name: 'resolveEvalCallsOnNonLiterals - TP-2',
+		func: __dirname + '/../src/modules/unsafe/resolveEvalCallsOnNonLiterals',
+		source: `eval([''][0]);`,
+		expected: `''`,
 	},
 	{
 		enabled: true,
