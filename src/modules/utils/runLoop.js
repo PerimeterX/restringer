@@ -1,3 +1,5 @@
+const {Arborist} = require('flast');
+const generateHash = require(__dirname + '/generateHash');
 const defaultLogger = require(__dirname + '/../utils/logger');
 const {defaultMaxIterations} = require(__dirname + '/../config');
 const {Arborist, generateFlatAST, generateCode} = require('flast');
@@ -17,7 +19,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 	let scriptSnapshot = '';
 	let currentIteration = 0;
 	try {
-		let scriptHash = generateScriptHash(script);
+		let scriptHash = generateHash(script);
 		let changesCounter = 0;
 		let arborist = new Arborist(generateFlatAST(script), logger.log);
 		while (scriptSnapshot !== script && currentIteration < maxIterations) {
@@ -35,7 +37,8 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 						changesCounter += numberOfNewChanges;
 						logger.log(`\t[+] ${func.name} committed ${numberOfNewChanges} new changes!`);
 						arborist.applyChanges();
-						scriptHash = generateScriptHash(script);
+						script = arborist.script;
+						scriptHash = generateHash(script);
 						arborist.ast.forEach(n => n.scriptHash = scriptHash);
 					}
 				} catch (e) {

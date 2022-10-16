@@ -4,7 +4,7 @@ const fs = require('fs');
 const {NodeVM} = require('vm2');
 const {JSDOM} = require('jsdom');
 const defaultLogger = require(__dirname + '/../utils/logger');
-const generateScriptHash = require(__dirname + '/../utils/generateScriptHash');
+const generateHash = require(__dirname + '/../utils/generateHash');
 
 let jQuerySrc = '';
 
@@ -19,7 +19,7 @@ const maxCacheSize = 100;
  * @return {string} The output string if successful; empty string otherwise.
  */
 function evalWithDom(stringToEval, injectjQuery = false, logger = defaultLogger) {
-	const cacheName = `evalWithDom-${generateScriptHash(stringToEval)}`;
+	const cacheName = `evalWithDom-${generateHash(stringToEval)}`;
 	if (!cache[cacheName]) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};
 		let out = '';

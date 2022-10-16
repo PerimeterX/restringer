@@ -1,7 +1,7 @@
 const getCache = require(__dirname + '/getCache');
+const generateHash = require(__dirname + '/generateHash');
 const isNodeMarked = require(__dirname + '/isNodeMarked');
 const isNodeInRanges = require(__dirname + '/isNodeInRanges');
-const generateScriptHash = require(__dirname + '/generateScriptHash');
 const {propertiesThatModifyContent} = require(__dirname + '/../config');
 
 const skipCollectionTypes = [
@@ -18,7 +18,7 @@ const skipCollectionTypes = [
  */
 function getDeclarationWithContext(originNode) {
 	const cache = getCache(originNode.scriptHash);
-	const srcHash = generateScriptHash(originNode.src);
+	const srcHash = generateHash(originNode.src);
 	const cacheNameId = `context-${originNode.nodeId}-${srcHash}`;
 	const cacheNameSrc = `context-${srcHash}`;
 	let cached = cache[cacheNameId] || cache[cacheNameSrc];

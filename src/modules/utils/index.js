@@ -5,7 +5,7 @@ module.exports = {
 	createOrderedSrc: require(__dirname + '/createOrderedSrc'),
 	doesBinaryExpressionContainOnlyLiterals: require(__dirname + '/doesBinaryExpressionContainOnlyLiterals'),
 	doesNodeContainRanges: require(__dirname + '/doesNodeContainRanges'),
-	generateScriptHash: require(__dirname + '/generateScriptHash'),
+	generateHash: require(__dirname + '/generateHash'),
 	getCache: require(__dirname + '/getCache'),
 	getCalleeName: require(__dirname + '/getCalleeName'),
 	getDeclarationWithContext: require(__dirname + '/getDeclarationWithContext'),
