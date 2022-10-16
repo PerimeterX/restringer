@@ -17,12 +17,18 @@ function replaceEvalCallsWithLiteralContent(arb) {
 		n.callee?.name === 'eval' &&
 		n.arguments[0]?.type === 'Literal');
 	for (const c of candidates) {
-		const cacheName = `replaceEval-${c.src}}`;
+		const cacheName = `replaceEval-${generateHash(c.src)}`;
 		try {
 			if (!cache[cacheName]) {
 				let body;
 				if (c.arguments[0].value) {
-					body = generateFlatAST(c.arguments[0].value, {detailed: false})[1];
+					body = generateFlatAST(c.arguments[0].value, {detailed: false})[0].body;
+					if (body.length > 1) {
+						body = {
+							type: 'BlockStatement',
+							body,
+						};
+					} else body = body[0];
 				} else body = {
 					type: 'Literal',
 					value: c.arguments[0].value,
@@ -39,6 +45,9 @@ function replaceEvalCallsWithLiteralContent(arb) {
 					replacementNode = replacementNode.expression;
 				}
 				replacementNode = {...c.parentNode, callee: replacementNode};
+			}
+			if (targetNode.parentNode.type === 'ExpressionStatement' && replacementNode.type === 'BlockStatement') {
+				targetNode = targetNode.parentNode;
 			}
 			arb.markNode(targetNode, replacementNode);
 		} catch (e) {
