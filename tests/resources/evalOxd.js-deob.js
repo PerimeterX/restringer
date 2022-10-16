@@ -384,6 +384,7 @@ var polyfill, sendBeacon, isSupported, b2h, last, progress_, th, lo;
         }
         function r() {
             return function () {
+              '';
             };
         }
         var a = [

@@ -431,14 +431,14 @@ var _0x2cb1 = function (_0x4b5899, _0x33789e) {
     _0x2cb1.TQhDkm = true;
   }
   var _0x449a46 = _0x2cb1.fteork[_0x4b5899];
-  if (_0x449a46 === undefined) {
+  if (_0x2cb1.fteork[_0x4b5899] === undefined) {
     if (_0x2cb1.heXqWm === undefined) {
       _0x2cb1.heXqWm = true;
     }
     _0x2cb187 = _0x2cb1.TQjdJo(_0x2cb187, _0x33789e);
     _0x2cb1.fteork[_0x4b5899] = _0x2cb187;
   } else {
-    _0x2cb187 = _0x449a46;
+    _0x2cb187 = _0x2cb1.fteork[_0x4b5899];
   }
   return _0x2cb187;
 };
