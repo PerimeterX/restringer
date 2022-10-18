@@ -95,7 +95,7 @@ function createNewNode(value, logger = {debugErr: () => {}}) {
 				break;
 		}
 	} catch (e) {
-		logger.debugErr(`[-] Unable to create a new node: ${e}`, 1);
+		logger.debug(`[-] Unable to create a new node: ${e}`);
 	}
 	return newNode;
 }

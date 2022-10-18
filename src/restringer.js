@@ -195,7 +195,8 @@ if (require.main === module) {
 				logger.log(`[+] Output saved to ${outputFilename}\n\tLength: ${restringer.script.length} ` +
 					`(difference is ${restringer.script.length - content.length})\n\tChanges: ${restringer.totalChangesCounter}`);
 				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds`);
-				if (logger.isDebugModeOn) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
+				// TODO write to file per command line arugments
+				if (logger.isLogging()) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
 		} else console.log('Usage:\n\trestringer.js obfuscated.js \t\t# Print deobfuscated file to stdout\n\t' +

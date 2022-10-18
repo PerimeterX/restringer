@@ -27,7 +27,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 			for (const func of funcs) {
 				const funcStartTime = +new Date();
 				try {
-					logger.log(`\t[!] Running ${func.name}...`, 1);
+					logger.debug(`\t[!] Running ${func.name}...`);
 					arborist = func(arborist);
 					if (!arborist.ast.length) break;
 					// If the hash doesn't exist it means the Arborist was replaced
@@ -43,8 +43,8 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = d
 				} catch (e) {
 					logger.error(`[-] Error in ${func.name} (iteration #${iterationsCounter}): ${e}\n${e.stack}`);
 				} finally {
-					logger.log(`\t\t[!] Running ${func.name} completed in ` +
-						`${((+new Date() - funcStartTime) / 1000).toFixed(3)} seconds`, 1);
+					logger.debug(`\t\t[!] Running ${func.name} completed in ` +
+						`${((+new Date() - funcStartTime) / 1000).toFixed(3)} seconds`);
 				}
 			}
 			++currentIteration;

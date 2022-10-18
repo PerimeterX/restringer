@@ -51,7 +51,7 @@ function replaceEvalCallsWithLiteralContent(arb) {
 			}
 			arb.markNode(targetNode, replacementNode);
 		} catch (e) {
-			logger.error(`[-] Unable to replace eval's body with call expression: ${e}`, 1);
+			logger.debug(`[-] Unable to replace eval's body with call expression: ${e}`);
 		}
 	}
 	return arb;
