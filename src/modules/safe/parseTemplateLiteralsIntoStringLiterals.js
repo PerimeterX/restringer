@@ -17,7 +17,7 @@ function parseTemplateLiteralsIntoStringLiterals(arb) {
 			newStringLiteral += c.quasis[i].value.raw + c.expressions[i].value;
 		}
 		newStringLiteral += c.quasis.slice(-1)[0].value.raw;
-		arb.markNode(c, createNewNode(newStringLiteral, logger));
+		arb.markNode(c, createNewNode(newStringLiteral));
 	}
 	return arb;
 }

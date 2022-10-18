@@ -1,3 +1,4 @@
+const logger = require(__dirname + '/logger');
 const {generateCode, parseCode} = require('flast');
 const {badValue} = require(__dirname + '/../config');
 const getObjType = require(__dirname + '/getObjType');
@@ -5,10 +6,9 @@ const getObjType = require(__dirname + '/getObjType');
 /**
  * Create a node from a value by its type.
  * @param {*} value The value to be parsed into an ASTNode.
- * @param {object?} logger (optional) logging functions.
  * @returns {ASTNode|badValue} The newly created node if successful; badValue string otherwise.
  */
-function createNewNode(value, logger = {debugErr: () => {}}) {
+function createNewNode(value) {
 	let newNode = badValue;
 	try {
 		if (![undefined, null].includes(value) && value.__proto__.constructor.name === 'Node') value = generateCode(value);
@@ -95,7 +95,7 @@ function createNewNode(value, logger = {debugErr: () => {}}) {
 				break;
 		}
 	} catch (e) {
-		logger.debugErr(`[-] Unable to create a new node: ${e}`, 1);
+		logger.debug(`[-] Unable to create a new node: ${e}`);
 	}
 	return newNode;
 }

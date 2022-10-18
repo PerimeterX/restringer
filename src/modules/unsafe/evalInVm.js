@@ -61,7 +61,7 @@ function evalInVm(stringToEval, logger = defaultLogger) {
 				}
 			}
 		} catch (e) {
-			logger.error(`[-] Error in _evalInVm: ${e}`, 1);
+			logger.debug(`[-] Error in _evalInVm: ${e}`);
 		}
 	}
 	return cache[cacheName];

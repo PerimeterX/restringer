@@ -23,7 +23,7 @@ function resolveMemberExpressionReferencesToArrayIndex(arb, logger) {
 			try {
 				arb.markNode(ref, c.init.elements[parseInt(ref.property.value)]);
 			} catch (e) {
-				logger.error(`[-] Unable to mark node for replacement: ${e}`, 1);
+				logger.debug(`[-] Unable to mark node for replacement: ${e}`);
 			}
 		}
 	}

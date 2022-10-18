@@ -50,7 +50,7 @@ function evalWithDom(stringToEval, injectjQuery = false, logger = defaultLogger)
 			});
 			vm.run(runString);
 		} catch (e) {
-			logger.error(`[-] Error in evalWithDom: ${e}`, 1);
+			logger.debug(`[-] Error in evalWithDom: ${e}`);
 		}
 		cache[cacheName] = out;
 	}
