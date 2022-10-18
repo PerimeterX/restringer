@@ -1,4 +1,5 @@
 const {VM} = require('vm2');
+const assert = require('node:assert');
 const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
@@ -54,9 +55,8 @@ function evalInVm(stringToEval) {
 			if (!res.VMError && !badTypes.includes(getObjType(res))) {
 				// To exclude results based on randomness or timing, eval again and compare results
 				const res2 = (new VM(vmOptions)).run(stringToEval);
-				if (JSON.stringify(res) === JSON.stringify(res2)) {
-					cache[cacheName] = createNewNode(res);
-				}
+				assert.deepEqual(res, res2);
+				cache[cacheName] = createNewNode(res);
 			}
 		} catch (e) {
 			logger.debug(`[-] Error in _evalInVm: ${e}`);
