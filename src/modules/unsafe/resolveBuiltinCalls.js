@@ -37,7 +37,7 @@ function resolveBuiltinCalls(arb) {
 				const args = c.arguments.map(a => a.value);
 				const tempValue = safeImplementation(...args);
 				if (tempValue) {
-					arb.markNode(c, createNewNode(tempValue, logger));
+					arb.markNode(c, createNewNode(tempValue));
 				}
 			} else {
 				const newNode = evalInVm(c.src, logger);
