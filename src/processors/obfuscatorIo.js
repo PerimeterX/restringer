@@ -15,7 +15,9 @@ const freezeReplacementString = 'function () {return "bypassed!"}';
  */
 function freezeUnbeautifiedValues(arb) {
 	const candidates = arb.ast.filter(n =>
-		n.type === 'Literal' && ['newState', 'removeCookie'].includes(n.value));
+		n.type === 'Literal' &&
+		['newState', 'removeCookie'].includes(n.value));
+
 	for (const c of candidates) {
 		let targetNode;
 		switch (c.value) {
