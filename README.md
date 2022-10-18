@@ -15,8 +15,6 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
   * [Command-Line Usage](#command-line-usage) 
   * [Use as a Module](#use-as-a-module) 
 * [Read More](#read-more)
-* [TODO](#todo)
-
 ***
 
 ## Installation 
