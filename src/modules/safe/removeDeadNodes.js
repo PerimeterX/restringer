@@ -1,3 +1,5 @@
+const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'FunctionDeclaration', 'ClassDeclaration'];
+
 /**
  * Remove nodes code which is only declared but never used.
  * NOTE: This is a dangerous operation which shouldn't run by default, invokations of the so-called dead code
@@ -6,7 +8,6 @@
  * @return {Arborist}
  */
 function removeDeadNodes(arb) {
-	const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'FunctionDeclaration', 'ClassDeclaration'];
 	const candidates = arb.ast.filter(n =>
 		n.type === 'Identifier' &&
 		relevantParents.includes(n.parentNode.type) &&

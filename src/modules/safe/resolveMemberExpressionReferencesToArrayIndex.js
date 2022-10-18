@@ -1,3 +1,7 @@
+const logger = require(__dirname + '/../utils/logger');
+
+const minArrayLength = 20;
+
 /**
  * Resolve member expressions to their targeted index in an array.
  * E.g.
@@ -5,11 +9,9 @@
  * ==>
  * const a = [1, 2, 3]; b = 1; c = 3;
  * @param {Arborist} arb
- * @param {object} logger
  * @return {Arborist}
  */
-function resolveMemberExpressionReferencesToArrayIndex(arb, logger) {
-	const minArrayLength = 20;
+function resolveMemberExpressionReferencesToArrayIndex(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'ArrayExpression' &&

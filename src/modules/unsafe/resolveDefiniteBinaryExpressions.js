@@ -1,7 +1,7 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/doesBinaryExpressionContainOnlyLiterals');
+
 /**
  * Resolve definite binary expressions.
  * E.g.
@@ -14,8 +14,9 @@ function resolveDefiniteBinaryExpressions(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'BinaryExpression' &&
 		doesBinaryExpressionContainOnlyLiterals(n));
+
 	for (const c of candidates) {
-		const newNode = evalInVm(c.src, logger);
+		const newNode = evalInVm(c.src);
 		if (newNode !== badValue) arb.markNode(c, newNode);
 	}
 	return arb;

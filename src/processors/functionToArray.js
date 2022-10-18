@@ -31,7 +31,8 @@ function replaceFunctionWithArray(arb) {
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'CallExpression' &&
 		n.id?.references &&
-		n.id?.references.filter(r => r.parentNode.type === 'MemberExpression').length === n.id?.references.length);
+		!n.id.references.find(r => r.parentNode.type !== 'MemberExpression'));
+
 	for (const c of candidates) {
 		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
 		const src = createOrderedSrc(getDeclarationWithContext(targetNode).concat(c.init));

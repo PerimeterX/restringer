@@ -3,7 +3,7 @@
 const fs = require('fs');
 const {NodeVM} = require('vm2');
 const {JSDOM} = require('jsdom');
-const defaultLogger = require(__dirname + '/../utils/logger');
+const logger = require(__dirname + '/../utils/logger');
 const generateHash = require(__dirname + '/../utils/generateHash');
 
 let jQuerySrc = '';
@@ -15,10 +15,9 @@ const maxCacheSize = 100;
  * Place a string into a file and evaluate it with a simulated browser environment.
  * @param {string} stringToEval
  * @param {boolean} injectjQuery Inject jQuery into the VM if true.
- * @param {object} logger (optional) logging functions.
  * @return {string} The output string if successful; empty string otherwise.
  */
-function evalWithDom(stringToEval, injectjQuery = false, logger = defaultLogger) {
+function evalWithDom(stringToEval, injectjQuery = false) {
 	const cacheName = `evalWithDom-${generateHash(stringToEval)}`;
 	if (!cache[cacheName]) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};

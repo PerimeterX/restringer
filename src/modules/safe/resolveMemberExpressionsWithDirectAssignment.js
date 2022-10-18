@@ -14,6 +14,7 @@ function resolveMemberExpressionsWithDirectAssignment(arb) {
 		n.object.declNode &&
 		n.parentNode.type === 'AssignmentExpression' &&
 		n.parentNode.right.type === 'Literal');
+
 	for (const c of candidates) {
 		const prop = c.property?.value || c.property?.name;
 		const valueUses = c.object.declNode.references.filter(n =>
@@ -21,7 +22,7 @@ function resolveMemberExpressionsWithDirectAssignment(arb) {
 			(n.parentNode.property.computed ?
 				n.parentNode.property?.value === prop :
 				n.parentNode.property?.name === prop) &&
-			n.parentNode.nodeId !== c.nodeId)
+			n.parentNode !== c)
 			.map(n => n.parentNode);
 		if (valueUses.length) {
 			// Skip if the value is reassigned

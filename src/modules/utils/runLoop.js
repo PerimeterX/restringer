@@ -1,6 +1,6 @@
 const {Arborist} = require('flast');
 const generateHash = require(__dirname + '/generateHash');
-const defaultLogger = require(__dirname + '/../utils/logger');
+const logger = require(__dirname + '/../utils/logger');
 const {defaultMaxIterations} = require(__dirname + '/../config');
 
 let iterationsCounter = 0;
@@ -9,11 +9,10 @@ let iterationsCounter = 0;
  * Run functions which modify the script in a loop until they are no long effective or the maximum number of cycles is reached.
  * @param {string} script The target script to run the functions on.
  * @param {function[]} funcs
- * @param {object?} logger (optional) logging functions.
  * @param {number?} maxIterations (optional) Stop the loop after this many iterations at most.
  * @return {string} The possibly modified script.
  */
-function runLoop(script, funcs, maxIterations = defaultMaxIterations, logger = defaultLogger) {
+function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 	let scriptSnapshot = '';
 	let currentIteration = 0;
 	try {

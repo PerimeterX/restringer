@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
 const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
@@ -15,19 +14,23 @@ function resolveBuiltinCalls(arb) {
 	const availableSafeImplementations = Object.keys(safeImplementations);
 	const callsWithOnlyLiteralArugments = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
-		!n.arguments.filter(a => a.type !== 'Literal').length);
+		!n.arguments.find(a => a.type !== 'Literal'));
+
 	const candidates = callsWithOnlyLiteralArugments.filter(n =>
 		n.callee.type === 'Identifier' &&
 		!n.callee.declNode &&
 		!skipBuiltinFunctions.includes(n.callee.name));
+
 	candidates.push(...callsWithOnlyLiteralArugments.filter(n =>
 		n.callee.type === 'MemberExpression' &&
 		!n.callee.object.declNode &&
 		!skipIdentifiers.includes(n.callee.object?.name) &&
 		!skipProperties.includes(n.callee.property?.name || n.callee.property?.value)));
+
 	candidates.push(...arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		availableSafeImplementations.includes((n.callee.name))));
+
 	for (const c of candidates) {
 		try {
 			const callee = c.callee;
@@ -40,7 +43,7 @@ function resolveBuiltinCalls(arb) {
 					arb.markNode(c, createNewNode(tempValue));
 				}
 			} else {
-				const newNode = evalInVm(c.src, logger);
+				const newNode = evalInVm(c.src);
 				if (newNode !== badValue) arb.markNode(c, newNode);
 			}
 		} catch {}

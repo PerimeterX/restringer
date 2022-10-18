@@ -14,9 +14,9 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb) {
 		n?.references?.length &&
 		n.references.filter(r =>
 			r.parentNode.type === 'AssignmentExpression' &&
-			getMainDeclaredObjectOfMemberExpression(r.parentNode.left).nodeId === r.nodeId).length === 1 &&
-		!n.references.filter(r =>
-			(/For.*Statement/.exec(r.parentNode.type) &&
+			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r).length === 1 &&
+		!n.references.find(r =>
+			(/For.*Statement/.test(r.parentNode.type) &&
 				r.parentKey === 'left') ||
 			// This covers cases like:
 			// let a; b === c ? (b++, a = 1) : a = 2
@@ -24,14 +24,15 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb) {
 				r.parentNode.parentNode.type,
 				r.parentNode.parentNode?.parentNode?.type,
 				r.parentNode.parentNode?.parentNode?.parentNode?.type,
-			].includes('ConditionalExpression')).length);
+			].includes('ConditionalExpression')));
+
 	for (const c of candidates) {
-		const assignmentNode = c.references.filter(r =>
+		const assignmentNode = c.references.find(r =>
 			r.parentNode.type === 'AssignmentExpression' &&
-			getMainDeclaredObjectOfMemberExpression(r.parentNode.left).nodeId === r.nodeId)[0];
+			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r);
 		const valueNode = assignmentNode.parentNode.right;
 		if (valueNode.type !== 'Literal') continue;
-		const refs = c.references.filter(r => r.nodeId !== assignmentNode.nodeId);
+		const refs = c.references.filter(r => r !== assignmentNode);
 		if (!areReferencesModified(arb.ast, refs)) {
 			for (const ref of refs) {
 				if (ref.parentNode.type === 'CallExpression' && ref.parentKey === 'callee') continue;

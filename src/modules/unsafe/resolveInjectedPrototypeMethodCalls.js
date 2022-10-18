@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 
@@ -35,7 +34,7 @@ function resolveInjectedPrototypeMethodCalls(arb) {
 				]),
 			];
 			const src = `${createOrderedSrc([...context, ...refContext])}\n${ref.src}`;
-			const newNode = evalInVm(src, logger);
+			const newNode = evalInVm(src);
 			if (newNode !== badValue) arb.markNode(ref, newNode);
 		}
 	}

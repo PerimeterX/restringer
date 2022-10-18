@@ -1,4 +1,3 @@
-const logger = require(__dirname + '/../utils/logger');
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue, skipProperties} = require(__dirname + '/../config');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
@@ -23,6 +22,7 @@ function resolveMemberExpressionsLocalReferences(arb) {
 		n.type === 'MemberExpression' &&
 		['Identifier', 'Literal'].includes(n.property.type) &&
 		!skipProperties.includes(n.property?.name || n.property?.value));
+
 	for (const c of candidates) {
 		// If this member expression is the callee of a call expression - skip it
 		if (c.parentNode.type === 'CallExpression' && c.parentKey === 'callee') continue;
@@ -38,11 +38,11 @@ function resolveMemberExpressionsLocalReferences(arb) {
 			const declNode = relevantIdentifier.declNode;
 			// Skip if the identifier was declared as a function's parameter.
 			if (/Function/.test(declNode.parentNode.type) &&
-				(declNode.parentNode.params || []).filter(p => p.nodeId === declNode.nodeId).length) continue;
+				(declNode.parentNode.params || []).find(p => p === declNode)) continue;
 			const context = createOrderedSrc(getDeclarationWithContext(relevantIdentifier.declNode.parentNode));
 			if (context) {
 				const src = `${context}\n${c.src}`;
-				const newNode = evalInVm(src, logger);
+				const newNode = evalInVm(src);
 				if (newNode !== badValue) {
 					let isEmptyReplacement = false;
 					switch (newNode.type) {

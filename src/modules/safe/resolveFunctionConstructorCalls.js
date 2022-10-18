@@ -18,7 +18,7 @@ function resolveFunctionConstructorCalls(arb) {
 		let args = '';
 		if (c.arguments.length > 1) {
 			const originalArgs = c.arguments.slice(0, -1);
-			if (originalArgs.filter(n => n.type !== 'Literal').length) continue;
+			if (originalArgs.find(n => n.type !== 'Literal')) continue;
 			args = originalArgs.map(n => n.value).join(', ');
 		}
 		// Wrap the code in a valid anonymous function in the same way Function.constructor would.
