@@ -13,8 +13,11 @@ function removeDeadNodes(arb) {
 		relevantParents.includes(n.parentNode.type) &&
 		(!n?.declNode?.references?.length && !n?.references?.length))
 		.map(n => n.parentNode);
+
 	for (const c of candidates) {
-		arb.markNode(c);
+		// Do not remove root nodes as they might be referenced in another script
+		if (c.parentNode.type === 'Program') continue;
+		arb.markNode(c?.parentNode?.type === 'ExpressionStatement' ? c.parentNode : c);
 	}
 	return arb;
 }
