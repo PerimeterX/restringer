@@ -1,5 +1,5 @@
 const {unsafe: {evalWithDom}, safe: {removeDeadNodes}} = require(__dirname + '/../modules');
-const {generateCode, Arborist} = require('flast');
+const {Arborist} = require('flast');
 
 const lineWithFinalAssignmentRegex = /(\w{3})\[.*]\s*=.*\((\w{3})\).*=\s*\1\s*\+\s*['"]/ms;
 const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;
@@ -34,7 +34,7 @@ function extractInnerLayer(arb) {
 	// couple of lines where an object's toString is being replaced with the inner layer code, and then
 	// run when the object is being added to a string, implicitly invoking the object's toString method.
 	// We can catch the variable holding the code before it's injected and output it instead.
-	let script = generateCode(arb.ast[0]);
+	let script = arb.script;
 
 	const matches = lineWithFinalAssignmentRegex.exec(script);
 	if (matches?.length) {
