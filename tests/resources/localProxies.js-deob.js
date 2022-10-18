@@ -811,8 +811,8 @@ function _0x18585b(_0x39d250, _0x5b10a5, _0x5e9dc9) {
     };
   }(), _0x5d8b17 = _0x2dbea1(this, function () {
     var _0x5efb50 = function () {
-      var _0x5d91f6 = _0x5efb50.constructor('return /" + this + "/')().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');
-      return !_0x5d91f6.test(_0x5d8b17);
+      var _0x5d91f6 = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
+      return !/^([^ ]+( +[^ ]+)+)+[^ ]}/.test(_0x5d8b17);
     };
     return _0x5efb50();
   });

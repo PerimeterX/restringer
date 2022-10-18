@@ -142,8 +142,8 @@ var _yg = function () {
 }();
 var _yh = _yg(this, function () {
   var a = function () {
-    var b = a.constructor('return /" + this + "/')().compile('^([^ ]+( +[^ ]+)+)+[^ ]}');
-    return !b.test(_yh);
+    var b = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
+    return !/^([^ ]+( +[^ ]+)+)+[^ ]}/.test(_yh);
   };
   return a();
 });
@@ -199,17 +199,19 @@ module.exports = _yj;
 function _yk(a) {
   function b(c) {
     if (typeof c === 'string') {
-      return function (e) {
-      }.constructor('while (true) {}').apply('counter');
+      return function () {
+        while (true) {
+        }
+      }.apply('counter');
     } else {
       if (('' + c / c).length !== 1 || c % 20 === 0) {
         (function () {
-          return true;
-        }.constructor('debugge_').call('action'));
+          debugge_;
+        }.call('action'));
       } else {
         (function () {
-          return false;
-        }.constructor('debugge_').apply('stateObject'));
+          debugge_;
+        }.apply('stateObject'));
       }
     }
     b(++c);
