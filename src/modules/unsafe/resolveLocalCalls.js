@@ -35,8 +35,8 @@ function resolveLocalCalls(arb) {
 
 	const modifiedRanges = [];
 	for (const c of candidates.sort(sortByFrequency)) {
-		if (c.arguments.filter(a => badArgumentTypes.includes(a.type)).length) continue;
-		if (doesNodeContainRanges(c, modifiedRanges)) continue;
+		if (c.arguments.find(a => badArgumentTypes.includes(a.type))) continue;
+		if (isNodeInRanges(c, modifiedRanges)) continue;
 		const callee = c.callee?.object || c.callee;
 		const declNode = c.callee?.declNode || c.callee?.object?.declNode;
 		if (declNode?.parentNode?.body?.body?.length && declNode.parentNode?.body?.body[0].type === 'ReturnStatement') {
