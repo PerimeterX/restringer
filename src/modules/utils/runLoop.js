@@ -50,7 +50,6 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 			++iterationsCounter;
 			logger.log(`[+] ==> Cycle ${iterationsCounter} completed in ${(Date.now() - cycleStartTime) / 1000} seconds` +
 				` with ${changesCounter ? changesCounter : 'no'} changes (${arborist.ast.length} nodes)`);
-			if (maxIterations) break;
 		}
 		if (changesCounter) script = arborist.script;
 	} catch (e) {
