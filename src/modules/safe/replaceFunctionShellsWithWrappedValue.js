@@ -6,9 +6,10 @@
 function replaceFunctionShellsWithWrappedValue(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'FunctionDeclaration' &&
-		n.body?.body?.length === 1 &&
+		n.body?.body?.length &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type));
+
 	for (const c of candidates) {
 		const replacementNode = c.body.body[0].argument;
 		for (const ref of (c.id?.references || [])) {

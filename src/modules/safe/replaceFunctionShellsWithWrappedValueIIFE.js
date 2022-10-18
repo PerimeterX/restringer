@@ -8,7 +8,7 @@ function replaceFunctionShellsWithWrappedValueIIFE(arb) {
 		n.type === 'FunctionExpression' &&
 		n.parentKey === 'callee' &&
 		!n.parentNode.arguments.length &&
-		n.body?.body?.length === 1 &&
+		n.body?.body?.length &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type))
 		.map(n => n.parentNode);
