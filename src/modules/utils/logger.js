@@ -14,7 +14,7 @@ let currentLogLevel = logLevels.LOG;
 
 function createLoggerForLevel(logLevel) {
 	if (!(logLevel in Object.values(logLevels))) throw new Error(`Unknown log level ${logLevel}.`);
-	return msg => currentLogLevel >= logLevels[logLevel] ? console.log(msg) : undefined;
+	return msg => logLevel >= currentLogLevel ? console.log(msg) : undefined;
 }
 const debug = createLoggerForLevel(logLevels.DEBUG);
 const log = createLoggerForLevel(logLevels.LOG);
