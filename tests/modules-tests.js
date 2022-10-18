@@ -1,4 +1,5 @@
 const {generateFlatAST} = require('flast');
+const {badValue} = require(__dirname + '/../src/modules/config');
 
 module.exports = [
 	// Safe
@@ -22,6 +23,21 @@ module.exports = [
 		func: __dirname + '/../src/modules/safe/consolidateNestedBlockStatements',
 		source: `if (a) {{do_a();}{do_b(); do_c();}{do_d();}}`,
 		expected: `if (a) {\n  do_a();\n  do_b();\n  do_c();\n  do_d();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'consolidateNestedBlockStatements - TP-3',
+		func: __dirname + '/../src/modules/safe/consolidateNestedBlockStatements',
+		source: `if (a) {{do_a();} do_b();}`,
+		expected: `if (a) {\n  do_a();\n  do_b();\n}`,
+	},
+	{
+		enabled: true,
+		looped: true,
+		name: 'consolidateNestedBlockStatements - TP-4',
+		func: __dirname + '/../src/modules/safe/consolidateNestedBlockStatements',
+		source: `if (a) {{{{{do_a();}}}} do_b();}`,
+		expected: `if (a) {\n  do_a();\n  do_b();\n}`,
 	},
 	{
 		enabled: true,
@@ -151,10 +167,10 @@ module.exports = [
 	},
 	{
 		enabled: true,
-		name: 'resolveFunctionConstructorCalls - TN-1',
+		name: 'resolveFunctionConstructorCalls - TP-2',
 		func: __dirname + '/../src/modules/safe/resolveFunctionConstructorCalls',
 		source: `a = Function.constructor('return /" + this + "/')().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');`,
-		expected: `a = Function.constructor('return /" + this + "/')().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');`,
+		expected: `a = function () {\n  return /" + this + "/;\n}().constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');`,
 	},
 	{
 		enabled: true,
@@ -244,14 +260,14 @@ module.exports = [
 
 	// Unsafe
 	{
-		enabled: false,
-		reason: 'TODO: Consider proper tests for function',
-		name: 'evalInVm - TP-1',
+		enabled: true,
+		isUtil: true,
+		name: 'evalInVm - TN-1',
 		func: __dirname + '/../src/modules/unsafe/evalInVm',
-		prepareTest: () => {},
-		prepareResult: () => {},
-		source: ``,
-		expected: `function a(x) {\n  return x + 3;\n}`,
+		prepareTest: a => [a],
+		prepareResult: b => b,
+		source: `Math.random();`,
+		expected: badValue,
 	},
 	{
 		enabled: false,
@@ -436,6 +452,7 @@ module.exports = [
 	// Utils
 	{
 		enabled: true,
+		isUtil: true,
 		name: 'areReferencesModified - TP-1',
 		func: __dirname + '/../src/modules/utils/areReferencesModified',
 		prepareTest: src => {
@@ -448,6 +465,7 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		isUtil: true,
 		name: 'areReferencesModified - TP-2',
 		func: __dirname + '/../src/modules/utils/areReferencesModified',
 		prepareTest: src => {
@@ -460,6 +478,7 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		isUtil: true,
 		name: 'areReferencesModified - TN-1',
 		func: __dirname + '/../src/modules/utils/areReferencesModified',
 		prepareTest: src => {
