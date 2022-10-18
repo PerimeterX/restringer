@@ -15,6 +15,7 @@ function resolveEvalCallsOnNonLiterals(arb) {
 		n.callee.name === 'eval' &&
 		n.arguments.length === 1 &&
 		n.arguments[0].type !== 'Literal');
+
 	for (const c of candidates) {
 		const argument = c.arguments[0];
 		const src = `var __a_ = ${argument.src}\n;__a_`;
@@ -35,7 +36,7 @@ function resolveEvalCallsOnNonLiterals(arb) {
 				}
 			}
 		} catch {}
-		if (replacementNode !== badValue) {arb.markNode(targetNode, replacementNode);}
+		if (replacementNode !== badValue) arb.markNode(targetNode, replacementNode);
 	}
 	return arb;
 }

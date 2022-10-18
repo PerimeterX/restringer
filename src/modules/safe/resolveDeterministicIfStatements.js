@@ -11,6 +11,7 @@ function resolveDeterministicIfStatements(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'IfStatement' &&
 		n.test.type === 'Literal');
+
 	for (const c of candidates) {
 		if (c.test.value) {
 			if (c.consequent) arb.markNode(c, c.consequent);

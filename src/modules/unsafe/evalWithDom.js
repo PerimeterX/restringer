@@ -1,6 +1,6 @@
 // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
 
-const fs = require('fs');
+const fs = require('node:fs');
 const {NodeVM} = require('vm2');
 const {JSDOM} = require('jsdom');
 const logger = require(__dirname + '/../utils/logger');

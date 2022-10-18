@@ -17,7 +17,8 @@ function resolveInjectedPrototypeMethodCalls(arb) {
 		n.left.type === 'MemberExpression' &&
 		(n.left.object.property?.name || n.left.object.property?.value) === 'prototype' &&
 		n.operator === '=' &&
-		(/FunctionExpression/.test(n.right?.type) || n.right?.type === 'Identifier'));
+		(/FunctionExpression|Identifier/.test(n.right?.type)));
+
 	for (const c of candidates) {
 		const methodName = c.left.property?.name || c.left.property?.value;
 		const context = getDeclarationWithContext(c);
@@ -25,6 +26,7 @@ function resolveInjectedPrototypeMethodCalls(arb) {
 			n.type === 'CallExpression' &&
 			n.callee.type === 'MemberExpression' &&
 			(n.callee.property?.name || n.callee.property?.value) === methodName);
+
 		for (const ref of references) {
 			const refContext = [
 				...new Set([

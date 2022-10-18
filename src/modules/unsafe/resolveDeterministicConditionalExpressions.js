@@ -1,5 +1,4 @@
 const evalInVm = require(__dirname + '/evalInVm');
-const logger = require(__dirname + '/../utils/logger');
 
 /**
  * Evaluate resolvable (independent) conditional expressions and replace them with their unchanged resolution.
@@ -12,8 +11,9 @@ function resolveDeterministicConditionalExpressions(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'ConditionalExpression' &&
 		n.test.type === 'Literal');
+
 	for (const c of candidates) {
-		const newNode = evalInVm(`!!(${c.test.src});`, logger);
+		const newNode = evalInVm(`Boolean(${c.test.src});`);
 		if (newNode.type === 'Literal') {
 			arb.markNode(c, newNode.value ? c.consequent : c.alternate);
 		}

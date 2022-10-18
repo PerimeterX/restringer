@@ -12,6 +12,7 @@ function resolveProxyVariables(arb) {
 	const candidates = [...new Set(arb.ast.filter(n =>
 		n.type === 'VariableDeclarator' &&
 		n?.init?.type === 'Identifier'))];
+
 	for (const c of candidates) {
 		const refs = c.id.references || [];
 		// Remove proxy assignments if there are no further proxies assigned

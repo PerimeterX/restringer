@@ -1,3 +1,7 @@
+/**
+ * Function To Array Replacements
+ * The obfuscated script dynamically generates an array which is referenced throughout the script.
+ */
 const {
 	unsafe: {
 		evalInVm,
@@ -10,11 +14,6 @@ const {
 		badValue,
 	}
 } = require(__dirname + '/../modules');
-
-/**
- * Function To Array Replacements
- * The obfuscated script dynamically generates an array which is referenced throughout the script.
- */
 
 /**
  * Run the generating function and replace it with the actual array.

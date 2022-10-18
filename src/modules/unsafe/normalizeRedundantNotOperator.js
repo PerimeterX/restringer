@@ -11,9 +11,10 @@ const relevantNodeTypes = ['Literal', 'ArrayExpression', 'ObjectExpression', 'Un
  */
 function normalizeRedundantNotOperator(arb) {
 	const candidates = arb.ast.filter(n =>
+		n.operator === '!' &&
 		n.type === 'UnaryExpression' &&
-		relevantNodeTypes.includes(n.argument.type) &&
-		n.operator === '!');
+		relevantNodeTypes.includes(n.argument.type));
+
 	for (const c of candidates) {
 		if (canUnaryExpressionBeResolved(c.argument)) {
 			const newNode = evalInVm(c.src);

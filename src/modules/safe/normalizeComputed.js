@@ -34,13 +34,14 @@ function normalizeComputed(arb) {
 
 	for (const c of candidates) {
 		const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';
-		const nonComputed = {...c};
-		nonComputed.computed = false;
-		nonComputed[relevantProperty] = {
-			type: 'Identifier',
-			name: c[relevantProperty].value,
-		};
-		arb.markNode(c, nonComputed);
+		arb.markNode(c, {
+			...c,
+			computed: false,
+			[relevantProperty]: {
+				type: 'Identifier',
+				name: c[relevantProperty].value,
+			},
+		});
 	}
 	return arb;
 }

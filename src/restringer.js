@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-
-const fs = require('fs');
-const version = require(__dirname + '/../package').version;
-const detectObfuscation = require('obfuscation-detector');
 const processors = require(__dirname + '/processors');
+const detectObfuscation = require('obfuscation-detector');
+const version = require(__dirname + '/../package').version;
 const {
 	utils: {
-		runLoop: staticRunLoop,
+		runLoop,
 		normalizeScript,
 		logger,
 	},
@@ -72,8 +70,8 @@ class REstringer {
 		const detectedObfuscationType = detectObfuscation(this.script, false).slice(-1)[0];
 		if (detectedObfuscationType) {
 			const relevantProcessors = processors[detectedObfuscationType]();
-			if (relevantProcessors?.preprocessors?.length) this._preprocessors = relevantProcessors.preprocessors;
-			if (relevantProcessors?.postprocessors?.length) this._postprocessors = relevantProcessors.postprocessors;
+			this._preprocessors = relevantProcessors?.preprocessors || [];
+			this._postprocessors = relevantProcessors?.postprocessors || [];
 			this.obfuscationName = detectedObfuscationType;
 		}
 		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
@@ -134,12 +132,8 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = staticRunLoop(this.script, this._safeDeobfuscationMethods());
-			if (this.script !== script) {
-				this.modified = true;
-				this.script = script;
-			}
-			script = staticRunLoop(this.script, this._unsafeDeobfuscationMethods(), 1);
+			script = runLoop(this.script, this._safeDeobfuscationMethods());
+			script = runLoop(script, this._unsafeDeobfuscationMethods(), 1);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -163,7 +157,7 @@ class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = staticRunLoop(this.script, [removeDeadNodes]);
+		if (clean) this.script = runLoop(this.script, [removeDeadNodes]);
 		return this.modified;
 	}
 
@@ -173,7 +167,7 @@ class REstringer {
 	 * @param {Array<Function|string>} processors An array of either imported deobfuscation methods or the name of internal methods.
 	 */
 	_runProcessors(processors) {
-		processors.forEach(proc => this.script = staticRunLoop(this.script, [proc], 1));
+		processors.forEach(proc => this.script = runLoop(this.script, [proc], 1));
 	}
 }
 
@@ -183,6 +177,7 @@ if (require.main === module) {
 		const argv = process.argv;
 		if (argv.length > 2) {
 			const inputFilename = argv[2];
+			const fs = require('node:fs');
 			let content = fs.readFileSync(inputFilename, 'utf-8');
 			const startTime = Date.now();
 			const originalInputLength = content.length;
