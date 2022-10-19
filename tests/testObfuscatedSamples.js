@@ -12,6 +12,7 @@ function testSampleDeobfuscation(testSampleName, testSampleFilename) {
 	const deobfuscatedTarget = fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8')
 		.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
 	const restringer = new REstringer(obfuscatedSource);
+	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();
 	const deobfuscationResult = restringer.script.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
 	assert.equal(deobfuscationResult, deobfuscatedTarget);

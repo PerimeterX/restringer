@@ -1,6 +1,6 @@
 const assert = require('node:assert');
 const {Arborist} = require('flast');
-const {runLoop} = require(__dirname + '/../src/modules').utils;
+const {runLoop, logger} = require(__dirname + '/../src/modules').utils;
 
 const tests = {
 	modulesTests: __dirname + '/modules-tests',
@@ -49,6 +49,7 @@ function testModuleInLoop(testName, testFunc, source, expected, prepTest = null,
 
 let allTests = 0;
 let skippedTests = 0;
+logger.setLogLevel(logger.logLevels.NONE);
 console.time('tests in');
 for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	const loadedTests = require(moduleTests);
