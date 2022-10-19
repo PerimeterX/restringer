@@ -173,29 +173,30 @@ class REstringer {
 
 module.exports = REstringer;
 if (require.main === module) {
+	const {parseArgs, printHelp} = require(__dirname + '/utils/parseArgs');
 	try {
-		const argv = process.argv;
-		if (argv.length > 2) {
-			const inputFilename = argv[2];
+		const args = parseArgs(process.argv.slice(2));
+		if (Object.keys(args).length && !(args.verbose && args.quiet) && args.inputFilename) {
 			const fs = require('node:fs');
-			let content = fs.readFileSync(inputFilename, 'utf-8');
+			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
-			const originalInputLength = content.length;
-			logger.log(`[!] Attempting to deobfuscate ${inputFilename} (length: ${originalInputLength})\n`);
+			logger.log(`[!] Deobfuscating ${args.inputFilename}...\n`);
 
 			const restringer = new REstringer(content);
-			restringer.deobfuscate(argv[3] === '--clean');
-			const outputFilename = `${inputFilename}-${restringer.obfuscationName}-deob.js`;
+			if (args.quiet) restringer.logger.setLogLevel(logger.logLevels.NONE);
+			else if (args.verbose) restringer.logger.setLogLevel(logger.logLevels.DEBUG);
+			restringer.deobfuscate();
 			if (restringer.modified) {
-				logger.log(`[+] Output saved to ${outputFilename}\n\tLength: ${restringer.script.length} ` +
-					`(difference is ${restringer.script.length - content.length})\n\tChanges: ${restringer.totalChangesCounter}`);
-				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds`);
-				// TODO write to file per command line arugments
-				if (logger.isLogging()) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
+				logger.log(`[+] Saved ${args.outputFilename}`);
+				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds, with ${restringer.totalChangesCounter} changes.`);
+				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
-		} else console.log('Usage:\n\trestringer.js obfuscated.js \t\t# Print deobfuscated file to stdout\n\t' +
-			'restringer.js obfuscated.js --clean \t# Print deobfuscated file to stdout and remove dead nodes');
+		} else {
+			if (!args.inputFilename) console.log(`Input filename must be provided`);
+			else if (args.verbose && args.quiet) console.log(`Don't set both -q and -v at the same time *smh*`);
+			console.log(printHelp());
+		}
 	} catch (e) {
 		logger.error(`[-] Critical Error: ${e}`);
 	}
