@@ -35,18 +35,21 @@ preventing the script from being deobfuscated.
 
 ### Command-Line Usage
 
-Output deobfuscated result to STDOUT (nothing will print if deobfuscation failed)
-> node restringer.js script.js
+```
+Usage: restringer input_filename [-h] [-c] [-q|-v] [-o [output_filename]]
 
-Show debug information and save deobfuscated script to `script.js-<obfuscation-type>-deob.js`
-> export DEOBDEBUG=true && node restringer.js script.js
+positional arguments:
+	input_filename    The obfuscated JS file
 
-Log level can be adusted via the `DEOBDEBUGLEVEL` environment variable for more or less granular 
-log output. The default level is an arbitrary 50, simply to leave space for other levels to be added when needed.
-
-> export DEOBDEBUG=true && DEOBDEBUGLEVEL=50 && node restringer.js script.js
-
-Level 1 is most verbose, level 2 is a good value to use for debugging.
+optional arguments:
+	-h, --help                      Show this help message and exit.
+	-c, --clean                     Remove dead nodes from script after deobfuscation is complete (unsafe).
+	-q, --quiet                     Suppress output to stdout. Output result only to stdout if the -o option is not set.
+																	Does not go with the -v option.
+	-v, --verbose                   Show more debug messages while deobfuscating. Does not go with the -q option.
+	-o, --output [output_filename]  Write deobfuscated script to output_filename. 
+																	Use <input_filename>-deob.js if no filename is provided.
+```
 ### Use as a Module
 
 ```javascript
