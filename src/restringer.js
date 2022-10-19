@@ -178,7 +178,7 @@ if (require.main === module) {
 	const {parseArgs, printHelp} = require(__dirname + '/utils/parseArgs');
 	try {
 		const args = parseArgs(process.argv.slice(2));
-		if (Object.keys(args).length && !(args.verbose && args.quiet) && args.inputFilename) {
+		if (Object.keys(args).length && !args.help && !(args.verbose && args.quiet) && args.inputFilename) {
 			const fs = require('node:fs');
 			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
@@ -195,8 +195,10 @@ if (require.main === module) {
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
 		} else {
-			if (!args.inputFilename) console.log(`Input filename must be provided`);
-			else if (args.verbose && args.quiet) console.log(`Don't set both -q and -v at the same time *smh*`);
+			if (!args.help) {
+				if (!args.inputFilename) console.log(`Error: Input filename must be provided`);
+				else if (args.verbose && args.quiet) console.log(`Error: Don't set both -q and -v at the same time *smh*`);
+			}
 			console.log(printHelp());
 		}
 	} catch (e) {
