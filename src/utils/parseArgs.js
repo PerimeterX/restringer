@@ -2,7 +2,7 @@ function printHelp() {
 	return `
 REstringer - a JavaScript deobfuscator
 
-Usage: ./restringer input_filename [-h] [-c] [-q|-v] [-o [output_filename]]
+Usage: restringer input_filename [-h] [-c] [-q|-v] [-o [output_filename]]
 
 positional arguments:
 	input_filename    The obfuscated JS file
