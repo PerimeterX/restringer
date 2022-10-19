@@ -1,5 +1,5 @@
-const assert = require('assert');
-const {generateFlatAST, generateCode, Arborist} = require('flast');
+const {Arborist} = require('flast');
+const assert = require('node:assert');
 
 const tests = {
 	processorsTests: __dirname + '/processors-tests',
@@ -20,13 +20,11 @@ const defaultPrepRes = arb => {arb.applyChanges(); return arb.script;};
 function testProcessor(testName, testProcs, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
 	process.stdout.write(`Testing ${testName}... `);
 	console.time('PASS');
-	const testInput = prepTest(source);
-	let rawRes = testInput;
+	let rawRes = prepTest(source);
 	testProcs.preprocessors.forEach(proc => rawRes = proc(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
 	testProcs.postprocessors.forEach(proc => rawRes = proc(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
 	const result = prepRes(rawRes);
-	assert(result === expected,
-		`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${result}\n\t!==\n${expected}\n-------------`);
+	assert.equal(result, expected);
 	console.timeEnd('PASS');
 }
 

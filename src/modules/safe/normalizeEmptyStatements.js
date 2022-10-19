@@ -5,6 +5,7 @@
  */
 function normalizeEmptyStatements(arb) {
 	const candidates = arb.ast.filter(n => n.type === 'EmptyStatement');
+
 	for (const c of candidates) {
 		// A for loop is sometimes used to assign variables without providing a loop body, just an empty statement.
 		// If we delete that empty statement the syntax breaks

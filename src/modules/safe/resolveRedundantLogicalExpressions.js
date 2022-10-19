@@ -10,6 +10,7 @@ function resolveRedundantLogicalExpressions(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'IfStatement' &&
 		n.test.type === 'LogicalExpression');
+
 	for (const c of candidates) {
 		if (c.test.operator === '&&') {
 			if (c.test.left.type === 'Literal') {

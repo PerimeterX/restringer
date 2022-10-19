@@ -1,4 +1,4 @@
-const assert = require('assert');
+const assert = require('node:assert');
 const {REstringer} = require(__dirname + '/..');
 
 const tests = {
@@ -15,6 +15,7 @@ function testCodeSample(testName, source, expected) {
 	process.stdout.write(`Testing ${testName}... `);
 	console.time('PASS');
 	const restringer = new REstringer(source);
+	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();
 	assert((restringer.script === expected ||
 			restringer.script.replace(/'/g, '"') === expected.replace(/'/g, '"') ||

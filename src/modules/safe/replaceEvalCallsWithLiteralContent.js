@@ -7,6 +7,7 @@ const generateHash = require(__dirname + '/../utils/generateHash');
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.
  * E.g.
  * eval('console.log("hello world")'); // <-- will be replaced with console.log("hello world");
+ * eval('a(); b();'); // <-- will be replaced with '{a(); b();}'
  * @param {Arborist} arb
  * @return {Arborist}
  */
@@ -16,6 +17,7 @@ function replaceEvalCallsWithLiteralContent(arb) {
 		n.type === 'CallExpression' &&
 		n.callee?.name === 'eval' &&
 		n.arguments[0]?.type === 'Literal');
+
 	for (const c of candidates) {
 		const cacheName = `replaceEval-${generateHash(c.src)}`;
 		try {

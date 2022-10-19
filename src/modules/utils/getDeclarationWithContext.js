@@ -24,16 +24,14 @@ function getDeclarationWithContext(originNode) {
 	let cached = cache[cacheNameId] || cache[cacheNameSrc];
 	if (!cached) {
 		const collectedContext = [originNode];
+		const examinedNodes = [];
 		const examineStack = [originNode];
-		const collectedContextIds = [];
 		const collectedRanges = [];
-		const examinedIds = [];
 		while (examineStack.length) {
 			const relevantNode = examineStack.pop();
-			if (examinedIds.includes(relevantNode.nodeId)) continue;
-			else examinedIds.push(relevantNode.nodeId);
+			if (examinedNodes.includes(relevantNode)) continue;
+			else examinedNodes.push(relevantNode);
 			if (isNodeMarked(relevantNode)) continue;
-			collectedContextIds.push(relevantNode.nodeId);
 			collectedRanges.push(relevantNode.range);
 			let relevantScope = relevantNode.scope;
 			const assignments = [];
@@ -87,9 +85,8 @@ function getDeclarationWithContext(originNode) {
 					.concat(references))
 			].map(ref => ref?.declNode ? ref.declNode : ref);
 			for (const rn of contextToCollect) {
-				if (rn && !collectedContextIds.includes(rn.nodeId) && !isNodeInRanges(rn, collectedRanges)) {
+				if (rn && !collectedContext.includes(rn) && !isNodeInRanges(rn, collectedRanges)) {
 					collectedRanges.push(rn.range);
-					collectedContextIds.push(rn.nodeId);
 					collectedContext.push(rn);
 					examineStack.push(rn);
 					for (const cn of (rn.childNodes || [])) {

@@ -17,14 +17,15 @@ function resolveProxyReferences(arb) {
 			['Identifier', 'MemberExpression'].includes(n.id.type) &&
 			['Identifier', 'MemberExpression'].includes(n.init?.type)) &&
 		!/For.*Statement/.test(n.parentNode?.parentNode?.type));
+
 	for (const c of candidates) {
 		const relevantIdentifier = getMainDeclaredObjectOfMemberExpression(c.id)?.declNode || c.id;
 		const refs = relevantIdentifier.references || [];
 		const replacementNode = c.init;
 		const replacementMainIdentifier = getMainDeclaredObjectOfMemberExpression(c.init)?.declNode;
-		if (replacementMainIdentifier && replacementMainIdentifier.nodeId === relevantIdentifier.nodeId) continue;
+		if (replacementMainIdentifier && replacementMainIdentifier === relevantIdentifier) continue;
 		// Exclude changes in the identifier's own init
-		if (getDescendants(c.init).find(n => n.declNode?.nodeId === relevantIdentifier.nodeId)) continue;
+		if (getDescendants(c.init).find(n => n.declNode === relevantIdentifier)) continue;
 		if (refs.length && !areReferencesModified(arb.ast, refs) && !areReferencesModified(arb.ast, [replacementNode])) {
 			for (const ref of refs) {
 				arb.markNode(ref, replacementNode);

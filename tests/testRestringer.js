@@ -4,6 +4,7 @@ const availableTests = {
 	Deobfuscation: __dirname + '/testDeobfuscations',
 	'Obfuscated Sample': __dirname + '/testObfuscatedSamples',
 };
+
 console.time('\nAll tests completed in');
 let exception = '';
 for (const [testName, testFile] of Object.entries(availableTests)) {

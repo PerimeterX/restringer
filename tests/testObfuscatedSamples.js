@@ -1,8 +1,7 @@
-const fs = require('fs');
-const assert = require('assert');
-const obfuscatedSamples = require(__dirname + '/obfuscated-samples');
+const fs = require('node:fs');
+const assert = require('node:assert');
 const {REstringer} = require(__dirname + '/..');
-
+const obfuscatedSamples = require(__dirname + '/obfuscated-samples');
 
 const resourcePath = __dirname + '/resources';
 
@@ -13,10 +12,10 @@ function testSampleDeobfuscation(testSampleName, testSampleFilename) {
 	const deobfuscatedTarget = fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8')
 		.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
 	const restringer = new REstringer(obfuscatedSource);
+	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();
 	const deobfuscationResult = restringer.script.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
-	assert(deobfuscationResult === deobfuscatedTarget,
-		`Deobfuscation result of '${testSampleName}' does not match the expected result!\nEXPECTED:\n${deobfuscatedTarget}\n\nOUTPUT:\n${deobfuscationResult}`);
+	assert.equal(deobfuscationResult, deobfuscatedTarget);
 	console.timeEnd(' PASS');
 }
 

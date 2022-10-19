@@ -18,6 +18,7 @@ function unwrapFunctionShells(arb) {
 		(n.body.body[0].argument?.callee?.property?.name || n.body.body[0].argument?.callee?.property?.value) === 'apply' &&
 		n.body.body[0].argument.arguments?.length === 2 &&
 		n.body.body[0].argument.callee.object.type === 'FunctionExpression');
+
 	for (const c of candidates) {
 		const replacementNode = c.body.body[0].argument.callee.object;
 		if (c.id && !replacementNode.id) replacementNode.id = c.id;

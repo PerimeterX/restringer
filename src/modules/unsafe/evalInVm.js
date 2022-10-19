@@ -1,6 +1,7 @@
 const {VM} = require('vm2');
+const assert = require('node:assert');
 const {badValue} = require(__dirname + '/../config');
-const defaultLogger = require(__dirname + '/../utils/logger');
+const logger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const generateHash = require(__dirname + '/../utils/generateHash');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
@@ -40,10 +41,9 @@ const maxCacheSize = 100;
 /**
  * Eval a string in a ~safe~ VM environment
  * @param {string} stringToEval
- * @param {object} logger (optional) logging functions.
  * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
  */
-function evalInVm(stringToEval, logger = defaultLogger) {
+function evalInVm(stringToEval) {
 	const cacheName = `eval-${generateHash(stringToEval)}`;
 	if (cache[cacheName] === undefined) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};
@@ -52,13 +52,11 @@ function evalInVm(stringToEval, logger = defaultLogger) {
 			// Break known trap strings
 			trapStrings.forEach(ts => stringToEval = stringToEval.replace(ts.trap, ts.replaceWith));
 			const res = (new VM(vmOptions)).run(stringToEval);
-			// noinspection JSUnresolvedVariable
 			if (!res.VMError && !badTypes.includes(getObjType(res))) {
 				// To exclude results based on randomness or timing, eval again and compare results
 				const res2 = (new VM(vmOptions)).run(stringToEval);
-				if (JSON.stringify(res) === JSON.stringify(res2)) {
-					cache[cacheName] = createNewNode(res);
-				}
+				assert.deepEqual(res, res2);
+				cache[cacheName] = createNewNode(res);
 			}
 		} catch (e) {
 			logger.debug(`[-] Error in _evalInVm: ${e}`);

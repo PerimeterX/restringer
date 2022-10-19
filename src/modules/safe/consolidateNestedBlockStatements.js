@@ -9,19 +9,25 @@ function consolidateNestedBlockStatements(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'BlockStatement' &&
 		n.parentNode.type === 'BlockStatement');
+
 	for (const c of candidates) {
-		if (c.parentNode.body?.length > 1) {
+		const parent = c.parentNode;
+		if (parent.body?.length > 1) {
 			if (c.body.length === 1) arb.markNode(c, c.body[0]);
 			else {
-				const currentIdx = c.parentNode.body.indexOf(c);
+				const currentIdx = parent.body.indexOf(c);
 				const replacementNode = {
 					type: 'BlockStatement',
-					body: [...c.parentNode.body.slice(0, currentIdx), ...c.body, ...c.parentNode.body.slice(currentIdx + 1)],
+					body: [
+						...parent.body.slice(0, currentIdx),
+						...c.body,
+						...parent.body.slice(currentIdx + 1)
+					],
 				};
-				arb.markNode(c.parentNode, replacementNode);
+				arb.markNode(parent, replacementNode);
 			}
 		}
-		else arb.markNode(c.parentNode, c);
+		else arb.markNode(parent, c);
 	}
 	return arb;
 }

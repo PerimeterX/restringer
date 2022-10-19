@@ -1,5 +1,6 @@
-const assert = require('assert');
+const assert = require('node:assert');
 const {Arborist} = require('flast');
+const {runLoop, logger} = require(__dirname + '/../src/modules').utils;
 
 const tests = {
 	modulesTests: __dirname + '/modules-tests',
@@ -17,26 +18,48 @@ const defaultPrepRes = arb => {arb.applyChanges(); return arb.script;};
  * @param prepTest {function} - (optional) Function for preparing the test input.
  * @param prepRes {function} - (optional) Function for parsing the test output.
  */
-function testModule(testName, testFunc, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
+function testModuleOnce(testName, testFunc, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
 	process.stdout.write(`Testing ${testName}... `);
 	console.time('PASS');
 	const testInput = prepTest(source);
 	const rawRes = testFunc(...testInput);
 	const result = prepRes(rawRes);
-	assert(result === expected,
-		`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${result}\n\t!==\n${expected}\n-------------`);
+	assert.equal(result, expected);
+	console.timeEnd('PASS');
+}
+
+/**
+ * Generic function for verifying source code is deobfuscated as expected.
+ * @param testName {string} - The name of the test to be displayed.
+ * @param testFunc {function} - The tested function.
+ * @param source {string}   - The source code to be deobfuscated.
+ * @param expected {string} - The expected output.
+ * @param prepTest {function} - (optional) Function for preparing the test input.
+ * @param prepRes {function} - (optional) Function for parsing the test output.
+ */
+function testModuleInLoop(testName, testFunc, source, expected, prepTest = null, prepRes = null) {
+	process.stdout.write(`Testing ${testName}... `);
+	console.time('PASS');
+	const testInput = prepTest ? prepTest(source) : source;
+	const rawResult = runLoop(testInput, [testFunc]);
+	const result = prepRes ? prepRes(rawResult) : rawResult;
+	assert.equal(result, expected);
 	console.timeEnd('PASS');
 }
 
 let allTests = 0;
 let skippedTests = 0;
+logger.setLogLevel(logger.logLevels.NONE);
 console.time('tests in');
 for (const [moduleName, moduleTests] of Object.entries(tests)) {
 	const loadedTests = require(moduleTests);
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {
-			testModule(`[${moduleName}] ${test.name}`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
+			// Tests will have the `looped` flag if they only produce the desired result after consecutive runs
+			if (!test.looped) testModuleOnce(`[${moduleName}] ${test.name}`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
+			// Tests will have the `isUtil` flag if they do not return an Arborist instance (i.e. can't use runLoop)
+			if (!test.isUtil) testModuleInLoop(`[${moduleName}] ${test.name} (looped)`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;
 			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);

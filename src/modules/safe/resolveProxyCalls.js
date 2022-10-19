@@ -22,10 +22,11 @@ function resolveProxyCalls(arb) {
 		n.body.body[0].argument?.type === 'CallExpression' &&
 		n.body.body[0].argument.arguments.length === n.params.length &&
 		n.body.body[0].argument.callee.type === 'Identifier');
+
 	for (const c of candidates) {
-		const funcId = c.id;
+		const funcName = c.id;
 		const ret = c.body.body[0].argument;
-		let  transitiveArguments = true;
+		let transitiveArguments = true;
 		try {
 			for (let i = 0; i < c.params.length; i++) {
 				if (c.params[i]?.name !== ret?.arguments[i]?.name) {
@@ -36,9 +37,10 @@ function resolveProxyCalls(arb) {
 		} catch {
 			transitiveArguments = false;
 		}
-		if (!transitiveArguments) continue;
-		for (const ref of funcId.references || []) {
-			arb.markNode(ref, ret.callee);
+		if (transitiveArguments) {
+			for (const ref of funcName.references || []) {
+				arb.markNode(ref, ret.callee);
+			}
 		}
 	}
 	return arb;

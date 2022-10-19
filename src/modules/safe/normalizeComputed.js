@@ -15,7 +15,7 @@ function normalizeComputed(arb) {
 		(n.type === 'MemberExpression' &&
 			n.property.type === 'Literal' &&
 			validIdentifierBeginning.test(n.property.value) &&
-			!badIdentifierCharsRegex.exec(n.property.value)) ||
+			!badIdentifierCharsRegex.test(n.property.value)) ||
 		/**
 		 * Ignore the same cases for method names and object properties, for example
 		 * class A {
@@ -30,16 +30,18 @@ function normalizeComputed(arb) {
 		(['MethodDefinition', 'Property'].includes(n.type) &&
 			n.key.type === 'Literal' &&
 			validIdentifierBeginning.test(n.key.value) &&
-			!badIdentifierCharsRegex.exec(n.key.value)));
+			!badIdentifierCharsRegex.test(n.key.value)));
+
 	for (const c of candidates) {
 		const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';
-		const nonComputed = {...c};
-		nonComputed.computed = false;
-		nonComputed[relevantProperty] = {
-			type: 'Identifier',
-			name: c[relevantProperty].value,
-		};
-		arb.markNode(c, nonComputed);
+		arb.markNode(c, {
+			...c,
+			computed: false,
+			[relevantProperty]: {
+				type: 'Identifier',
+				name: c[relevantProperty].value,
+			},
+		});
 	}
 	return arb;
 }

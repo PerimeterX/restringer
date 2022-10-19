@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 
 /**
  * Replace definite member expressions with their intended value.
@@ -13,13 +12,14 @@ const logger = require(__dirname + '/../utils/logger');
 function resolveDefiniteMemberExpressions(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'MemberExpression' &&
+		n.parentNode.type !== 'UpdateExpression' && // Prevent replacing (++[[]][0]) with (++1)
 		(n.property.type === 'Literal' ||
 			(n.property.name && !n.computed)) &&
 		['ArrayExpression', 'Literal'].includes(n.object.type) &&
 		(n.object?.value?.length || n.object?.elements?.length));
+
 	for (const c of candidates) {
-		if (c.parentNode.type === 'UpdateExpression') continue;   // Prevent replacing (++[[]][0]) with (++1)
-		const newNode = evalInVm(c.src, logger);
+		const newNode = evalInVm(c.src);
 		if (newNode !== badValue) arb.markNode(c, newNode);
 	}
 	return arb;

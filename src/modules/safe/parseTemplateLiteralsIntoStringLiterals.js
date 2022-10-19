@@ -1,4 +1,3 @@
-const logger = require(__dirname + '/../utils/logger');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 
 /**
@@ -10,7 +9,8 @@ const createNewNode = require(__dirname + '/../utils/createNewNode');
 function parseTemplateLiteralsIntoStringLiterals(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'TemplateLiteral' &&
-		!n.expressions.filter(exp => exp.type !== 'Literal').length);
+		!n.expressions.find(exp => exp.type !== 'Literal'));
+
 	for (const c of candidates) {
 		let newStringLiteral = '';
 		for (let i = 0; i < c.expressions.length; i++) {

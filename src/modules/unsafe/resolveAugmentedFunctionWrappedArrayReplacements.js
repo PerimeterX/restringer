@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const getDescendants = require(__dirname + '/../utils/getDescendants');
 
 /**
@@ -13,15 +12,17 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
 function resolveAugmentedFunctionWrappedArrayReplacements(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'FunctionDeclaration' && n.id);
+
 	for (const c of candidates) {
 		const descendants = getDescendants(c);
-		if (descendants.filter(d =>
+		if (descendants.find(d =>
 			d.type === 'AssignmentExpression' &&
-			d.left?.name === c.id?.name).length) {
+			d.left?.name === c.id?.name)) {
 			const arrDecryptor = c;
 			const arrCandidates = descendants.filter(n =>
 				n.type === 'MemberExpression' && n.object.type === 'Identifier')
 				.map(n => n.object);
+
 			for (const ac of arrCandidates) {
 				// If a direct reference to a global variable pointing at an array
 				let arrRef;
@@ -34,24 +35,22 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb) {
 					arrRef = ac.declNode.parentNode.init.callee?.declNode?.parentNode;
 				}
 				if (arrRef) {
-					const arrRefId = ac.declNode.nodeId;
-					const iifes = arb.ast.filter(n =>
+					const iife = arb.ast.find(n =>
 						n.type === 'ExpressionStatement' &&
 						n.expression.type === 'CallExpression' &&
 						n.expression.callee.type === 'FunctionExpression' &&
 						n.expression.arguments.length &&
 						n.expression.arguments[0].type === 'Identifier' &&
-						n.expression.arguments[0].declNode.nodeId === arrRefId);
-					if (iifes.length) {
-						const iife = iifes[0];
+						n.expression.arguments[0].declNode === ac.declNode);
+					if (iife) {
 						const context = [arrRef.src, arrDecryptor.src, iife.src].join('\n');
-						const skipScopes = [arrRef.scope.scopeId, arrDecryptor.scope.scopeId, iife.expression.callee.scope.scopeId];
+						const skipScopes = [arrRef.scope, arrDecryptor.scope, iife.expression.callee.scope];
 						const replacementCandidates = arb.ast.filter(n =>
 							n?.callee?.name === arrDecryptor.id.name &&
-							!skipScopes.includes(n.scope.scopeId));
+							!skipScopes.includes(n.scope));
 						for (const rc of replacementCandidates) {
 							const src = `${context}\n${rc.src}`;
-							const newNode = evalInVm(src, logger);
+							const newNode = evalInVm(src);
 							if (newNode !== badValue) arb.markNode(rc, newNode);
 						}
 					}

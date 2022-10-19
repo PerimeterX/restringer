@@ -1,3 +1,7 @@
+/**
+ * Function To Array Replacements
+ * The obfuscated script dynamically generates an array which is referenced throughout the script.
+ */
 const {
 	unsafe: {
 		evalInVm,
@@ -10,11 +14,6 @@ const {
 		badValue,
 	}
 } = require(__dirname + '/../modules');
-
-/**
- * Function To Array Replacements
- * The obfuscated script dynamically generates an array which is referenced throughout the script.
- */
 
 /**
  * Run the generating function and replace it with the actual array.
@@ -31,7 +30,8 @@ function replaceFunctionWithArray(arb) {
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'CallExpression' &&
 		n.id?.references &&
-		n.id?.references.filter(r => r.parentNode.type === 'MemberExpression').length === n.id?.references.length);
+		!n.id.references.find(r => r.parentNode.type !== 'MemberExpression'));
+
 	for (const c of candidates) {
 		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
 		const src = createOrderedSrc(getDeclarationWithContext(targetNode).concat(c.init));

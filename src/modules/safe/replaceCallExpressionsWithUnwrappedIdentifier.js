@@ -14,6 +14,7 @@ function replaceCallExpressionsWithUnwrappedIdentifier(arb) {
 				/FunctionExpression/.test(n.callee.declNode.parentNode?.init?.type)) ||
 			(n.callee.declNode.parentNode.type === 'FunctionDeclaration' &&
 				n.callee.declNode.parentKey === 'id')));
+
 	for (const c of candidates) {
 		const declBody = c.callee.declNode.parentNode?.init?.body || c.callee.declNode.parentNode?.body;
 		if (!Array.isArray(declBody)) {

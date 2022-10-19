@@ -1,16 +1,3 @@
-const {
-	unsafe: {
-		evalInVm
-	},
-	config: {
-		badValue
-	},
-	utils: {
-		createOrderedSrc,
-		getDeclarationWithContext,
-	},
-} = require(__dirname + '/../modules');
-
 /**
  * Augmented Array Replacements
  * The obfuscated script uses a shuffled array,
@@ -27,6 +14,18 @@ const {
  * This processor will un-shuffle the array by running the IIFE augmenting it, and replace the array with the un-shuffled version,
  * while removing the augmenting IIFE.
  */
+const {
+	unsafe: {
+		evalInVm
+	},
+	config: {
+		badValue
+	},
+	utils: {
+		createOrderedSrc,
+		getDeclarationWithContext,
+	},
+} = require(__dirname + '/../modules');
 
 /**
  * Extract the array and the immediately-invoking function expression.
@@ -41,8 +40,9 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 		n.callee.type === 'FunctionExpression' &&
 		n.arguments.length > 1 && n.arguments[0].type === 'Identifier' &&
 		n.arguments[1].type === 'Literal' && !Number.isNaN(parseInt(n.arguments[1].value)));
+
 	for (const candidate of candidates) {
-		const relevantArrayIdentifier = candidate.arguments.filter(n => n.type === 'Identifier')[0];
+		const relevantArrayIdentifier = candidate.arguments.find(n => n.type === 'Identifier');
 		// The context for this eval is the relevant array and the IIFE augmenting it (the candidate).
 		const context = `var ${relevantArrayIdentifier.declNode.parentNode.src}\n!${createOrderedSrc(getDeclarationWithContext(candidate))}`;
 		// By adding the name of the array after the context, the un-shuffled array is procured.

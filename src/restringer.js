@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-
-const fs = require('fs');
-const version = require(__dirname + '/../package').version;
-const detectObfuscation = require('obfuscation-detector');
 const processors = require(__dirname + '/processors');
+const detectObfuscation = require('obfuscation-detector');
+const version = require(__dirname + '/../package').version;
 const {
 	utils: {
-		runLoop: staticRunLoop,
+		runLoop,
 		normalizeScript,
 		logger,
 	},
@@ -63,6 +61,8 @@ class REstringer {
 		this.totalChangesCounter = 0;
 		this._preprocessors = [];
 		this._postprocessors = [];
+		this.logger = logger;
+		this.logger.setLogLevel(logger.logLevels.LOG);    // Default log level
 	}
 
 	/**
@@ -72,8 +72,8 @@ class REstringer {
 		const detectedObfuscationType = detectObfuscation(this.script, false).slice(-1)[0];
 		if (detectedObfuscationType) {
 			const relevantProcessors = processors[detectedObfuscationType]();
-			if (relevantProcessors?.preprocessors?.length) this._preprocessors = relevantProcessors.preprocessors;
-			if (relevantProcessors?.postprocessors?.length) this._postprocessors = relevantProcessors.postprocessors;
+			this._preprocessors = relevantProcessors?.preprocessors || [];
+			this._postprocessors = relevantProcessors?.postprocessors || [];
 			this.obfuscationName = detectedObfuscationType;
 		}
 		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
@@ -134,12 +134,8 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = staticRunLoop(this.script, this._safeDeobfuscationMethods());
-			if (this.script !== script) {
-				this.modified = true;
-				this.script = script;
-			}
-			script = staticRunLoop(this.script, this._unsafeDeobfuscationMethods(), 1);
+			script = runLoop(this.script, this._safeDeobfuscationMethods());
+			script = runLoop(script, this._unsafeDeobfuscationMethods(), 1);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -163,7 +159,7 @@ class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = staticRunLoop(this.script, [removeDeadNodes]);
+		if (clean) this.script = runLoop(this.script, [removeDeadNodes]);
 		return this.modified;
 	}
 
@@ -173,34 +169,36 @@ class REstringer {
 	 * @param {Array<Function|string>} processors An array of either imported deobfuscation methods or the name of internal methods.
 	 */
 	_runProcessors(processors) {
-		processors.forEach(proc => this.script = staticRunLoop(this.script, [proc], 1));
+		processors.forEach(proc => this.script = runLoop(this.script, [proc], 1));
 	}
 }
 
 module.exports = REstringer;
 if (require.main === module) {
+	const {parseArgs, printHelp} = require(__dirname + '/utils/parseArgs');
 	try {
-		const argv = process.argv;
-		if (argv.length > 2) {
-			const inputFilename = argv[2];
-			let content = fs.readFileSync(inputFilename, 'utf-8');
+		const args = parseArgs(process.argv.slice(2));
+		if (Object.keys(args).length && !(args.verbose && args.quiet) && args.inputFilename) {
+			const fs = require('node:fs');
+			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
-			const originalInputLength = content.length;
-			logger.log(`[!] Attempting to deobfuscate ${inputFilename} (length: ${originalInputLength})\n`);
+			logger.log(`[!] Deobfuscating ${args.inputFilename}...\n`);
 
 			const restringer = new REstringer(content);
-			restringer.deobfuscate(argv[3] === '--clean');
-			const outputFilename = `${inputFilename}-${restringer.obfuscationName}-deob.js`;
+			if (args.quiet) restringer.logger.setLogLevel(logger.logLevels.NONE);
+			else if (args.verbose) restringer.logger.setLogLevel(logger.logLevels.DEBUG);
+			restringer.deobfuscate();
 			if (restringer.modified) {
-				logger.log(`[+] Output saved to ${outputFilename}\n\tLength: ${restringer.script.length} ` +
-					`(difference is ${restringer.script.length - content.length})\n\tChanges: ${restringer.totalChangesCounter}`);
-				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds`);
-				// TODO write to file per command line arugments
-				if (logger.isLogging()) fs.writeFileSync(outputFilename, restringer.script, {encoding: 'utf-8'});
+				logger.log(`[+] Saved ${args.outputFilename}`);
+				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds, with ${restringer.totalChangesCounter} changes.`);
+				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
-		} else console.log('Usage:\n\trestringer.js obfuscated.js \t\t# Print deobfuscated file to stdout\n\t' +
-			'restringer.js obfuscated.js --clean \t# Print deobfuscated file to stdout and remove dead nodes');
+		} else {
+			if (!args.inputFilename) console.log(`Input filename must be provided`);
+			else if (args.verbose && args.quiet) console.log(`Don't set both -q and -v at the same time *smh*`);
+			console.log(printHelp());
+		}
 	} catch (e) {
 		logger.error(`[-] Critical Error: ${e}`);
 	}

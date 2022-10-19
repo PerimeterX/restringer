@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const getDescendants = require(__dirname + '/../utils/getDescendants');
 
 /**
@@ -13,15 +12,16 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
 function resolveMinimalAlphabet(arb) {
 	const candidates = arb.ast.filter(n =>
 		(n.type === 'UnaryExpression' &&
-			((n.argument.type === 'Literal' && /^\D/.exec(n.argument.raw[0])) ||
+			((n.argument.type === 'Literal' && /^\D/.test(n.argument.raw[0])) ||
 				n.argument.type === 'ArrayExpression')) ||
 		(n.type === 'BinaryExpression' &&
 			n.operator === '+' &&
 			(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
 			![n.left?.type, n.right?.type].includes('ThisExpression')));
+
 	for (const c of candidates) {
 		if (getDescendants(c).find(n => n.type === 'ThisExpression')) continue;
-		const newNode = evalInVm(c.src, logger);
+		const newNode = evalInVm(c.src);
 		if (newNode !== badValue) {
 			arb.markNode(c, newNode);
 		}

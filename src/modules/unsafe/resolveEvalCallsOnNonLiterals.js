@@ -1,7 +1,6 @@
 const {parseCode} = require('flast');
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 
 /**
  * Resolve eval call expressions where the argument isn't a literal.
@@ -16,10 +15,11 @@ function resolveEvalCallsOnNonLiterals(arb) {
 		n.callee.name === 'eval' &&
 		n.arguments.length === 1 &&
 		n.arguments[0].type !== 'Literal');
+
 	for (const c of candidates) {
 		const argument = c.arguments[0];
 		const src = `var __a_ = ${argument.src}\n;__a_`;
-		const newNode = evalInVm(src, logger);
+		const newNode = evalInVm(src);
 		const targetNode = c.parentNode.type === 'ExpressionStatement' ? c.parentNode : c;
 		let replacementNode = newNode;
 		try {
@@ -36,7 +36,7 @@ function resolveEvalCallsOnNonLiterals(arb) {
 				}
 			}
 		} catch {}
-		if (replacementNode !== badValue) {arb.markNode(targetNode, replacementNode);}
+		if (replacementNode !== badValue) arb.markNode(targetNode, replacementNode);
 	}
 	return arb;
 }
