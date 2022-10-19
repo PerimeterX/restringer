@@ -61,6 +61,8 @@ class REstringer {
 		this.totalChangesCounter = 0;
 		this._preprocessors = [];
 		this._postprocessors = [];
+		this.logger = logger;
+		this.logger.setLogLevel(logger.logLevels.LOG);    // Default log level
 	}
 
 	/**
