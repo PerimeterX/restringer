@@ -8,13 +8,13 @@ positional arguments:
 	input_filename    The obfuscated JS file
 
 optional arguments:
-	-h, --help                      Show this help message and exit.
-	-c, --clean                     Remove dead nodes from script after deobfuscation is complete (unsafe).
-	-q, --quiet                     Suppress output to stdout. Output result only to stdout if the -o option is not set.
-																	Does not go with the -v option.
-	-v, --verbose                   Show more debug messages while deobfuscating. Does not go with the -q option.
-	-o, --output [output_filename]  Write deobfuscated script to output_filename. 
-																	Use <input_filename>-deob.js if no filename is provided.`;
+  -h, --help                      Show this help message and exit.
+  -c, --clean                     Remove dead nodes from script after deobfuscation is complete (unsafe).
+  -q, --quiet                     Suppress output to stdout. Output result only to stdout if the -o option is not set.
+                                  Does not go with the -v option.
+  -v, --verbose                   Show more debug messages while deobfuscating. Does not go with the -q option.
+  -o, --output [output_filename]  Write deobfuscated script to output_filename. 
+                                  Use <input_filename>-deob.js if no filename is provided.`;
 }
 
 function parseArgs(args) {
