@@ -20,7 +20,7 @@ optional arguments:
 function parseArgs(args) {
 	let opts;
 	try {
-		const inputFilename = args.splice(0, 1)[0];
+		const inputFilename = args[0] && args[0][0] !== '-' ? args[0] : '';
 		opts = {
 			inputFilename,
 			help: args.includes('-h') || args.includes('--help'),
