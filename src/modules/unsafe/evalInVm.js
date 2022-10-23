@@ -52,7 +52,7 @@ function evalInVm(stringToEval) {
 			// Break known trap strings
 			trapStrings.forEach(ts => stringToEval = stringToEval.replace(ts.trap, ts.replaceWith));
 			const res = (new VM(vmOptions)).run(stringToEval);
-			if (!res.VMError && !badTypes.includes(getObjType(res))) {
+			if (!res?.VMError && !badTypes.includes(getObjType(res))) {
 				// To exclude results based on randomness or timing, eval again and compare results
 				const res2 = (new VM(vmOptions)).run(stringToEval);
 				assert.deepEqual(res, res2);
