@@ -3,6 +3,7 @@ module.exports = {
 	normalizeComputed: require(__dirname + '/normalizeComputed'),
 	normalizeEmptyStatements: require(__dirname + '/normalizeEmptyStatements'),
 	parseTemplateLiteralsIntoStringLiterals: require(__dirname + '/parseTemplateLiteralsIntoStringLiterals'),
+	rearrangeSwitches: require(__dirname + '/rearrangeSwitches'),
 	removeDeadNodes: require(__dirname + '/removeDeadNodes'),
 	replaceCallExpressionsWithUnwrappedIdentifier: require(__dirname + '/replaceCallExpressionsWithUnwrappedIdentifier'),
 	replaceEvalCallsWithLiteralContent: require(__dirname + '/replaceEvalCallsWithLiteralContent'),
