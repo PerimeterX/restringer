@@ -59,7 +59,6 @@ class REstringer {
 		this.normalize = normalize;
 		this.modified = false;
 		this.obfuscationName = 'Generic';
-		this.totalChangesCounter = 0;
 		this._preprocessors = [];
 		this._postprocessors = [];
 		this.logger = logger;
@@ -72,10 +71,10 @@ class REstringer {
 	determineObfuscationType() {
 		const detectedObfuscationType = detectObfuscation(this.script, false).slice(-1)[0];
 		if (detectedObfuscationType) {
-			const relevantProcessors = processors[detectedObfuscationType]();
-			this._preprocessors = relevantProcessors?.preprocessors || [];
-			this._postprocessors = relevantProcessors?.postprocessors || [];
 			this.obfuscationName = detectedObfuscationType;
+			if (processors[detectedObfuscationType]) {
+				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]());
+			}
 		}
 		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
 		return this.obfuscationName;
@@ -192,7 +191,7 @@ if (require.main === module) {
 			restringer.deobfuscate();
 			if (restringer.modified) {
 				logger.log(`[+] Saved ${args.outputFilename}`);
-				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds, with ${restringer.totalChangesCounter} changes.`);
+				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds.`);
 				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
