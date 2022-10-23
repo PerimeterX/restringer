@@ -1,6 +1,7 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue, skipProperties} = require(__dirname + '/../config');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
+const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/getMainDeclaredObjectOfMemberExpression');
 
@@ -39,6 +40,8 @@ function resolveMemberExpressionsLocalReferences(arb) {
 			// Skip if the identifier was declared as a function's parameter.
 			if (/Function/.test(declNode.parentNode.type) &&
 				(declNode.parentNode.params || []).find(p => p === declNode)) continue;
+			const prop = c.property;
+			if (prop.type === 'Identifier' && prop.declNode?.references && areReferencesModified(arb.ast, prop.declNode.references)) continue;
 			const context = createOrderedSrc(getDeclarationWithContext(relevantIdentifier.declNode.parentNode));
 			if (context) {
 				const src = `${context}\n${c.src}`;
@@ -53,7 +56,13 @@ function resolveMemberExpressionsLocalReferences(arb) {
 							if (!newNode.properties.length) isEmptyReplacement = true;
 							break;
 						case 'Literal':
-							if (!String(newNode.value).length) isEmptyReplacement = true;
+							if (
+								!String(newNode.value).length ||  // ''
+								newNode.raw === 'null'            // null
+							) isEmptyReplacement = true;
+							break;
+						case 'Identifier':
+							if (newNode.name === 'undefined') isEmptyReplacement = true;
 							break;
 					}
 					if (!isEmptyReplacement) {
