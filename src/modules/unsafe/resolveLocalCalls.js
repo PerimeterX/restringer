@@ -63,7 +63,7 @@ function resolveLocalCalls(arb) {
 		const context = cache[cacheName];
 		const src = context ? `${context}\n${c.src}` : c.src;
 		const newNode = evalInVm(src);
-		if (newNode !== badValue && newNode.type !== 'FunctionDeclaration') {
+		if (newNode !== badValue && newNode.type !== 'FunctionDeclaration' && newNode.name !== 'undefined') {
 			arb.markNode(c, newNode);
 			modifiedRanges.push(c.range);
 		}
