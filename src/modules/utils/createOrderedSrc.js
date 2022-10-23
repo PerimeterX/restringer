@@ -1,5 +1,6 @@
 const {generateFlatAST} = require('flast');
 
+const largeNumber = 999e8;
 const sortByNodeId = (a, b) => a.nodeId > b.nodeId ? 1 : b.nodeId > a.nodeId ? -1 : 0;
 
 /**
@@ -14,11 +15,15 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 			if (n.parentNode.type === 'ExpressionStatement') {
 				// noinspection JSValidateTypes
 				nodes[idx] = n.parentNode;
-				if (n.callee.type === 'FunctionExpression') nodes[idx].nodeId = 9999999; // Exceedingly high nodeId ensures IIFEs are placed last.
+				if (!preserveOrder && n.callee.type === 'FunctionExpression') {
+					// Set nodeId to place IIFE just after its argument's declaration
+					const argDeclNodeId = n.arguments.find(a => a.nodeId === Math.max(...n.arguments.filter(arg => arg?.declNode?.nodeId).map(arg => arg.nodeId)))?.nodeId;
+					nodes[idx].nodeId = argDeclNodeId ? argDeclNodeId + 1 : nodes[idx].nodeId + largeNumber;
+				}
 			} else if (n.callee.type === 'FunctionExpression') {
 				if (!preserveOrder) {
 					const newNode = generateFlatAST(`(${n.src});`)[1];
-					newNode.nodeId = 9999999;
+					newNode.nodeId = n.nodeId + largeNumber;
 					nodes[idx] = newNode;
 				} else nodes[idx] = n;
 			}

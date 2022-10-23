@@ -13,7 +13,9 @@ const defaultMaxIterations = 500;
 const propertiesThatModifyContent = ['push', 'forEach', 'pop', 'insert', 'add', 'set', 'delete'];
 
 // Builtin functions that shouldn't be resolved in the deobfuscation context.
-const skipBuiltinFunctions = ['Function', 'eval', 'Array', 'Object', 'fetch', 'XMLHttpRequest', 'Promise'];
+const skipBuiltinFunctions = [
+	'Function', 'eval', 'Array', 'Object', 'fetch', 'XMLHttpRequest', 'Promise', 'console', 'performance', '$',
+];
 
 // Identifiers that shouldn't be touched since they're either session-based or resolve inconsisstently.
 const skipIdentifiers = [

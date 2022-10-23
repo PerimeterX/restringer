@@ -246,14 +246,12 @@ console.log('hello world');`,
   ], b = 'hello';
 console.log('hello world');`,
 	},
-	// TODO: Implement functionality
 	{
-		enabled: false,
-		reason: 'TODO: Implement',
+		enabled: true,
 		name: 'Replace Wrapped Functions With Return Statement',
 		source: 'function A(a,b){return function() {return a+b;}.apply(this, arguments);}',
 		expected: `function A(a, b) {
-    return a + b;
+  return a + b;
 }`,
 	},
 	{
@@ -285,10 +283,8 @@ a.b = 3;
 a.c = '5';
 console.log('35');`,
 	},
-	// TODO: Fix test
 	{
-		enabled: false,
-		reason: 'Fix: Replace values *after* augmentation',
+		enabled: true,
 		name: 'Resolve External References With Context',
 		source: `const a = [1, 2, 3]; (function(arr) {arr.forEach((x, i, arr) => arr[i] = x * 10)})(a); function b() {const c = [...a]; return c[0] + 3;}`,
 		expected: `const a = [

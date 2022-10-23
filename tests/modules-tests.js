@@ -429,6 +429,13 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'resolveLocalCalls - TN-3',
+		func: __dirname + '/../src/modules/unsafe/resolveLocalCalls',
+		source: `function a() {} a();`,
+		expected: `function a() {} a();`,
+	},
+	{
+		enabled: true,
 		name: 'resolveMinimalAlphabet - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
 		source: `+true; -true; +false; +[]; ~true; ~false; ~[]; +[3]; +['']; -[4]; ![]; +[[]];`,
