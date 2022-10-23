@@ -12,7 +12,8 @@ const {badValue} = require(__dirname + '/../config');
 function resolveDefiniteMemberExpressions(arb) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'MemberExpression' &&
-		n.parentNode.type !== 'UpdateExpression' && // Prevent replacing (++[[]][0]) with (++1)
+		!['UpdateExpression'].includes(n.parentNode.type) && // Prevent replacing (++[[]][0]) with (++1)
+		!(n.parentKey === 'callee') &&    // Prevent replacing obj.method() with undefined()
 		(n.property.type === 'Literal' ||
 			(n.property.name && !n.computed)) &&
 		['ArrayExpression', 'Literal'].includes(n.object.type) &&
