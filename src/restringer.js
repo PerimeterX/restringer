@@ -28,6 +28,7 @@ const {
 		resolveFunctionConstructorCalls,
 		resolveProxyVariables,
 		resolveProxyReferences,
+		rearrangeSwitches,
 	},
 	unsafe: {
 		resolveMinimalAlphabet,
@@ -85,6 +86,7 @@ class REstringer {
 	 */
 	_safeDeobfuscationMethods() {
 		return [
+			rearrangeSwitches,
 			normalizeEmptyStatements,
 			consolidateNestedBlockStatements,
 			resolveRedundantLogicalExpressions,

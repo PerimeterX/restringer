@@ -69,6 +69,25 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'rearrangeSwitches - TP-1',
+		func: __dirname + '/../src/modules/safe/rearrangeSwitches',
+		source: `(() => {let a = 1;\twhile (true) {switch (a) {case 3: return console.log(3); case 2: console.log(2); a = 3; break;
+case 1: console.log(1); a = 2; break;}}})();`,
+		expected: `(() => {
+  let a = 1;
+  while (true) {
+    {
+      console.log(1);
+      a = 2;
+      console.log(2);
+      a = 3;
+      return console.log(3);
+    }
+  }
+})();`,
+	},
+	{
+		enabled: true,
 		name: 'removeDeadNodes - TP-1',
 		func: __dirname + '/../src/modules/safe/removeDeadNodes',
 		source: 'var a = 3, b = 12; console.log(b);',
