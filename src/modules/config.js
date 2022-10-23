@@ -10,7 +10,24 @@ const badValue = '--BAD-VAL--';
 // Do not repeate more than this many iterations.
 const defaultMaxIterations = 500;
 
+// The global maximum allowed iterations of runLoop. Value of -1 means unlimited.
+let globalMaxIterations = -1;
+
+/**
+ * @return {number} The global maximum allowed iterations of runLoop. Value of -1 means unlimited.
+ */
+function getGlobalMaxIterations() {
+	return globalMaxIterations;
+}
+
 const propertiesThatModifyContent = ['push', 'forEach', 'pop', 'insert', 'add', 'set', 'delete'];
+
+/**
+ * @param {number} num The number of allowed iterations across all runs. Set to -1 to disable limit.
+ */
+function setGlobalMaxIterations(num) {
+	globalMaxIterations = num;
+}
 
 // Builtin functions that shouldn't be resolved in the deobfuscation context.
 const skipBuiltinFunctions = [
@@ -38,6 +55,8 @@ module.exports = {
 	badValue,
 	defaultMaxIterations,
 	propertiesThatModifyContent,
+	setGlobalMaxIterations,
+	getGlobalMaxIterations,
 	skipBuiltinFunctions,
 	skipIdentifiers,
 	skipProperties,

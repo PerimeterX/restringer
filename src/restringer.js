@@ -42,6 +42,9 @@ const {
 		resolveInjectedPrototypeMethodCalls,
 		resolveEvalCallsOnNonLiterals,
 	},
+	config: {
+		setGlobalMaxIterations,
+	}
 } = require(__dirname + '/modules');
 
 // Silence asyc errors
@@ -176,10 +179,10 @@ class REstringer {
 
 module.exports = REstringer;
 if (require.main === module) {
-	const {parseArgs, printHelp} = require(__dirname + '/utils/parseArgs');
+	const {argsAreValid, parseArgs} = require(__dirname + '/utils/parseArgs');
 	try {
 		const args = parseArgs(process.argv.slice(2));
-		if (Object.keys(args).length && !args.help && !(args.verbose && args.quiet) && args.inputFilename) {
+		if (argsAreValid(args)) {
 			const fs = require('node:fs');
 			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
@@ -188,6 +191,10 @@ if (require.main === module) {
 			const restringer = new REstringer(content);
 			if (args.quiet) restringer.logger.setLogLevel(logger.logLevels.NONE);
 			else if (args.verbose) restringer.logger.setLogLevel(logger.logLevels.DEBUG);
+			if (args.maxIterations) {
+				setGlobalMaxIterations(args.maxIterations);
+				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
+			}
 			restringer.deobfuscate();
 			if (restringer.modified) {
 				logger.log(`[+] Saved ${args.outputFilename}`);
@@ -195,12 +202,6 @@ if (require.main === module) {
 				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
 				else console.log(restringer.script);
 			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
-		} else {
-			if (!args.help) {
-				if (!args.inputFilename) console.log(`Error: Input filename must be provided`);
-				else if (args.verbose && args.quiet) console.log(`Error: Don't set both -q and -v at the same time *smh*`);
-			}
-			console.log(printHelp());
 		}
 	} catch (e) {
 		logger.error(`[-] Critical Error: ${e}`);
