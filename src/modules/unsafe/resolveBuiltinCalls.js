@@ -24,6 +24,7 @@ function resolveBuiltinCalls(arb) {
 	candidates.push(...callsWithOnlyLiteralArugments.filter(n =>
 		n.callee.type === 'MemberExpression' &&
 		!n.callee.object.declNode &&
+		!skipBuiltinFunctions.includes(n.callee.object?.name) &&
 		!skipIdentifiers.includes(n.callee.object?.name) &&
 		!skipProperties.includes(n.callee.property?.name || n.callee.property?.value)));
 
