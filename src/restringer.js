@@ -195,8 +195,7 @@ if (require.main === module) {
 				setGlobalMaxIterations(args.maxIterations);
 				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
 			}
-			restringer.deobfuscate();
-			if (restringer.modified) {
+			if (restringer.deobfuscate()) {
 				logger.log(`[+] Saved ${args.outputFilename}`);
 				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds.`);
 				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
