@@ -14,6 +14,7 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 * [Usage](#usage)
   * [Command-Line Usage](#command-line-usage) 
   * [Use as a Module](#use-as-a-module) 
+* [Create Custom Deobfuscators](#create-custom-deobfuscators)
 * [Read More](#read-more)
 ***
 
@@ -62,6 +63,44 @@ if (restringer.deobfuscate()) {
   console.log('Nothing was deobfuscated :/');
 }
 // Output: 'REstringer';
+```
+
+***
+## Create Custom Deobfuscators
+REstringer is highly modularized. It exposes modules that allow creating custom deobfuscators 
+that can solve specific problems.
+
+The basic structure of such a deobfuscator would be an array of deobfuscation modules 
+(either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via the [runLoop](src/modules/utils/runLoop.js) util function.
+
+Unsafe modules run code through `eval` (using [vm2](https://www.npmjs.com/package/vm2) to be on the safe side) while safe modules do not.
+
+```javascript
+const {
+  safe: {normalizeComputed},
+  unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls}
+} = require('restringer').modules;
+let script = 'obfuscated JS here';
+const deobModules = [
+  resolveDefiniteBinaryExpressions,
+  resolveLocalCalls,
+  normalizeComputed,
+];
+script = runLoop(script, deobModules);
+console.log(script); // Deobfuscated script
+```
+
+With the additional `candidateFilter` function argument, it's possible to narrow down the targeted nodes:
+```javascript
+const {unsafe: {resolveLocalCalls}} = require('restringer').modules;
+let script = 'obfuscated JS here';
+
+// It's better to define a function with a name that can show up in the log (otherwise you'll get 'undefined')
+function resolveLocalCallsInGlobalScope(arb) {
+  return resolveLocalCalls(arb, n => n.parentNode?.type === 'Program');
+}
+script = runLoop(script, [resolveLocalCallsInGlobalScope]);
+console.log(script); // Deobfuscated script
 ```
 
 ***
