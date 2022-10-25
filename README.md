@@ -11,6 +11,8 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 
 ## Table of Contents
 * [Installation](#installation)
+  * [npm](#npm)
+  * [Clone The Repo](#clone-the-repo)
 * [Usage](#usage)
   * [Command-Line Usage](#command-line-usage) 
   * [Use as a Module](#use-as-a-module) 
@@ -19,6 +21,12 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 ***
 
 ## Installation 
+### npm
+```bash
+npm install restringer
+```
+
+### Clone The Repo
 Requires Node 16 or newer.
 ```bash
 git clone git@github.com:PerimeterX/restringer.git
