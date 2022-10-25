@@ -7,9 +7,10 @@ const {badValue} = require(__dirname + '/../config');
  * '123'[0]; ==> '1';
  * 'hello'.length ==> 5;
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveDefiniteMemberExpressions(arb) {
+function resolveDefiniteMemberExpressions(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'MemberExpression' &&
 		!['UpdateExpression'].includes(n.parentNode.type) && // Prevent replacing (++[[]][0]) with (++1)
@@ -17,7 +18,8 @@ function resolveDefiniteMemberExpressions(arb) {
 		(n.property.type === 'Literal' ||
 			(n.property.name && !n.computed)) &&
 		['ArrayExpression', 'Literal'].includes(n.object.type) &&
-		(n.object?.value?.length || n.object?.elements?.length));
+		(n.object?.value?.length || n.object?.elements?.length) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const newNode = evalInVm(c.src);

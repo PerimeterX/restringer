@@ -5,9 +5,10 @@ const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/g
  * When an identifier holds a static value which is assigned after declaration but doesn't change afterwards,
  * replace all references to it with the value.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb) {
+function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.parentNode?.type === 'VariableDeclarator' &&
 		!n.parentNode.init &&
@@ -24,7 +25,8 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb) {
 				r.parentNode.parentNode.type,
 				r.parentNode.parentNode?.parentNode?.type,
 				r.parentNode.parentNode?.parentNode?.parentNode?.type,
-			].includes('ConditionalExpression')));
+			].includes('ConditionalExpression')) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const assignmentNode = c.references.find(r =>

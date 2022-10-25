@@ -5,13 +5,15 @@ const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'Function
  * NOTE: This is a dangerous operation which shouldn't run by default, invokations of the so-called dead code
  * may be dynamically built during execution. Handle with care.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function removeDeadNodes(arb) {
+function removeDeadNodes(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'Identifier' &&
 		relevantParents.includes(n.parentNode.type) &&
-		(!n?.declNode?.references?.length && !n?.references?.length))
+		(!n?.declNode?.references?.length && !n?.references?.length) &&
+		candidateFilter(n))
 		.map(n => n.parentNode);
 
 	for (const c of candidates) {

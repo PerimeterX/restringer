@@ -4,12 +4,14 @@
  * if (false && ...) do_a(); else do_b(); ==> do_b();
  * if (... || true) do_c(); else do_d(); ==> do_c();
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveRedundantLogicalExpressions(arb) {
+function resolveRedundantLogicalExpressions(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'IfStatement' &&
-		n.test.type === 'LogicalExpression');
+		n.test.type === 'LogicalExpression' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		if (c.test.operator === '&&') {

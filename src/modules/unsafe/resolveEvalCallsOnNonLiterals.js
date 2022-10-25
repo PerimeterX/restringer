@@ -7,14 +7,16 @@ const {badValue} = require(__dirname + '/../config');
  * E.g.
  * eval(function() {return 'atob'}()); // <-- will be resolved into 'atob'
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveEvalCallsOnNonLiterals(arb) {
+function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee.name === 'eval' &&
 		n.arguments.length === 1 &&
-		n.arguments[0].type !== 'Literal');
+		n.arguments[0].type !== 'Literal' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const argument = c.arguments[0];

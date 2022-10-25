@@ -9,14 +9,16 @@ const minArrayLength = 20;
  * ==>
  * const a = [1, 2, 3]; b = 1; c = 3;
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMemberExpressionReferencesToArrayIndex(arb) {
+function resolveMemberExpressionReferencesToArrayIndex(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'ArrayExpression' &&
 		n.id?.references &&
-		n.init.elements.length > minArrayLength);
+		n.init.elements.length > minArrayLength &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const refs = c.id.references.map(n => n.parentNode);

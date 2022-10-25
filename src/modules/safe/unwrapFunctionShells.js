@@ -8,16 +8,18 @@
  * // will be replaced with
  * function a(x) {return x + 3}
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function unwrapFunctionShells(arb) {
+function unwrapFunctionShells(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		['FunctionDeclaration', 'FunctionExpression'].includes(n.type) &&
 		n.body?.body?.length === 1 &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		(n.body.body[0].argument?.callee?.property?.name || n.body.body[0].argument?.callee?.property?.value) === 'apply' &&
 		n.body.body[0].argument.arguments?.length === 2 &&
-		n.body.body[0].argument.callee.object.type === 'FunctionExpression');
+		n.body.body[0].argument.callee.object.type === 'FunctionExpression' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const replacementNode = c.body.body[0].argument.callee.object;

@@ -5,9 +5,10 @@ const {badIdentifierCharsRegex, validIdentifierBeginning} = require(__dirname + 
  * E.g.
  *   console['log'] -> console.log
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function normalizeComputed(arb) {
+function normalizeComputed(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.computed &&   // Filter for only member expressions using bracket notation
 		// Ignore member expressions with properties which can't be non-computed, like arr[2] or window['!obj']
@@ -30,7 +31,8 @@ function normalizeComputed(arb) {
 		(['MethodDefinition', 'Property'].includes(n.type) &&
 			n.key.type === 'Literal' &&
 			validIdentifierBeginning.test(n.key.value) &&
-			!badIdentifierCharsRegex.test(n.key.value)));
+			!badIdentifierCharsRegex.test(n.key.value)) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';

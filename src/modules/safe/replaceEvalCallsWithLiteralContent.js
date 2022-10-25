@@ -9,14 +9,16 @@ const generateHash = require(__dirname + '/../utils/generateHash');
  * eval('console.log("hello world")'); // <-- will be replaced with console.log("hello world");
  * eval('a(); b();'); // <-- will be replaced with '{a(); b();}'
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function replaceEvalCallsWithLiteralContent(arb) {
+function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.name === 'eval' &&
-		n.arguments[0]?.type === 'Literal');
+		n.arguments[0]?.type === 'Literal' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const cacheName = `replaceEval-${generateHash(c.src)}`;

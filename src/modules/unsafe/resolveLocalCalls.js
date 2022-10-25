@@ -10,16 +10,18 @@ const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__
  * Collect all available context on call expressions where the callee is defined in the script and attempt
  * to resolve their value.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveLocalCalls(arb) {
+function resolveLocalCalls(arb, candidateFilter = () => true) {
 	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		(n.callee?.declNode ||
 			(n.callee?.object?.declNode &&
 				!skipProperties.includes(n.callee.property?.value || n.callee.property?.name)) ||
-			n.callee?.object?.type === 'Literal'));
+			n.callee?.object?.type === 'Literal') &&
+		candidateFilter(n));
 
 	const frequency = {};
 	candidates.map(c => getCalleeName(c)).forEach(name => {

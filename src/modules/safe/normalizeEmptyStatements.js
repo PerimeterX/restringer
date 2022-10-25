@@ -1,10 +1,13 @@
 /**
  * Remove unrequired empty statements.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function normalizeEmptyStatements(arb) {
-	const candidates = arb.ast.filter(n => n.type === 'EmptyStatement');
+function normalizeEmptyStatements(arb, candidateFilter = () => true) {
+	const candidates = arb.ast.filter(n =>
+		n.type === 'EmptyStatement' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		// A for loop is sometimes used to assign variables without providing a loop body, just an empty statement.
