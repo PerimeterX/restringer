@@ -66,14 +66,16 @@ var _yb = function (a, b) {
       };
       var f = e();
       var g = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-      f.atob || (f.atob = function (h) {
-        var i = String(h).replace(/=+$/, '');
-        var j = '';
-        for (var k = 0, l, m, n = 0; m = i.charAt(n++); ~m && (l = k % 4 ? l * 64 + m : m, k++ % 4) ? j += String.fromCharCode(255 & l >> (-2 * k & 6)) : 0) {
-          m = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='.indexOf(m);
-        }
-        return j;
-      });
+      if (!f.atob) {
+        f.atob = function (h) {
+          var i = String(h).replace(/=+$/, '');
+          var j = '';
+          for (var k = 0, l, m, n = 0; m = i.charAt(n++); ~m && (l = k % 4 ? l * 64 + m : m, k++ % 4) ? j += String.fromCharCode(255 & l >> (-2 * k & 6)) : 0) {
+            m = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='.indexOf(m);
+          }
+          return j;
+        };
+      }
     }());
     _yb.iYlyGP = function (e) {
       var f = atob(e);
