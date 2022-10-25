@@ -23,10 +23,15 @@ function replaceBooleanExpressionsWithIf(arb, candidateFilter = () => true) {
 					argument: c.expression.left,
 				}
 				: c.expression.left;
-		// wrap expression in statement so it results in e.g. if (x) y(); instead of if (x) (y());
+		// wrap expression in block statement so it results in e.g. if (x) { y(); } instead of if (x) (y());
 		const consequentStatement = {
-			type: 'ExpressionStatement',
-			expression: c.expression.right,
+			type: 'BlockStatement',
+			body: [
+				{
+					type: 'ExpressionStatement',
+					expression: c.expression.right
+				}
+			],
 		};
 		const ifStatement = {
 			type: 'IfStatement',
