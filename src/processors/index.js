@@ -8,5 +8,5 @@ module.exports = {
 	'function_to_array_replacements': () => require(__dirname + '/functionToArray.js'),
 	'proxied_augmented_array_replacements': () => require(__dirname + '/augmentedArray.js'),
 	'augmented_array_function_replacements': () => require(__dirname + '/augmentedArray.js'),
-	'proxied_augmented_array_function_replacements': () => require(__dirname + '/augmentedArray.js'),
+	'augmented_proxied_array_function_replacements': () => require(__dirname + '/augmentedArray.js'),
 };
