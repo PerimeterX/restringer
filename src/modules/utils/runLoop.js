@@ -27,7 +27,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 		let scriptHash = generateHash(script);
 		let changesCounter = 0;
 		let arborist = new Arborist(script, logger.log);
-		while (arborist.ast.length && scriptSnapshot !== script && currentIteration < maxIterations && !hasGlobalMaxIterationBeenReached()) {
+		while (arborist.ast?.length && scriptSnapshot !== script && currentIteration < maxIterations && !hasGlobalMaxIterationBeenReached()) {
 			const cycleStartTime = Date.now();
 			scriptSnapshot = script;
 			arborist.ast.forEach(n => n.scriptHash = scriptHash);   // Mark each node with the script hash to distinguish cache of different scripts.
@@ -36,7 +36,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 				try {
 					logger.debug(`\t[!] Running ${func.name}...`);
 					arborist = func(arborist);
-					if (!arborist.ast.length) break;
+					if (!arborist.ast?.length) break;
 					// If the hash doesn't exist it means the Arborist was replaced
 					const numberOfNewChanges = arborist.getNumberOfChanges() + +!arborist.ast[0].scriptHash;
 					if (numberOfNewChanges) {
