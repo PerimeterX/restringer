@@ -5,12 +5,14 @@
  * ==>
  * do_a(); do_d();
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveDeterministicIfStatements(arb) {
+function resolveDeterministicIfStatements(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'IfStatement' &&
-		n.test.type === 'Literal');
+		n.test.type === 'Literal' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		if (c.test.value) {

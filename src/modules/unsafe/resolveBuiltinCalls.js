@@ -8,13 +8,15 @@ const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirnam
  * Resolve calls to builtin functions (like atob or String(), etc...).
  * Use safe implmentations of known functions when available.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveBuiltinCalls(arb) {
+function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 	const availableSafeImplementations = Object.keys(safeImplementations);
 	const callsWithOnlyLiteralArugments = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
-		!n.arguments.find(a => a.type !== 'Literal'));
+		!n.arguments.find(a => a.type !== 'Literal') &&
+		candidateFilter(n));
 
 	const candidates = callsWithOnlyLiteralArugments.filter(n =>
 		n.callee.type === 'Identifier' &&

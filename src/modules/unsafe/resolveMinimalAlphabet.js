@@ -7,9 +7,10 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * as well as binary expressions around the + operator. These usually resolve to string values,
  * which can be used to obfuscate code in schemes such as JSFuck.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMinimalAlphabet(arb) {
+function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		(n.type === 'UnaryExpression' &&
 			((n.argument.type === 'Literal' && /^\D/.test(n.argument.raw[0])) ||
@@ -17,7 +18,8 @@ function resolveMinimalAlphabet(arb) {
 		(n.type === 'BinaryExpression' &&
 			n.operator === '+' &&
 			(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
-			![n.left?.type, n.right?.type].includes('ThisExpression')));
+			![n.left?.type, n.right?.type].includes('ThisExpression')) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		if (getDescendants(c).find(n => n.type === 'ThisExpression')) continue;

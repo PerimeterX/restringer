@@ -6,14 +6,16 @@
  * a.c = '5';
  * console.log(a.b + a.c);  // a.b + a.c will be replaced with '35'
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMemberExpressionsWithDirectAssignment(arb) {
+function resolveMemberExpressionsWithDirectAssignment(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'MemberExpression' &&
 		n.object.declNode &&
 		n.parentNode.type === 'AssignmentExpression' &&
-		n.parentNode.right.type === 'Literal');
+		n.parentNode.right.type === 'Literal' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const prop = c.property?.value || c.property?.name;

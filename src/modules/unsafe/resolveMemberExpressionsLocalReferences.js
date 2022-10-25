@@ -16,13 +16,15 @@ const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/g
  * const a = {hello: 'world'};
  * const b = a['hello']; // <-- will be resolved to 'world'
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMemberExpressionsLocalReferences(arb) {
+function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'MemberExpression' &&
 		['Identifier', 'Literal'].includes(n.property.type) &&
-		!skipProperties.includes(n.property?.name || n.property?.value));
+		!skipProperties.includes(n.property?.name || n.property?.value) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		// If this member expression is the callee of a call expression - skip it

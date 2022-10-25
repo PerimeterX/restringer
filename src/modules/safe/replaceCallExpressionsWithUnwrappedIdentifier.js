@@ -4,16 +4,18 @@
  * function a() {return String}
  * a()(val) // <-- will be replaced with String(val)
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function replaceCallExpressionsWithUnwrappedIdentifier(arb) {
+function replaceCallExpressionsWithUnwrappedIdentifier(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.declNode &&
 		((n.callee.declNode.parentNode.type === 'VariableDeclarator' &&
 				/FunctionExpression/.test(n.callee.declNode.parentNode?.init?.type)) ||
 			(n.callee.declNode.parentNode.type === 'FunctionDeclaration' &&
-				n.callee.declNode.parentKey === 'id')));
+				n.callee.declNode.parentKey === 'id')) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const declBody = c.callee.declNode.parentNode?.init?.body || c.callee.declNode.parentNode?.body;

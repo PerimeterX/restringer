@@ -7,11 +7,13 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * sometimes wrapped in its own function, and is also augmented.
  * TODO: Add example code
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveAugmentedFunctionWrappedArrayReplacements(arb) {
+function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
-		n.type === 'FunctionDeclaration' && n.id);
+		n.type === 'FunctionDeclaration' && n.id &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const descendants = getDescendants(c);

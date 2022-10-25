@@ -4,12 +4,14 @@ const createNewNode = require(__dirname + '/../utils/createNewNode');
  * E.g.
  * `hello ${'world'}!`; // <-- will be parsed into 'hello world!'
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function parseTemplateLiteralsIntoStringLiterals(arb) {
+function parseTemplateLiteralsIntoStringLiterals(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'TemplateLiteral' &&
-		!n.expressions.find(exp => exp.type !== 'Literal'));
+		!n.expressions.find(exp => exp.type !== 'Literal') &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		let newStringLiteral = '';

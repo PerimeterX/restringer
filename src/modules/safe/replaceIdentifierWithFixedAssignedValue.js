@@ -3,12 +3,14 @@ const areReferencesModified = require(__dirname + '/../utils/areReferencesModifi
 /**
  * When an identifier holds a static literal value, replace all references to it with the value.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function replaceIdentifierWithFixedAssignedValue(arb) {
+function replaceIdentifierWithFixedAssignedValue(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n?.declNode?.parentNode?.init?.type === 'Literal' &&
-		!(n.parentKey === 'property' && n.parentNode.type === 'ObjectExpression'));
+		!(n.parentKey === 'property' && n.parentNode.type === 'ObjectExpression') &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const valueNode = c.declNode.parentNode.init;

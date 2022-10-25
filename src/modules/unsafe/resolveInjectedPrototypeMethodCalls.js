@@ -9,15 +9,17 @@ const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationW
  * String.prototype.secret = function() {return 'secret ' + this}
  * 'hello'.secret(); // <-- will be resolved to 'secret hello'.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveInjectedPrototypeMethodCalls(arb) {
+function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'AssignmentExpression' &&
 		n.left.type === 'MemberExpression' &&
 		(n.left.object.property?.name || n.left.object.property?.value) === 'prototype' &&
 		n.operator === '=' &&
-		(/FunctionExpression|Identifier/.test(n.right?.type)));
+		(/FunctionExpression|Identifier/.test(n.right?.type)) &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const methodName = c.left.property?.name || c.left.property?.value;

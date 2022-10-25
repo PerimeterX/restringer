@@ -5,13 +5,15 @@ const maxRepetition = 50;
 /**
  *
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function rearrangeSwitches(arb) {
+function rearrangeSwitches(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'SwitchStatement' &&
 		n.discriminant.type === 'Identifier' &&
-		n?.discriminant.declNode?.parentNode?.init?.type === 'Literal');
+		n?.discriminant.declNode?.parentNode?.init?.type === 'Literal' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		let ordered = [];

@@ -3,12 +3,14 @@
  * E.g.
  * if (a) {{do_a();}} ===> if (a) {do_a();}
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function consolidateNestedBlockStatements(arb) {
+function consolidateNestedBlockStatements(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'BlockStatement' &&
-		n.parentNode.type === 'BlockStatement');
+		n.parentNode.type === 'BlockStatement' &&
+		candidateFilter(n));
 
 	for (const c of candidates) {
 		const parent = c.parentNode;

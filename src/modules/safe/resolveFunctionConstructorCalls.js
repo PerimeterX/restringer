@@ -4,14 +4,17 @@ const {generateFlatAST} = require('flast');
  * Typical for packers, function constructor calls where the last argument
  * is a code snippet, should be replaced with the code nodes.
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveFunctionConstructorCalls(arb) {
+function resolveFunctionConstructorCalls(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'CallExpression' &&
 		n.callee?.type === 'MemberExpression' &&
 		(n.callee.property?.name || n.callee.property?.value) === 'constructor' &&
-		n.arguments.length && n.arguments.slice(-1)[0].type === 'Literal');
+		n.arguments.length && n.arguments.slice(-1)[0].type === 'Literal' &&
+		candidateFilter(n));
+
 	for (const c of candidates) {
 		let args = '';
 		if (c.arguments.length > 1) {
