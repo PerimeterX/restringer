@@ -69,6 +69,34 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		name: 'rearrangeSequences - TP-1',
+		func: __dirname + '/../src/modules/safe/rearrangeSequences',
+		source: `function f() { return a(), b(), c(); }`,
+		expected: `function f() {\n  a();\n  b();\n  return c();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'rearrangeSequences - TP-2',
+		func: __dirname + '/../src/modules/safe/rearrangeSequences',
+		source: `function f() { if (x) return a(), b(), c(); else d(); }`,
+		expected: `function f() {\n  if (x) {\n    a();\n    b();\n    return c();\n  } else\n    d();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'rearrangeSequences - TP-3',
+		func: __dirname + '/../src/modules/safe/rearrangeSequences',
+		source: `function f() { if (a(), b()) c(); }`,
+		expected: `function f() {\n  a();\n  if (b())\n    c();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'rearrangeSequences - TP-4',
+		func: __dirname + '/../src/modules/safe/rearrangeSequences',
+		source: `function f() { if (x) if (a(), b()) c(); }`,
+		expected: `function f() {\n  if (x) {\n    a();\n    if (b())\n      c();\n  }\n}`,
+	},
+	{
+		enabled: true,
 		name: 'rearrangeSwitches - TP-1',
 		func: __dirname + '/../src/modules/safe/rearrangeSwitches',
 		source: `(() => {let a = 1;\twhile (true) {switch (a) {case 3: return console.log(3); case 2: console.log(2); a = 3; break;

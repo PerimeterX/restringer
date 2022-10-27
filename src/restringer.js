@@ -30,6 +30,7 @@ const {
 		resolveFunctionConstructorCalls,
 		resolveProxyVariables,
 		resolveProxyReferences,
+		rearrangeSequences,
 		rearrangeSwitches,
 	},
 	unsafe: {
@@ -90,6 +91,7 @@ class REstringer {
 	 */
 	_safeDeobfuscationMethods() {
 		return [
+			rearrangeSequences,
 			rearrangeSwitches,
 			normalizeEmptyStatements,
 			consolidateNestedBlockStatements,
