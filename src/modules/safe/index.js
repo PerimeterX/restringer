@@ -1,11 +1,11 @@
 module.exports = {
-	consolidateNestedBlockStatements: require(__dirname + '/consolidateNestedBlockStatements'),
 	normalizeComputed: require(__dirname + '/normalizeComputed'),
 	normalizeEmptyStatements: require(__dirname + '/normalizeEmptyStatements'),
 	parseTemplateLiteralsIntoStringLiterals: require(__dirname + '/parseTemplateLiteralsIntoStringLiterals'),
 	rearrangeSequences: require(__dirname + '/rearrangeSequences'),
 	rearrangeSwitches: require(__dirname + '/rearrangeSwitches'),
 	removeDeadNodes: require(__dirname + '/removeDeadNodes'),
+	removeRedundantBlockStatements: require(__dirname + '/removeRedundantBlockStatements'),
 	replaceBooleanExpressionsWithIf: require(__dirname + '/replaceBooleanExpressionsWithIf'),
 	replaceCallExpressionsWithUnwrappedIdentifier: require(__dirname + '/replaceCallExpressionsWithUnwrappedIdentifier'),
 	replaceEvalCallsWithLiteralContent: require(__dirname + '/replaceEvalCallsWithLiteralContent'),

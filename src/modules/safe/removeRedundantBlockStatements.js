@@ -6,10 +6,10 @@
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function consolidateNestedBlockStatements(arb, candidateFilter = () => true) {
+function removeRedundantBlockStatements(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'BlockStatement' &&
-		n.parentNode.type === 'BlockStatement' &&
+		['BlockStatement', 'Program'].includes(n.parentNode.type) &&
 		candidateFilter(n));
 
 	for (const c of candidates) {
@@ -19,7 +19,7 @@ function consolidateNestedBlockStatements(arb, candidateFilter = () => true) {
 			else {
 				const currentIdx = parent.body.indexOf(c);
 				const replacementNode = {
-					type: 'BlockStatement',
+					type: parent.type,
 					body: [
 						...parent.body.slice(0, currentIdx),
 						...c.body,
@@ -30,8 +30,9 @@ function consolidateNestedBlockStatements(arb, candidateFilter = () => true) {
 			}
 		}
 		else arb.markNode(parent, c);
+		if (parent.type === 'Program') break;   // No reason to continue if the root node will be replaced
 	}
 	return arb;
 }
 
-module.exports = consolidateNestedBlockStatements;
+module.exports = removeRedundantBlockStatements;
