@@ -26,9 +26,11 @@ const {
 		replaceIdentifierWithFixedAssignedValue,
 		replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 		replaceBooleanExpressionsWithIf,
+		replaceSequencesWithExpressions,
 		resolveFunctionConstructorCalls,
 		resolveProxyVariables,
 		resolveProxyReferences,
+		rearrangeSequences,
 		rearrangeSwitches,
 	},
 	unsafe: {
@@ -89,6 +91,7 @@ class REstringer {
 	 */
 	_safeDeobfuscationMethods() {
 		return [
+			rearrangeSequences,
 			rearrangeSwitches,
 			normalizeEmptyStatements,
 			consolidateNestedBlockStatements,
@@ -105,6 +108,7 @@ class REstringer {
 			replaceIdentifierWithFixedAssignedValue,
 			replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
 			replaceBooleanExpressionsWithIf,
+			replaceSequencesWithExpressions,
 			resolveFunctionConstructorCalls,
 			replaceFunctionShellsWithWrappedValue,
 			replaceFunctionShellsWithWrappedValueIIFE,
