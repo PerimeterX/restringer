@@ -5,7 +5,7 @@
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function replaceSequencesWithStatement(arb, candidateFilter = () => true) {
+function replaceSequencesWithExpressions(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'ExpressionStatement' &&
 		n.expression.type === 'SequenceExpression' &&
@@ -20,7 +20,7 @@ function replaceSequencesWithStatement(arb, candidateFilter = () => true) {
 		}));
 
 		if (parent.type === 'BlockStatement') {
-			// Insert between other children
+			// Insert between other statements
 			const currentIdx = parent.body.indexOf(c);
 			const replacementNode = {
 				type: 'BlockStatement',
@@ -44,4 +44,4 @@ function replaceSequencesWithStatement(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = replaceSequencesWithStatement;
+module.exports = replaceSequencesWithExpressions;
