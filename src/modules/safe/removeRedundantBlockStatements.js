@@ -1,5 +1,6 @@
 /**
- * Remove redundant block statements which have another block statement as their body.
+ * Remove redundant block statements which either have another block statement as their body,
+ * or are a direct child of the Program node.
  * E.g.
  * if (a) {{do_a();}} ===> if (a) {do_a();}
  * @param {Arborist} arb
