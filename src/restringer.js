@@ -11,7 +11,7 @@ const {
 	safe: {
 		resolveProxyCalls,
 		normalizeEmptyStatements,
-		consolidateNestedBlockStatements,
+		removeRedundantBlockStatements,
 		removeDeadNodes,
 		resolveRedundantLogicalExpressions,
 		resolveMemberExpressionReferencesToArrayIndex,
@@ -94,7 +94,7 @@ class REstringer {
 			rearrangeSequences,
 			rearrangeSwitches,
 			normalizeEmptyStatements,
-			consolidateNestedBlockStatements,
+			removeRedundantBlockStatements,
 			resolveRedundantLogicalExpressions,
 			resolveProxyCalls,
 			resolveProxyVariables,

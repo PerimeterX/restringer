@@ -821,13 +821,11 @@ function _0x18585b(_0x39d250, _0x5b10a5, _0x5e9dc9) {
   _0x5d8b17();
   _0x39d250[_0x5e9dc9] = _0x39d250[_0x5b10a5];
 }
-{
-  _0x18585b(window, 'setTimeout', '_S');
-  _0x18585b(window, 'setInterval', '_A');
-  _0x18585b(window, 'clearInterval', '_CA');
-  _0x18585b(window, 'btoa', '_b');
-  _0x18585b(window, 'atob', '_a');
-}
+_0x18585b(window, 'setTimeout', '_S');
+_0x18585b(window, 'setInterval', '_A');
+_0x18585b(window, 'clearInterval', '_CA');
+_0x18585b(window, 'btoa', '_b');
+_0x18585b(window, 'atob', '_a');
 var _0xdc52be = {}, _0x1b8194 = {}, _0x16159b = {}, _0x2c11ba = {}, _0x33cc2f, _0x3ee8f6, _0x25fd7c = false, _0x5acbd9 = true, _0x171a7f = true;
 const _0x125a5a = 'cart_created';
 function _0x149802(_0xdfe62c, _0x483660) {

@@ -69,12 +69,7 @@ l[c] = v;`,
 		enabled: true,
 		name: 'Remove Nested Block Statements',
 		source: '{{freeNested;}} {{{freeNested2}}}',
-		expected: `{
-  freeNested;
-}
-{
-  freeNested2;
-}`,
+		expected: `freeNested;\nfreeNested2;`,
 	},
 	{
 		enabled: true,
@@ -94,15 +89,7 @@ const b = true;`,
 		enabled: true,
 		name: 'Replace Deterministic If Statement',
 		source: 'if(true){a;}if(false){b}if(false||c){c}if(true&&d){d}',
-		expected: `{
-  a;
-}
-if (c) {
-  c;
-}
-if (d) {
-  d;
-}`,
+		expected: `a;\nif (c) {\n  c;\n}\nif (d) {\n  d;\n}`,
 	},
 	{
 		enabled: true,
@@ -354,23 +341,13 @@ const b = 3;`,
 		enabled: true,
 		name: 'Verify Correct Context For Function Declaration',
 		source: `function a(v) {return v + '4'}; if (a(0)) {console.log(a(18));}`,
-		expected: `function a(v) {
-  return v + '4';
-}
-{
-  console.log('184');
-}`,
+		expected: `function a(v) {\n  return v + '4';\n}\nconsole.log('184');`,
 	},
 	{
 		enabled: true,
 		name: 'Verify Correct Context For Function Variable',
 		source: `let a = function (v) {return v + '4'}; if (a(0)) {console.log(a(18));}`,
-		expected: `let a = function (v) {
-  return v + '4';
-};
-{
-  console.log('184');
-}`,
+		expected: `let a = function (v) {\n  return v + '4';\n};\nconsole.log('184');`,
 	},
 	{
 		enabled: true,
