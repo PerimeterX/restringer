@@ -45,13 +45,16 @@ function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 			// eval('Function')('alert("hacked!")');
 			if (c.parentKey === 'callee') {
 				targetNode = c.parentNode;
-				if (replacementNode.type === 'ExpressionStatement' && replacementNode.expression.type === 'Identifier') {
+				if (replacementNode.type === 'ExpressionStatement') {
 					replacementNode = replacementNode.expression;
 				}
 				replacementNode = {...c.parentNode, callee: replacementNode};
 			}
 			if (targetNode.parentNode.type === 'ExpressionStatement' && replacementNode.type === 'BlockStatement') {
 				targetNode = targetNode.parentNode;
+			}
+			if (targetNode.parentNode.type === 'BinaryExpression' && replacementNode.type === 'ExpressionStatement') {
+				replacementNode = replacementNode.expression;
 			}
 			arb.markNode(targetNode, replacementNode);
 		} catch (e) {
