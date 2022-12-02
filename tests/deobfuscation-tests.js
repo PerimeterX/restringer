@@ -311,6 +311,12 @@ const c = function (a, b) {
 	},
 	{
 		enabled: true,
+		name: 'Resolve Member Expression Local References with Unary Expressions Correctly',
+		source: `const a = ['-example', '-3', '-Infinity']; a[0]; a[1]; a[2];`,
+		expected: `const a = [\n  '-example',\n  '-3',\n  '-Infinity'\n];\n'-example';\n-'3';\n-Infinity;`,
+	},
+	{
+		enabled: true,
 		name: 'Resolve Member Expression References With Context',
 		source: `const a = [1, 2, 3]; (function(arr) {arr.forEach((x, i, arr) => arr[i] = x * 3)})(a); const b = a[0];`,
 		expected: `const a = [
