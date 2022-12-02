@@ -27,7 +27,7 @@ function createNewNode(value) {
 					} else newNode = {
 						type: 'UnaryExpression',
 						operator: String(value)[0],
-						argument: createNewNode(String(value).substring(1)),
+						argument: createNewNode(absVal),
 					};
 				} else if (['Infinity', 'NaN'].includes(String(value))) {
 					newNode = {
