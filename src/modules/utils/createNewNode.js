@@ -17,7 +17,14 @@ function createNewNode(value) {
 			case 'Number':
 			case 'Boolean':
 				if (['-', '+', '!'].includes(String(value)[0]) && String(value).length > 1) {
-					newNode = {
+					const absVal = String(value).substring(1);
+					if (Number.isNaN(parseInt(absVal)) && !['Infinity', 'NaN'].includes(absVal)) {
+						newNode = {
+							type: 'Literal',
+							value,
+							raw: String(value),
+						};
+					} else newNode = {
 						type: 'UnaryExpression',
 						operator: String(value)[0],
 						argument: createNewNode(String(value).substring(1)),
