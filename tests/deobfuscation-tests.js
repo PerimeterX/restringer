@@ -204,7 +204,7 @@ console.log('hello world');`,
 		enabled: true,
 		name: 'Replace Local Member Expressions Proxy - Chained Proxies',
 		source: 'const a = ["hello"], b = a[0], c = b; console.log(c);',
-		expected: `const a = ['hello'], b = 'hello';\nconsole.log('hello');`,
+		expected: `const a = ['hello'], b = 'hello', c = 'hello';\nconsole.log('hello');`,
 	},
 	{
 		enabled: true,
