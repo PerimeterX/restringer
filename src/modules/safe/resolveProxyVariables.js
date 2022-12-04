@@ -19,11 +19,10 @@ function resolveProxyVariables(arb, candidateFilter = () => true) {
 
 	for (const c of candidates) {
 		const refs = c.id.references || [];
-		// Remove proxy assignments if there are no further proxies assigned
-		if (!refs.find(n => ['right', 'init'].includes(n.parentKey) &&
-			['AssignmentExpression', 'VariableDeclarator'].includes(n.parentNode.type))) arb.markNode(c);
-		if (areReferencesModified(arb.ast, refs)) continue;
-		for (const ref of refs) {
+		// Remove proxy assignments if there are no more references
+		if (!refs.length) arb.markNode(c);
+		else if (areReferencesModified(arb.ast, refs)) continue;
+		else for (const ref of refs) {
 			arb.markNode(ref, c.init);
 		}
 	}

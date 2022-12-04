@@ -1,6 +1,6 @@
 {
   "name": "restringer",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
   "bin": {
