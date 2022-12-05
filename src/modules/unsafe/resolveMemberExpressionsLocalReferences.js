@@ -24,6 +24,7 @@ function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => tr
 		n.type === 'MemberExpression' &&
 		['Identifier', 'Literal'].includes(n.property.type) &&
 		!skipProperties.includes(n.property?.name || n.property?.value) &&
+		(!(n.parentKey == 'left' && n.parentNode.type === 'AssignmentExpression')) &&
 		candidateFilter(n));
 
 	for (const c of candidates) {
