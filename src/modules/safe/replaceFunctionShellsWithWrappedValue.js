@@ -15,7 +15,10 @@ function replaceFunctionShellsWithWrappedValue(arb, candidateFilter = () => true
 	for (const c of candidates) {
 		const replacementNode = c.body.body[0].argument;
 		for (const ref of (c.id?.references || [])) {
-			arb.markNode(ref.parentNode, replacementNode);
+			// Make sure the function is called and not just referenced in another call expression
+			if (ref.parentNode.type === 'CallExpression' && ref.parentNode.callee === ref) {
+				arb.markNode(ref.parentNode, replacementNode);
+			}
 		}
 	}
 	return arb;
