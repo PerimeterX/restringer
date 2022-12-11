@@ -1,4 +1,5 @@
 const availableTests = {
+	Utils: __dirname + '/testUtils',
 	Modules: __dirname + '/testModules',
 	Processors: __dirname + '/testProcessors',
 	Deobfuscation: __dirname + '/testDeobfuscations',
