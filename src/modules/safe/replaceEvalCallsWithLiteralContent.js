@@ -53,7 +53,9 @@ function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 			if (targetNode.parentNode.type === 'ExpressionStatement' && replacementNode.type === 'BlockStatement') {
 				targetNode = targetNode.parentNode;
 			}
-			if (targetNode.parentNode.type === 'BinaryExpression' && replacementNode.type === 'ExpressionStatement') {
+			// Edge case where the eval call renders an expression statement which is then used as an expression:
+			// console.log(eval('1;')) --> console.log(1)
+			if (targetNode.parentNode.type !== 'ExpressionStatement' && replacementNode.type === 'ExpressionStatement') {
 				replacementNode = replacementNode.expression;
 			}
 			arb.markNode(targetNode, replacementNode);

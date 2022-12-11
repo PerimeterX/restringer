@@ -172,6 +172,13 @@ case 1: console.log(1); a = 2; break;}}})();`,
 	},
 	{
 		enabled: true,
+		name: 'replaceEvalCallsWithLiteralContent - TP-6',
+		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
+		source: `console.log(eval('1;'));`,
+		expected: `console.log(1);`,
+	},
+	{
+		enabled: true,
 		name: 'replaceFunctionShellsWithWrappedValue - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceFunctionShellsWithWrappedValue',
 		source: `function a() {return String}\na()(val);`,
