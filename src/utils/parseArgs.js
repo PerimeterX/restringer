@@ -22,23 +22,26 @@ function parseArgs(args) {
 	let opts;
 	try {
 		const inputFilename = args[0] && args[0][0] !== '-' ? args[0] : '';
+		const argsStr = args.join(' ');
 		opts = {
 			inputFilename,
-			help: args.includes('-h') || args.includes('--help'),
-			clean: args.includes('-c') || args.includes('--clean'),
-			quiet: args.includes('-q') || args.includes('--quiet'),
-			verbose: args.includes('-v') || args.includes('--verbose'),
-			outputToFile: args.includes('-o') || args.includes('--output'),
-			maxIterations: args.includes('-m') || args.includes('--max-iterations'),
+			help: /(^|\s)(-h|--help)/.test(argsStr),
+			clean: /(^|\s)(-c|--clean)/.test(argsStr),
+			quiet: /(^|\s)(-q|--quiet)/.test(argsStr),
+			verbose: /(^|\s)(-v|--verbose)/.test(argsStr),
+			outputToFile: /(^|\s)(-o|--output)/.test(argsStr),
+			maxIterations: /(^|\s)(-m|--max-iterations)/.test(argsStr),
 			outputFilename: `${inputFilename}-deob.js`,
 		};
-		if (opts.outputToFile) {
-			const outFileIdx = (~args.indexOf('-o') ? args.indexOf('-o') : args.indexOf('--output')) + 1;
-			if (args[outFileIdx] && args[outFileIdx][0] !== '-') opts.outputFilename = opts[outFileIdx];
-		}
-		if (opts.maxIterations) {
-			const maxItersIdx = (~args.indexOf('-m') ? args.indexOf('-m') : args.indexOf('--max-iterations')) + 1;
-			if (args[maxItersIdx] && args[maxItersIdx][0] !== '-') opts.maxIterations = Number(args[maxItersIdx]);
+		for (let i = 1; i < args.length; i++) {
+			if (opts.outputToFile && /-o|--output/.exec(args[i])) {
+				if (args[i].includes('=')) opts.outputFilename = args[i].split('=')[1];
+				else if (args[i + 1] && args[i + 1][0] !== '-') opts.outputFilename = args[i + 1];
+				break;
+			} else if (opts.maxIterations && /-m|--max-iterations/.exec(args[i])) {
+				if (args[i].includes('=')) opts.maxIterations = Number(args[i].split('=')[1]);
+				else if (args[i + 1] && args[i + 1][0] !== '-') opts.maxIterations = Number(args[i + 1]);
+			}
 		}
 	} catch {}
 	return opts;
@@ -53,7 +56,7 @@ function argsAreValid(args) {
 	if (args.help) console.log(printHelp());
 	else if (!args.inputFilename) console.log(`Error: Input filename must be provided`);
 	else if (args.verbose && args.quiet) console.log(`Error: Don't set both -q and -v at the same time *smh*`);
-	else if (args.maxIterations === true) console.log(`Error: --max-iterations requires a number (e.g. --max-iterations 12)`);
+	else if (args.maxIterations !== false && Number.isNaN(parseInt(args.maxIterations))) console.log(`Error: --max-iterations requires a number larger than 0 (e.g. --max-iterations 12)`);
 	else return true;
 	return false;
 }
