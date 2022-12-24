@@ -369,6 +369,98 @@ case 1: console.log(1); a = 2; break;}}})();`,
 		source: `function a(x) {return function() {return x + 3}.apply(this, arguments);}`,
 		expected: `function a(x) {\n  return x + 3;\n}`,
 	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TP-1 (arrow functions)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `var a = (() => {
+      return b => {
+        return c(b - 40);
+      };
+    })();`,
+		expected: `var a = b => {\n  return c(b - 40);\n};`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TP-2 (function expression)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `var a = (function () {
+  return b => c(b - 40);
+})();`,
+		expected: `var a = b => c(b - 40);`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapSimpleOperations - TP-1',
+		func: __dirname + '/../src/modules/safe/unwrapSimpleOperations',
+		source: `function add(b,c){return b + c;}
+function minus(b,c){return b - c;}
+function mul(b,c){return b * c;}
+function div(b,c){return b / c;}
+function power(b,c){return b ** c;}
+function and(b,c){return b && c;}
+function band(b,c){return b & c;}
+function or(b,c){return b || c;}
+function bor(b,c){return b | c;}
+function xor(b,c){return b ^ c;}
+add(1, 2);
+minus(1, 2);
+mul(1, 2);
+div(1, 2);
+power(1, 2);
+and(1, 2);
+band(1, 2);
+or(1, 2);
+bor(1, 2);
+xor(1, 2);`,
+		expected: `function add(b, c) {
+  return b + c;
+}
+function minus(b, c) {
+  return b - c;
+}
+function mul(b, c) {
+  return b * c;
+}
+function div(b, c) {
+  return b / c;
+}
+function power(b, c) {
+  return b ** c;
+}
+function and(b, c) {
+  return b && c;
+}
+function band(b, c) {
+  return b & c;
+}
+function or(b, c) {
+  return b || c;
+}
+function bor(b, c) {
+  return b | c;
+}
+function xor(b, c) {
+  return b ^ c;
+}
+1 + 2;
+1 - 2;
+1 * 2;
+1 / 2;
+1 ** 2;
+1 && 2;
+1 & 2;
+1 || 2;
+1 | 2;
+1 ^ 2;`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyCalls - TP-1',
+		func: __dirname + '/../src/modules/safe/simplifyCalls',
+		source: `func1.apply(this, [arg1, arg2]); func2.call(this, arg1, arg2);`,
+		expected: `func1(arg1, arg2);\nfunc2(arg1, arg2);`,
+	},
 
 	// Unsafe
 	{
