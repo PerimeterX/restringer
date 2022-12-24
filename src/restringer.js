@@ -31,6 +31,7 @@ const {
 		resolveProxyVariables,
 		resolveProxyReferences,
 		rearrangeSequences,
+		simplifyCalls,
 		rearrangeSwitches,
 	},
 	unsafe: {
@@ -112,6 +113,7 @@ class REstringer {
 			resolveFunctionConstructorCalls,
 			replaceFunctionShellsWithWrappedValue,
 			replaceFunctionShellsWithWrappedValueIIFE,
+			simplifyCalls,
 			unwrapFunctionShells,
 		];
 	}
