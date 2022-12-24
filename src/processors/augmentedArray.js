@@ -16,7 +16,8 @@
  */
 const {
 	unsafe: {
-		evalInVm
+		evalInVm,
+		resolveFunctionToArray,
 	},
 	config: {
 		badValue
@@ -43,10 +44,12 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 
 	for (const candidate of candidates) {
 		const relevantArrayIdentifier = candidate.arguments.find(n => n.type === 'Identifier');
+		const declKind = /function/i.test(relevantArrayIdentifier.declNode.parentNode.type) ? '' : 'var ';
+		const ref = !declKind ? `${relevantArrayIdentifier.name}()` : relevantArrayIdentifier.name;
 		// The context for this eval is the relevant array and the IIFE augmenting it (the candidate).
-		const context = `var ${relevantArrayIdentifier.declNode.parentNode.src}\n!${createOrderedSrc(getDeclarationWithContext(candidate))}`;
+		const context = `${declKind}${relevantArrayIdentifier.declNode.parentNode.src}\n!${createOrderedSrc(getDeclarationWithContext(candidate))}`;
 		// By adding the name of the array after the context, the un-shuffled array is procured.
-		const src = `${context};\n${relevantArrayIdentifier.name};`;
+		const src = `${context};\n${ref};`;
 		const newNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
 		if (newNode !== badValue) {
 			let candidateExpression = candidate;
@@ -54,13 +57,21 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 				candidateExpression = candidateExpression?.parentNode;
 			}
 			arb.markNode(candidateExpression ? candidateExpression : candidate);
-			arb.markNode(relevantArrayIdentifier.declNode.parentNode.init, newNode);
+			if (relevantArrayIdentifier.declNode.parentNode.type === 'FunctionDeclaration') {
+				arb.markNode(relevantArrayIdentifier.declNode.parentNode.body, {
+					type: 'BlockStatement',
+					body: [{
+						type: 'ReturnStatement',
+						argument: newNode,
+					}],
+				});
+			} else arb.markNode(relevantArrayIdentifier.declNode.parentNode.init, newNode);
 		}
 	}
 	return arb;
 }
 
 module.exports = {
-	preprocessors: [replaceArrayWithStaticAugmentedVersion],
+	preprocessors: [replaceArrayWithStaticAugmentedVersion, resolveFunctionToArray],
 	postprocessors: [],
 };
