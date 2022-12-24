@@ -19,7 +19,16 @@ function resolveDefiniteBinaryExpressions(arb, candidateFilter = () => true) {
 
 	for (const c of candidates) {
 		const newNode = evalInVm(c.src);
-		if (newNode !== badValue) arb.markNode(c, newNode);
+		if (newNode !== badValue) {
+			// Fix issue where a number below zero would be replaced with a string
+			if (newNode.type === 'UnaryExpression' && typeof c?.left?.value === 'number' && typeof c?.right?.value === 'number') {
+				// noinspection JSCheckFunctionSignatures
+				const v = parseInt(newNode.argument.value);
+				newNode.argument.value = v;
+				newNode.argument.raw = `${v}`;
+			}
+			arb.markNode(c, newNode);
+		}
 	}
 	return arb;
 }
