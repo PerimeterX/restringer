@@ -61,14 +61,16 @@ function getDeclarationWithContext(originNode) {
 				case 'AssignmentExpression':
 					relevantScope = relevantNode.right?.scope;
 					examineStack.push(relevantNode.right);
+					if (relevantNode.init) examineStack.push(relevantNode.init);
 					break;
 				case 'CallExpression':
 					relevantScope = relevantNode.callee.scope;
 					references.push(...relevantNode.arguments.filter(a => a.type === 'Identifier'));
+					examineStack.push(relevantNode.callee);
 					break;
 				case 'MemberExpression':
 					relevantScope = relevantNode.object.scope;
-					examineStack.push(relevantNode.property);
+					examineStack.push(relevantNode.object, relevantNode.property);
 					break;
 				case 'Identifier':
 					if (relevantNode.declNode) {

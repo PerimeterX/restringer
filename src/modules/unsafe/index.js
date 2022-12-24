@@ -8,6 +8,7 @@ module.exports = {
 	resolveDefiniteMemberExpressions: require(__dirname + '/resolveDefiniteMemberExpressions'),
 	resolveDeterministicConditionalExpressions: require(__dirname + '/resolveDeterministicConditionalExpressions'),
 	resolveEvalCallsOnNonLiterals: require(__dirname + '/resolveEvalCallsOnNonLiterals'),
+	resolveFunctionToArray: require(__dirname + '/resolveFunctionToArray'),
 	resolveInjectedPrototypeMethodCalls: require(__dirname + '/resolveInjectedPrototypeMethodCalls'),
 	resolveLocalCalls: require(__dirname + '/resolveLocalCalls'),
 	resolveMemberExpressionsLocalReferences: require(__dirname + '/resolveMemberExpressionsLocalReferences'),

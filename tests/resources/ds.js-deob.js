@@ -566,7 +566,7 @@ var _0x2cb1 = function (_0x4b5899, _0x33789e) {
             return _0x2a25b1 in this && !(_0x2a25b1 in (this.constructor || _0x886b9b).prototype && this[_0x2a25b1] === (this.constructor || _0x886b9b).prototype[_0x2a25b1]);
           });
           _0x70dec9 = null;
-          return _0x4a23a5.call(this, _0x4cd1e1);
+          return _0x4a23a5(_0x4cd1e1);
         };
       }
       _0x4ffa0e = function (_0x4297dd, _0x58a00b) {

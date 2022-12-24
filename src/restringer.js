@@ -31,7 +31,10 @@ const {
 		resolveProxyVariables,
 		resolveProxyReferences,
 		rearrangeSequences,
+		simplifyCalls,
 		rearrangeSwitches,
+		unwrapIIFEs,
+		unwrapSimpleOperations,
 	},
 	unsafe: {
 		resolveMinimalAlphabet,
@@ -44,6 +47,7 @@ const {
 		resolveDeterministicConditionalExpressions,
 		resolveInjectedPrototypeMethodCalls,
 		resolveEvalCallsOnNonLiterals,
+		resolveFunctionToArray,
 	},
 	config: {
 		setGlobalMaxIterations,
@@ -96,6 +100,7 @@ class REstringer {
 			normalizeEmptyStatements,
 			removeRedundantBlockStatements,
 			resolveRedundantLogicalExpressions,
+			unwrapSimpleOperations,
 			resolveProxyCalls,
 			resolveProxyVariables,
 			resolveProxyReferences,
@@ -112,7 +117,9 @@ class REstringer {
 			resolveFunctionConstructorCalls,
 			replaceFunctionShellsWithWrappedValue,
 			replaceFunctionShellsWithWrappedValueIIFE,
+			simplifyCalls,
 			unwrapFunctionShells,
+			unwrapIIFEs,
 		];
 	}
 
@@ -121,6 +128,7 @@ class REstringer {
 	 */
 	_unsafeDeobfuscationMethods() {
 		return [
+			resolveFunctionToArray,
 			resolveMinimalAlphabet,
 			resolveDefiniteBinaryExpressions,
 			resolveAugmentedFunctionWrappedArrayReplacements,

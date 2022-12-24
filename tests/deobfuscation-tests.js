@@ -87,6 +87,12 @@ const b = true;`,
 	},
 	{
 		enabled: true,
+		name: 'Replace Augmented Function with Corrected Array',
+		source: `(function(a, b){const myArr=a();for(let i=0;i<b;i++)myArr.push(myArr.shift());})(arr,1);function arr(){var a1=[2, 1];arr=function(){return a1;};return arr();}const a = arr();console.log(a[0], a[1]);`,
+		expected: `function arr() {\n  return [\n    1,\n    2\n  ];\n}\nconst a = [\n  1,\n  2\n];\nconsole.log(1, 2);`,
+	},
+	{
+		enabled: true,
 		name: 'Replace Deterministic If Statement',
 		source: 'if(true){a;}if(false){b}if(false||c){c}if(true&&d){d}',
 		expected: `a;\nif (c) {\n  c;\n}\nif (d) {\n  d;\n}`,
