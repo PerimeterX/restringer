@@ -24,4 +24,6 @@ module.exports = {
 	resolveRedundantLogicalExpressions: require(__dirname + '/resolveRedundantLogicalExpressions'),
 	simplifyCalls: require(__dirname + '/simplifyCalls'),
 	unwrapFunctionShells: require(__dirname + '/unwrapFunctionShells'),
+	unwrapIIFEs: require(__dirname + '/unwrapIIFEs'),
+	unwrapSimpleOperations: require(__dirname + '/unwrapSimpleOperations'),
 };

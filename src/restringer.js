@@ -33,6 +33,8 @@ const {
 		rearrangeSequences,
 		simplifyCalls,
 		rearrangeSwitches,
+		unwrapIIFEs,
+		unwrapSimpleOperations,
 	},
 	unsafe: {
 		resolveMinimalAlphabet,
@@ -97,6 +99,7 @@ class REstringer {
 			normalizeEmptyStatements,
 			removeRedundantBlockStatements,
 			resolveRedundantLogicalExpressions,
+			unwrapSimpleOperations,
 			resolveProxyCalls,
 			resolveProxyVariables,
 			resolveProxyReferences,
@@ -115,6 +118,7 @@ class REstringer {
 			replaceFunctionShellsWithWrappedValueIIFE,
 			simplifyCalls,
 			unwrapFunctionShells,
+			unwrapIIFEs,
 		];
 	}
 
