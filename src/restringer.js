@@ -47,6 +47,7 @@ const {
 		resolveDeterministicConditionalExpressions,
 		resolveInjectedPrototypeMethodCalls,
 		resolveEvalCallsOnNonLiterals,
+		resolveFunctionToArray,
 	},
 	config: {
 		setGlobalMaxIterations,
@@ -127,6 +128,7 @@ class REstringer {
 	 */
 	_unsafeDeobfuscationMethods() {
 		return [
+			resolveFunctionToArray,
 			resolveMinimalAlphabet,
 			resolveDefiniteBinaryExpressions,
 			resolveAugmentedFunctionWrappedArrayReplacements,
