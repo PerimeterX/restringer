@@ -591,6 +591,13 @@ function xor(b, c) {
 	},
 	{
 		enabled: true,
+		name: 'resolveFunctionToArray - TP-1',
+		func: __dirname + '/../src/modules/unsafe/resolveFunctionToArray',
+		source: `function a() {return [1];}\nconst b = a();`,
+		expected: `function a() {\n  return [1];\n}\nconst b = [1];`,
+	},
+	{
+		enabled: true,
 		name: 'resolveInjectedPrototypeMethodCalls - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveInjectedPrototypeMethodCalls',
 		source: `String.prototype.secret = function () {return 'secret ' + this;}; 'hello'.secret();`,
