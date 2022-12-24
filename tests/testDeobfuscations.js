@@ -17,10 +17,7 @@ function testCodeSample(testName, source, expected) {
 	const restringer = new REstringer(source);
 	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();
-	assert((restringer.script === expected ||
-			restringer.script.replace(/'/g, '"') === expected.replace(/'/g, '"') ||
-			restringer.script.replace(/"/g, `'`) === expected.replace(/"/g, `'`)),
-	`\n\tFAIL: deobfuscation result !== expected:\n-------------\n${restringer.script}\n\t!==\n${expected}\n-------------`);
+	assert.equal(restringer.script, expected);
 	console.timeEnd('PASS');
 }
 
