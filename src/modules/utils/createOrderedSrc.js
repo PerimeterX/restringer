@@ -22,9 +22,14 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 				}
 			} else if (n.callee.type === 'FunctionExpression') {
 				if (!preserveOrder) {
-					const newNode = generateFlatAST(`(${n.src});`)[1];
-					newNode.nodeId = n.nodeId + largeNumber;
-					nodes[idx] = newNode;
+					const altFuncName = (n.parentNode.type === 'VariableDeclarator' ? n.parentNode.id.name : 'func' + n.nodeId);
+					const funcStartRegexp = new RegExp('function[^(]*');
+					const funcSrc = n.callee?.id ? n.src : n.src.replace(funcStartRegexp, 'function ' + altFuncName);
+					const newNode = generateFlatAST(`(${funcSrc});`)[1];
+					if (newNode) {
+						newNode.nodeId = n.nodeId + largeNumber;
+						nodes[idx] = newNode;
+					}
 				} else nodes[idx] = n;
 			}
 		}
