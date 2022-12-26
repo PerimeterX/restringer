@@ -63,7 +63,8 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 			}
 		}
 		const context = cache[cacheName];
-		const src = context ? `${context}\n${c.src}` : c.src;
+		const nodeSrc = createOrderedSrc([c]);
+		const src = context ? `${context}\n${nodeSrc}` : nodeSrc;
 		const newNode = evalInVm(src);
 		if (newNode !== badValue && newNode.type !== 'FunctionDeclaration' && newNode.name !== 'undefined') {
 			arb.markNode(c, newNode);
