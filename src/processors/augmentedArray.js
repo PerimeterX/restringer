@@ -42,21 +42,21 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 		n.arguments.length > 1 && n.arguments[0].type === 'Identifier' &&
 		n.arguments[1].type === 'Literal' && !Number.isNaN(parseInt(n.arguments[1].value)));
 
-	for (const candidate of candidates) {
-		const relevantArrayIdentifier = candidate.arguments.find(n => n.type === 'Identifier');
+	for (const c of candidates) {
+		const relevantArrayIdentifier = c.arguments.find(n => n.type === 'Identifier');
 		const declKind = /function/i.test(relevantArrayIdentifier.declNode.parentNode.type) ? '' : 'var ';
 		const ref = !declKind ? `${relevantArrayIdentifier.name}()` : relevantArrayIdentifier.name;
 		// The context for this eval is the relevant array and the IIFE augmenting it (the candidate).
-		const context = `${declKind}${relevantArrayIdentifier.declNode.parentNode.src}\n!${createOrderedSrc(getDeclarationWithContext(candidate))}`;
+		const context = `${declKind}${relevantArrayIdentifier.declNode.parentNode.src}\n!${createOrderedSrc(getDeclarationWithContext(c))}`;
 		// By adding the name of the array after the context, the un-shuffled array is procured.
 		const src = `${context};\n${ref};`;
 		const newNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
 		if (newNode !== badValue) {
-			let candidateExpression = candidate;
+			let candidateExpression = c;
 			while (candidateExpression && candidateExpression.type !== 'ExpressionStatement') {
 				candidateExpression = candidateExpression?.parentNode;
 			}
-			arb.markNode(candidateExpression ? candidateExpression : candidate);
+			arb.markNode(candidateExpression ? candidateExpression : c);
 			if (relevantArrayIdentifier.declNode.parentNode.type === 'FunctionDeclaration') {
 				arb.markNode(relevantArrayIdentifier.declNode.parentNode.body, {
 					type: 'BlockStatement',

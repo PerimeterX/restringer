@@ -29,7 +29,7 @@ function resolveFunctionToArray(arb) {
 
 	for (const c of candidates) {
 		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
-		const src = createOrderedSrc(getDeclarationWithContext(targetNode).concat(c.init));
+		const src = createOrderedSrc(getDeclarationWithContext(targetNode)) + `\n${createOrderedSrc([c.init])}`;
 		const newNode = evalInVm(src);
 		if (newNode !== badValue) {
 			arb.markNode(c.init, newNode);
