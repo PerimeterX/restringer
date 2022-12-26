@@ -1,6 +1,5 @@
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
 const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
@@ -38,7 +37,7 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 	for (const c of candidates) {
 		try {
 			const callee = c.callee;
-			if (callee?.declNode || callee?.object?.declNode) continue;
+			if (callee?.declNode) continue;
 			const safeImplementation = safeImplementations[callee.name];
 			if (safeImplementation) {
 				const args = c.arguments.map(a => a.value);
@@ -50,9 +49,7 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 				const newNode = evalInVm(c.src);
 				if (newNode !== badValue) arb.markNode(c, newNode);
 			}
-		} catch (e) {
-			logger.debug(e.message);
-		}
+		} catch {}
 	}
 	return arb;
 }

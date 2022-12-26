@@ -61,6 +61,7 @@ function getDeclarationWithContext(originNode) {
 				case 'AssignmentExpression':
 					relevantScope = relevantNode.right?.scope;
 					examineStack.push(relevantNode.right);
+					if (relevantNode.init) examineStack.push(relevantNode.init);
 					break;
 				case 'CallExpression':
 					relevantScope = relevantNode.callee.scope;
@@ -71,53 +72,32 @@ function getDeclarationWithContext(originNode) {
 					relevantScope = relevantNode.object.scope;
 					examineStack.push(relevantNode.object, relevantNode.property);
 					break;
-				case 'Identifier': {
-					let actualNode;
-					if (relevantNode.declNode) actualNode = relevantNode.declNode;
-					else if (relevantNode.parentKey === 'id') {
-						switch (relevantNode.parentNode.type) {
-							case 'FunctionDeclaration':
-								actualNode = relevantNode;
-								break;
-							case 'VariableDeclarator':
-								if (/Function/.exec(relevantNode.parentNode?.init?.type)) actualNode = relevantNode;
-								break;
-						}
-					}
-					if (actualNode) {
-						relevantScope = actualNode.scope;
-						references.push(actualNode.parentNode);
+				case 'Identifier':
+					if (relevantNode.declNode) {
+						relevantScope = relevantNode.declNode.scope;
+						references.push(relevantNode.declNode.parentNode);
 					}
 					break;
-				}
 			}
 
 			// noinspection JSUnresolvedVariable
-			const contextToCollect = [
-				...new Set(
-					relevantScope.through.map(ref => ref.identifier?.declNode?.parentNode)
-						.concat(assignments)
-						.concat(references)
-				)].map(ref => ref?.declNode ? ref.declNode : ref);
+			const contextToCollect = [...new Set(
+				relevantScope.through.map(ref => ref.identifier?.declNode?.parentNode)
+					.concat(assignments)
+					.concat(references))
+			].map(ref => ref?.declNode ? ref.declNode : ref);
 			for (const rn of contextToCollect) {
-				if (rn && !collectedContext.includes(rn)) {
-					if (/Function/.exec(rn.type) || (!isNodeInRanges(rn, collectedRanges) || (rn.declNode && !isNodeInRanges(rn.declNode, collectedRanges)))) {
-						if (rn.scope.scopeId > 0 && rn.scope.block !== rn && rn.scope !== relevantScope) {
-							examineStack.push(rn.scope.block);
-							collectedContext.push(rn);
-						} else {
-							collectedRanges.push(rn.range);
-							collectedContext.push(rn);
-							examineStack.push(rn);
-							for (const cn of (rn.childNodes || [])) {
-								examineStack.push(cn);
-							}
-						}
+				if (rn && !collectedContext.includes(rn) && !isNodeInRanges(rn, collectedRanges)) {
+					collectedRanges.push(rn.range);
+					collectedContext.push(rn);
+					examineStack.push(rn);
+					for (const cn of (rn.childNodes || [])) {
+						examineStack.push(cn);
 					}
 				}
 			}
 		}
-		cached = [...new Set(collectedContext.filter(n => !skipCollectionTypes.includes(n.type)))];
+		cached = collectedContext.filter(n => !skipCollectionTypes.includes(n.type));
 		cache[cacheNameId] = cached;        // Caching context for the same node
 		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
 	}
