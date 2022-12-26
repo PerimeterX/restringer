@@ -30,14 +30,7 @@ function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) 
 			(n.callee.property?.name || n.callee.property?.value) === methodName);
 
 		for (const ref of references) {
-			const refContext = [
-				...new Set([
-					...getDeclarationWithContext(ref.callee),
-					...getDeclarationWithContext(ref.callee?.object),
-					...getDeclarationWithContext(ref.callee?.property),
-				]),
-			];
-			const src = `${createOrderedSrc([...context, ...refContext])}\n${ref.src}`;
+			const src = `${createOrderedSrc([...context])}\n${createOrderedSrc([ref])}`;
 			const newNode = evalInVm(src);
 			if (newNode !== badValue) arb.markNode(ref, newNode);
 		}
