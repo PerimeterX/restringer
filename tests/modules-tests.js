@@ -153,8 +153,8 @@ case 1: console.log(1); a = 2; break;}}})();`,
 		enabled: true,
 		name: 'replaceEvalCallsWithLiteralContent - TP-3',
 		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
-		source: `function q() {return (eval('a; b;'));}`,
-		expected: `function q() {\n  return {\n    a;\n    b;\n  };\n}`,
+		source: `function q() {return (eval('a, b;'));}`,
+		expected: `function q() {\n  return a, b;\n}`,
 	},
 	{
 		enabled: true,
@@ -649,8 +649,8 @@ function xor(b, c) {
 		enabled: true,
 		name: 'resolveMinimalAlphabet - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
-		source: `+true; -true; +false; +[]; ~true; ~false; ~[]; +[3]; +['']; -[4]; ![]; +[[]];`,
-		expected: `1;\n-'1';\n0;\n0;\n-'2';\n-'1';\n-'1';\n3;\n0;\n-'4';\nfalse;\n0;`,
+		source: `+true; -true; +false; -false; +[]; ~true; ~false; ~[]; +[3]; +['']; -[4]; ![]; +[[]];`,
+		expected: `1;\n-'1';\n0;\n-0;\n0;\n-'2';\n-'1';\n-'1';\n3;\n0;\n-'4';\nfalse;\n0;`,
 	},
 	{
 		enabled: true,
@@ -664,7 +664,7 @@ function xor(b, c) {
 		name: 'resolveMinimalAlphabet - TN-1',
 		func: __dirname + '/../src/modules/unsafe/resolveMinimalAlphabet',
 		source: `-false; -[]; +{}; -{}; -'a'; ~{}; -['']; +[1, 2]; +this; +[this];`,
-		expected: `-false;\n-[];\n+{};\n-{};\nNaN;\n~{};\n-[''];\nNaN;\n+this;\n+[this];`,
+		expected: `-0;\n-0;\n+{};\n-{};\nNaN;\n~{};\n-0;\nNaN;\n+this;\n+[this];`,
 	},
 
 	// Utils
