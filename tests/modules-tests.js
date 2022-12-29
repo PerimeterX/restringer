@@ -140,7 +140,7 @@ case 1: console.log(1); a = 2; break;}}})();`,
 		name: 'replaceEvalCallsWithLiteralContent - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceEvalCallsWithLiteralContent',
 		source: `eval('console.log("hello world")');`,
-		expected: `console.log('hello world');;`,
+		expected: `console.log('hello world');`,
 	},
 	{
 		enabled: true,
