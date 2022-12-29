@@ -34,6 +34,12 @@ function createNewNode(value) {
 						type: 'Identifier',
 						name: String(value),
 					};
+				} else if (Object.is(value, -0)) {
+					newNode = {
+						type: 'UnaryExpression',
+						operator: '-',
+						argument: createNewNode(0),
+					};
 				} else {
 					newNode = {
 						type: 'Literal',
