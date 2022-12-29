@@ -32,7 +32,10 @@ function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 							type: 'BlockStatement',
 							body,
 						};
-					} else body = body[0];
+					} else {
+						body = body[0];
+						if (body.type === 'ExpressionStatement') body = body.expression;
+					}
 				} else body = {
 					type: 'Literal',
 					value: c.arguments[0].value,
