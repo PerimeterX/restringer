@@ -12,6 +12,7 @@ function separateChainedDeclarators(arb, candidateFilter = () => true) {
 	const candidates = arb.ast.filter(n =>
 		n.type === 'VariableDeclaration' &&
 		n.declarations.length > 1 &&
+		!n.parentNode.type.match(/For.*Statement/) &&
 		candidateFilter(n));
 
 	for (const c of candidates) {
@@ -24,12 +25,24 @@ function separateChainedDeclarators(arb, candidateFilter = () => true) {
 			});
 		}
 		// Since we're inserting new nodes, we'll need to replace the parent node
-		const replacedArr = c.parentNode[c.parentKey];
-		const idx = replacedArr.indexOf(c);
-		const replacementNode = {
-			...c.parentNode,
-			[c.parentKey]: replacedArr.slice(0, idx).concat(decls).concat(replacedArr.slice(idx + 1)),
-		};
+		let replacementNode;
+		if (Array.isArray(c.parentNode[c.parentKey])) {
+			const replacedArr = c.parentNode[c.parentKey];
+			const idx = replacedArr.indexOf(c);
+			replacementNode = {
+				...c.parentNode,
+				[c.parentKey]: replacedArr.slice(0, idx).concat(decls).concat(replacedArr.slice(idx + 1)),
+			};
+		} else {
+			// If the parent node isn't ready to accept multiple nodes, inject a block statement to hold them.
+			replacementNode = {
+				...c.parentNode,
+				[c.parentKey]: {
+					type: 'BlockStatement',
+					body: decls,
+				},
+			};
+		}
 		arb.markNode(c.parentNode, replacementNode);
 	}
 	return arb;
