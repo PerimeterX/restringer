@@ -210,13 +210,13 @@ console.log('hello world');`,
 		enabled: true,
 		name: 'Replace Local Member Expressions Proxy - Chained Proxies',
 		source: 'const a = ["hello"], b = a[0], c = b; console.log(c);',
-		expected: `const a = ['hello'], b = 'hello', c = 'hello';\nconsole.log('hello');`,
+		expected: `const a = ['hello'];\nconst b = 'hello';\nconst c = 'hello';\nconsole.log('hello');`,
 	},
 	{
 		enabled: true,
 		name: 'Replace Local Member Expressions Proxy - Member Assignment',
 		source: 'const a = ["hello"], b = a[0];',
-		expected: `const a = ['hello'], b = 'hello';`,
+		expected: `const a = ['hello'];\nconst b = 'hello';`,
 	},
 	{
 		enabled: true,
@@ -234,9 +234,10 @@ console.log('hello world');`,
 		name: 'Replace Reference Proxy',
 		source: `const a = ['hello', ' world'], b = a[0], c = a; console.log(b + c[1]);`,
 		expected: `const a = [
-    'hello',
-    ' world'
-  ], b = 'hello';
+  'hello',
+  ' world'
+];
+const b = 'hello';
 console.log('hello world');`,
 	},
 	{
@@ -368,7 +369,8 @@ const b = 3;`,
 const a = {b: 'hello'};
 a.n = 15;
 console.log(a.n, a.b);`,
-		expected: `const n = 3, b = 'B';
+		expected: `const n = 3;
+const b = 'B';
 const a = { b: 'hello' };
 a.n = 15;
 console.log(15, 'hello');`,
