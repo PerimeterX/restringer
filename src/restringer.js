@@ -35,6 +35,7 @@ const {
 		rearrangeSwitches,
 		unwrapIIFEs,
 		unwrapSimpleOperations,
+		separateChainedDeclarators,
 	},
 	unsafe: {
 		resolveMinimalAlphabet,
@@ -96,6 +97,7 @@ class REstringer {
 	_safeDeobfuscationMethods() {
 		return [
 			rearrangeSequences,
+			separateChainedDeclarators,
 			rearrangeSwitches,
 			normalizeEmptyStatements,
 			removeRedundantBlockStatements,
