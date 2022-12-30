@@ -478,6 +478,22 @@ function xor(b, c) {
 	},
 	{
 		enabled: true,
+		looped: true,
+		name: 'separateChainedDeclarators - TP-4',
+		func: __dirname + '/../src/modules/safe/separateChainedDeclarators',
+		source: `if (a) var b, c; while (true) var e = 3, d = 3;`,
+		expected: `if (a) {\n  var b;\n  var c;\n}\nwhile (true) {\n  var e = 3;\n  var d = 3;\n}`,
+	},
+	{
+		enabled: true,
+		looped: true,
+		name: 'separateChainedDeclarators - TN-1',
+		func: __dirname + '/../src/modules/safe/separateChainedDeclarators',
+		source: `for (let i, b = 2, c = 3;;);`,
+		expected: `for (let i, b = 2, c = 3;;);`,
+	},
+	{
+		enabled: true,
 		name: 'simplifyCalls - TP-1',
 		func: __dirname + '/../src/modules/safe/simplifyCalls',
 		source: `func1.apply(this, [arg1, arg2]); func2.call(this, arg1, arg2);`,
