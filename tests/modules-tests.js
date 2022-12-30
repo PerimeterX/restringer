@@ -456,6 +456,28 @@ function xor(b, c) {
 	},
 	{
 		enabled: true,
+		name: 'separateChainedDeclarators - TP-1',
+		func: __dirname + '/../src/modules/safe/separateChainedDeclarators',
+		source: `const foo = 5, bar = 7;`,
+		expected: `const foo = 5;\nconst bar = 7;`,
+	},
+	{
+		enabled: true,
+		name: 'separateChainedDeclarators - TP-2',
+		func: __dirname + '/../src/modules/safe/separateChainedDeclarators',
+		source: `const a = 1; let foo = 5, bar = 7;`,
+		expected: `const a = 1;\nlet foo = 5;\nlet bar = 7;`,
+	},
+	{
+		enabled: true,
+		looped: true,
+		name: 'separateChainedDeclarators - TP-3',
+		func: __dirname + '/../src/modules/safe/separateChainedDeclarators',
+		source: `!function() {var a, b = 2; let c, d = 3;}();`,
+		expected: `!function () {\n  var a;\n  var b = 2;\n  let c;\n  let d = 3;\n}();`,
+	},
+	{
+		enabled: true,
 		name: 'simplifyCalls - TP-1',
 		func: __dirname + '/../src/modules/safe/simplifyCalls',
 		source: `func1.apply(this, [arg1, arg2]); func2.call(this, arg1, arg2);`,
