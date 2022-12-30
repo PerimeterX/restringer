@@ -85,7 +85,12 @@ setTimeout(function () {
   }
   function d(f) {
     f = f.replace(/ /g, '');
-    var c, d, e, g, a, b;
+    var c;
+    var d;
+    var e;
+    var g;
+    var a;
+    var b;
     e = true;
     g = 0;
     d = (f + '').split('').reverse();
@@ -159,7 +164,13 @@ setTimeout(function () {
     _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
     encode: function (c) {
       var j = '';
-      var f, h, e, i, g, k, a;
+      var f;
+      var h;
+      var e;
+      var i;
+      var g;
+      var k;
+      var a;
       var d = 0;
       c = b._utf8_encode(c);
       while (d < c.length) {
@@ -183,8 +194,13 @@ setTimeout(function () {
     },
     decode: function (c) {
       var j = '';
-      var f, h, e;
-      var i, g, k, a;
+      var f;
+      var h;
+      var e;
+      var i;
+      var g;
+      var k;
+      var a;
       var d = 0;
       c = c.replace(/[^A-Za-z0-9+/=]/g, '');
       while (d < c.length) {

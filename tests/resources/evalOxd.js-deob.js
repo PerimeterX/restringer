@@ -1,4 +1,11 @@
-var polyfill, sendBeacon, isSupported, b2h, last, progress_, th, lo;
+var polyfill;
+var sendBeacon;
+var isSupported;
+var b2h;
+var last;
+var progress_;
+var th;
+var lo;
 (function () {
   function Ox$(z, i) {
     var j = z.length;
@@ -169,7 +176,13 @@ var polyfill, sendBeacon, isSupported, b2h, last, progress_, th, lo;
       return b;
     }
     function k(r, i) {
-      var m = {}, j = {}, g = {}, s = {}, l = {}, k = {}, w = {};
+      var m = {};
+      var j = {};
+      var g = {};
+      var s = {};
+      var l = {};
+      var k = {};
+      var w = {};
       m._ = i;
       var e = r.length;
       j._ = [];
@@ -226,7 +239,13 @@ var polyfill, sendBeacon, isSupported, b2h, last, progress_, th, lo;
       return h.split('').reverse().join('');
     }
     function g() {
-      var e = {}, f = {}, f = {}, f = {}, b = {}, c = {}, l = {};
+      var e = {};
+      var f = {};
+      var f = {};
+      var f = {};
+      var b = {};
+      var c = {};
+      var l = {};
       var j = [];
       bu();
       e._ = document.querySelectorAll('input, checkbox, textarea, select');
