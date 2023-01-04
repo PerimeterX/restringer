@@ -41,7 +41,7 @@ const maxCacheSize = 100;
 /**
  * Eval a string in a ~safe~ VM environment
  * @param {string} stringToEval
- * @return {string|ASTNode} A node based on the eval result if successful; badValue string otherwise.
+ * @return {ASTNode|badValue} A node based on the eval result if successful; badValue string otherwise.
  */
 function evalInVm(stringToEval) {
 	const cacheName = `eval-${generateHash(stringToEval)}`;
@@ -52,6 +52,7 @@ function evalInVm(stringToEval) {
 			// Break known trap strings
 			trapStrings.forEach(ts => stringToEval = stringToEval.replace(ts.trap, ts.replaceWith));
 			const res = (new VM(vmOptions)).run(stringToEval);
+			// noinspection JSUnresolvedVariable
 			if (!res?.VMError && !badTypes.includes(getObjType(res))) {
 				// To exclude results based on randomness or timing, eval again and compare results
 				const res2 = (new VM(vmOptions)).run(stringToEval);
