@@ -7,7 +7,6 @@ const fixes = ['!', '~', '-', '+', '--', '++'];
  * @return {boolean}
  */
 function matchBinaryOrLogical(n) {
-	// noinspection JSUnresolvedVariable
 	return ['LogicalExpression', 'BinaryExpression'].includes(n.type) &&
 		operators.includes(n.operator) &&
 		n.parentNode.type === 'ReturnStatement' &&
@@ -40,7 +39,6 @@ function handleBinaryOrLogical(c, arb) {
  * @return {boolean}
  */
 function matchUnary(n) {
-	// noinspection JSUnresolvedVariable
 	return n.type === 'UnaryExpression' &&
 		fixes.includes(n.operator) &&
 		n.parentNode.type === 'ReturnStatement' &&
