@@ -13,7 +13,6 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 	nodes.forEach((n, idx) => {
 		if (n.type === 'CallExpression') {
 			if (n.parentNode.type === 'ExpressionStatement') {
-				// noinspection JSValidateTypes
 				nodes[idx] = n.parentNode;
 				if (!preserveOrder && n.callee.type === 'FunctionExpression') {
 					// Set nodeId to place IIFE just after its argument's declaration
@@ -31,6 +30,16 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 						nodes[idx] = newNode;
 					}
 				} else nodes[idx] = n;
+			}
+		}  else if (n.type === 'FunctionExpression' && !n.id) {
+			if (n.parentNode.type === 'VariableDeclarator') {
+				const funcStartRegexp = new RegExp('function[^(]*');
+				const funcSrc = n.src.replace(funcStartRegexp, 'function ' + n.parentNode.id.name);
+				const newNode = generateFlatAST(`(${funcSrc});`)[1];
+				if (newNode) {
+					newNode.nodeId = n.nodeId;
+					nodes[idx] = newNode;
+				}
 			}
 		}
 	});
