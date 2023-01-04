@@ -20,7 +20,6 @@ const {badValue} = require(__dirname + '/../config');
  * @return {Arborist}
  */
 function resolveFunctionToArray(arb) {
-	// noinspection DuplicatedCode
 	const candidates = arb.ast.filter(n =>
 		n.type === 'VariableDeclarator' &&
 		n.init?.type === 'CallExpression' &&
@@ -29,7 +28,8 @@ function resolveFunctionToArray(arb) {
 
 	for (const c of candidates) {
 		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
-		const src = createOrderedSrc(getDeclarationWithContext(targetNode)) + `\n${createOrderedSrc([c.init])}`;
+		const isContained = [c.init, c.init?.parentNode].includes(targetNode);
+		const src = createOrderedSrc(getDeclarationWithContext(targetNode, isContained)) + `\n${createOrderedSrc([c.init])}`;
 		const newNode = evalInVm(src);
 		if (newNode !== badValue) {
 			arb.markNode(c.init, newNode);
