@@ -48,7 +48,6 @@ const {
 		resolveDeterministicConditionalExpressions,
 		resolveInjectedPrototypeMethodCalls,
 		resolveEvalCallsOnNonLiterals,
-		resolveFunctionToArray,
 	},
 	config: {
 		setGlobalMaxIterations,
@@ -130,7 +129,6 @@ class REstringer {
 	 */
 	_unsafeDeobfuscationMethods() {
 		return [
-			resolveFunctionToArray,
 			resolveMinimalAlphabet,
 			resolveDefiniteBinaryExpressions,
 			resolveAugmentedFunctionWrappedArrayReplacements,
@@ -178,7 +176,7 @@ class REstringer {
 		this._runProcessors(this._preprocessors);
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
-		if (this.normalize) this.script = normalizeScript(this.script);
+		if (this.modified && this.normalize) this.script = normalizeScript(this.script);
 		if (clean) this.script = runLoop(this.script, [removeDeadNodes]);
 		return this.modified;
 	}

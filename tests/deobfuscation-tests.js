@@ -11,17 +11,23 @@ module.exports = [
     };
     augmentArray(++numberOfShifts);
 })(arr, 3);
-console.log(arr.join(' '));`,
-		expected: `const arr = [\n  1,\n  2,\n  3,\n  4,\n  5,\n  6,\n  7,\n  8,\n  9,\n  10,\n  'a',\n  'b',\n  'c'\n];
-(function (targetArray, numberOfShifts) {
-  var augmentArray = function (counter) {
-    while (--counter) {
-      targetArray.push(targetArray.shift());
-    }
-  };
-  augmentArray(++numberOfShifts);
-}(arr, 3));
-console.log('4 5 6 7 8 9 10 a b c 1 2 3');`,
+console.log(arr[7], arr[8]);`,
+		expected: `const arr = [
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  'a',
+  'b',
+  'c',
+  1,
+  2,
+  3
+];
+console.log('a', 'b');`,
 	},
 	{
 		enabled: true,
@@ -335,12 +341,6 @@ const c = function (a, b) {
   arr.forEach((x, i, arr) => arr[i] = x * 3);
 }(a));
 const b = 3;`,
-	},
-	{
-		enabled: true,
-		name: 'Uncompute Member Expressions: Literal -> Identifier',
-		source: `console['log']`,
-		expected: `console.log;`,
 	},
 	{
 		enabled: true,
