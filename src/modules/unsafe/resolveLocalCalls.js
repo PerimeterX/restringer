@@ -6,8 +6,6 @@ const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
 
-
-
 /**
  * Collect all available context on call expressions where the callee is defined in the script and attempt
  * to resolve their value.
