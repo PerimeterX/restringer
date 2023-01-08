@@ -44,7 +44,7 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 
 	for (const c of candidates) {
 		let targetNode = c;
-		while (targetNode && targetNode.type !== 'ExpressionStatement') {
+		while (targetNode && (targetNode.type !== 'ExpressionStatement' && targetNode.parentNode.type !== 'SequenceExpression')) {
 			targetNode = targetNode?.parentNode;
 		}
 		const relevantArrayIdentifier = c.arguments.find(n => n.type === 'Identifier');
