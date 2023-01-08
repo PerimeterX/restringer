@@ -44,7 +44,7 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 
 	for (const c of candidates) {
 		let targetNode = c;
-		while (targetNode && targetNode.type !== 'ExpressionStatement') {
+		while (targetNode && (targetNode.type !== 'ExpressionStatement' && targetNode.parentNode.type !== 'SequenceExpression')) {
 			targetNode = targetNode?.parentNode;
 		}
 		const relevantArrayIdentifier = c.arguments.find(n => n.type === 'Identifier');
@@ -54,7 +54,7 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 		const contextNodes = getDeclarationWithContext(c, true);
 		const context = `${contextNodes.length ? createOrderedSrc(contextNodes) : ''}`;
 		// By adding the name of the array after the context, the un-shuffled array is procured.
-		const src = `${context};\n${targetNode.src}\n${ref};`;
+		const src = `${context};\n${createOrderedSrc([targetNode])}\n${ref};`;
 		const newNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
 		if (newNode !== badValue) {
 			arb.markNode(targetNode || c);
