@@ -147,7 +147,7 @@ var _yh = _yg(this, function () {
     var b = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
     return !/^([^ ]+( +[^ ]+)+)+[^ ]}/.test(_yh);
   };
-  return true;
+  return a();
 });
 true;
 var _yi = function () {
