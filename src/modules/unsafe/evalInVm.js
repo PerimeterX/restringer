@@ -15,6 +15,11 @@ const disableObjects = {  // APIs that should be disabled when running scripts i
 	debugger: {},
 };
 
+const matchingObjectKeys = {
+	[Object.keys(console).sort().join('')]: {type: 'Identifier', name: 'console'},
+	[Object.keys(console).sort().slice(1).join('')]: {type: 'Identifier', name: 'console'}, // Alternative console without the 'Console' object
+};
+
 const trapStrings = [     // Rules for diffusing code traps.
 	{
 		trap: /while\s*\(\s*(true|1)\s*\)\s*\{\s*}/gi,
@@ -33,6 +38,7 @@ const trapStrings = [     // Rules for diffusing code traps.
 const vmOptions = {
 	timeout: 5 * 1000,
 	sandbox: {...disableObjects},
+	wasm: false,
 };
 
 let cache = {};
@@ -54,13 +60,18 @@ function evalInVm(stringToEval) {
 			const res = (new VM(vmOptions)).run(stringToEval);
 			// noinspection JSUnresolvedVariable
 			if (!res?.VMError && !badTypes.includes(getObjType(res))) {
-				// To exclude results based on randomness or timing, eval again and compare results
-				const res2 = (new VM(vmOptions)).run(stringToEval);
-				assert.deepEqual(res, res2);
-				cache[cacheName] = createNewNode(res);
+				// If the result is a builtin object / function, return a matching identifier
+				const objKeys = Object.keys(res).sort().join('');
+				if (matchingObjectKeys[objKeys]) cache[cacheName] = matchingObjectKeys[objKeys];
+				else {
+					// To exclude results based on randomness or timing, eval again and compare results
+					const res2 = (new VM(vmOptions)).run(stringToEval);
+					assert.deepEqual(res, res2);
+					cache[cacheName] = createNewNode(res);
+				}
 			}
 		} catch (e) {
-			logger.debug(`[-] Error in _evalInVm: ${e}`);
+			logger.debug(`[-] Error in _evalInVm: ${e.message}`);
 		}
 	}
 	return cache[cacheName];
