@@ -504,6 +504,16 @@ function xor(b, c) {
 	{
 		enabled: true,
 		isUtil: true,
+		name: 'evalInVm - TP-1',
+		func: __dirname + '/../src/modules/unsafe/evalInVm',
+		prepareTest: a => [a],
+		prepareResult: b => b,
+		source: `function a() {return console;} a();`,
+		expected: {type: 'Identifier', name: 'console'},
+	},
+	{
+		enabled: true,
+		isUtil: true,
 		name: 'evalInVm - TN-1',
 		func: __dirname + '/../src/modules/unsafe/evalInVm',
 		prepareTest: a => [a],

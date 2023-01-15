@@ -24,7 +24,7 @@ function testModuleOnce(testName, testFunc, source, expected, prepTest = default
 	const testInput = prepTest(source);
 	const rawRes = testFunc(...testInput);
 	const result = prepRes(rawRes);
-	assert.equal(result, expected);
+	assert.deepEqual(result, expected);
 	console.timeEnd('PASS');
 }
 
@@ -43,7 +43,7 @@ function testModuleInLoop(testName, testFunc, source, expected, prepTest = null,
 	const testInput = prepTest ? prepTest(source) : source;
 	const rawResult = runLoop(testInput, [testFunc]);
 	const result = prepRes ? prepRes(rawResult) : rawResult;
-	assert.equal(result, expected);
+	assert.deepEqual(result, expected);
 	console.timeEnd('PASS');
 }
 

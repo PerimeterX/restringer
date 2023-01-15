@@ -30,6 +30,9 @@ const irrelevantTypesToAvoidIteratingOver = [
 // Direct child nodes of an if statement
 const ifKeys = ['consequent', 'alternate'];
 
+// Node types which are acceptable when wrapping an anonymous function
+const standaloneNodeTypes = ['ExpressionStatement', 'AssignmentExpression', 'VariableDeclarator'];
+
 /**
  * @param {ASTNode} targetNode
  * @return {boolean} True if any of the descendants are marked for modification; false otherwise.
@@ -63,6 +66,20 @@ function isNodeAnAssignmentToProperty(n) {
 		(n.parentKey === 'object' &&  // e.g. targetNode.push(value) <-- this changes the value of targetNode
 			(propertiesThatModifyContent.includes(n.parentNode.property?.value || n.parentNode.property.name) ||
 				n.parentNode.property.isMarked)));  // Collect references which are marked, so they will prevent the context from collecting
+}
+
+/**
+ * @param {ASTNode[]} nodesArr
+ * @return {ASTNode[]} Nodes which aren't contained in other nodes from the array
+ */
+function removeRedundantNodes(nodesArr) {
+	const keep = [];
+	for (const targetNode of nodesArr) {
+		if (!nodesArr.find(n => n !== targetNode && n.range[0] <= targetNode.range[0] && n.range[1] >= targetNode.range[1])) {
+			keep.push(targetNode);
+		}
+	}
+	return keep;
 }
 
 /**
@@ -102,7 +119,9 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 				case 'Identifier': {
 					const refs = node.references || [];
 					// Review the declaration of an identifier
-					if (node.declNode && node.declNode.parentNode) targetNodes.push(node.declNode.parentNode);
+					if (node.declNode && node.declNode.parentNode) {
+						targetNodes.push(node.declNode.parentNode);
+					}
 					else if (refs.length && node.parentNode) targetNodes.push(node.parentNode);
 					// Review call expression that receive the identifier as an argument for possible augmenting functions
 					targetNodes.push(...refs.filter(r =>
@@ -113,6 +132,7 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 					targetNodes.push(...refs.filter(r =>
 						r.parentNode.type === 'AssignmentExpression' &&
 						r.parentKey === 'left' &&
+						node.parentNode.type !== 'FunctionDeclaration' &&   // Skip function reassignments
 						!isConsequentOrAlternate(r))
 						.map(r => r.parentNode));
 					// Review assignments to property
@@ -125,17 +145,35 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 					break;
 				case 'FunctionExpression':
 					// Review the parent node of anonymous functions
-					if (!node.id) targetNodes.push(node.parentNode);
+					if (!node.id) {
+						let targetParent = node;
+						while (!standaloneNodeTypes.includes(targetParent.type) && targetParent.parentNode) {
+							targetParent = targetParent.parentNode;
+						}
+						if (standaloneNodeTypes.includes(targetParent.type)) targetNodes.push(targetParent);
+					}
 			}
 
 			for (const targetNode of targetNodes) {
 				if (!seenNodes.includes(targetNode)) stack.push(targetNode);
+				// noinspection JSUnresolvedVariable
+				if (targetNode === targetNode.scope.block) {
+					// Collect out-of-scope variables used inside the scope
+					// noinspection JSUnresolvedVariable
+					stack.push(
+						...targetNode.scope.through.map(n => n.identifier)
+							.filter(n => !(seenNodes.includes(n) || stack.includes(n) || irrelevantTypesToAvoidIteratingOver.includes(n))));
+				} else if (targetNode.scope.scopeId && originNode.scope !== targetNode.scope) {
+					// Collect the scope itself instead of just the node, if the scope isn't the global scope
+					// noinspection JSUnresolvedVariable
+					const s = targetNode.scope.block;
+					if (!(seenNodes.includes(s) || stack.includes(s) || irrelevantTypesToAvoidIteratingOver.includes(s))) stack.push(s);
+				}
 				for (const childNode of targetNode.childNodes) {
-					if (
-						!seenNodes.includes(childNode) &&
-						!stack.includes(childNode) &&
-						!irrelevantTypesToAvoidIteratingOver.includes(childNode.type)
-					) {
+					if (!(
+						seenNodes.includes(childNode) ||
+						stack.includes(childNode) ||
+						irrelevantTypesToAvoidIteratingOver.includes(childNode.type))) {
 						stack.push(childNode);
 					}
 				}
@@ -150,6 +188,8 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 			n.id && (n.id.references || []).filter(r =>
 				r.parentNode.type === 'AssignmentExpression' &&
 				r.parentKey === 'left').forEach(ref => functionNameReassignment.push(ref.parentNode)));
+		cached = removeRedundantNodes(cached);
+
 		if (functionNameReassignment.length) cached = cached.filter(n => !functionNameReassignment.includes(n));
 		cache[cacheNameId] = cached;        // Caching context for the same node
 		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
