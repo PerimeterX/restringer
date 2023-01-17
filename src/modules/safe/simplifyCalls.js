@@ -16,10 +16,11 @@ function simplifyCalls(arb, candidateFilter = () => true) {
 		candidateFilter(n));
 
 	for (const c of candidates) {
+		const args = (c.callee.property?.name || c.callee.property?.value) === 'apply' ? c.arguments[1].elements : c.arguments.slice(1);
 		arb.markNode(c,  {
 			type: 'CallExpression',
 			callee: c.callee.object,
-			arguments: (c.callee.property?.name || c.callee.property?.value) === 'apply' ? c.arguments[1].elements : c.arguments.slice(1),
+			arguments: Array.isArray(args) ? args : (args ? [args] : []),
 		});
 	}
 	return arb;

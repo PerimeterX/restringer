@@ -39,6 +39,8 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 		try {
 			const callee = c.callee;
 			if (callee?.declNode || callee?.object?.declNode) continue;
+			if ((callee?.object?.type || callee.type ) === 'ThisExpression' ||
+				(callee?.property?.name || callee?.property?.value) === 'constructor') continue;
 			const safeImplementation = safeImplementations[callee.name];
 			if (safeImplementation) {
 				const args = c.arguments.map(a => a.value);
