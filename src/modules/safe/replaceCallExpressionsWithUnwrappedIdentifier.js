@@ -27,7 +27,7 @@ function replaceCallExpressionsWithUnwrappedIdentifier(arb, candidateFilter = ()
 				}
 			} else if (declBody.type === 'BlockStatement' && declBody.body.length === 1 && declBody.body[0].type === 'ReturnStatement') {
 				const arg = declBody.body[0].argument;
-				if (arg.type === 'Identifier' || (arg.type === 'CallExpression' && !arg.arguments.length)) {
+				if (arg.type === 'Identifier' || (arg.type === 'CallExpression' && !arg.arguments?.length)) {
 					arb.markNode(c, arg);
 				}
 			}

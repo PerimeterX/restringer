@@ -21,7 +21,7 @@ function resolveProxyCalls(arb, candidateFilter = () => true) {
 		n.body?.body?.length === 1 &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		n.body.body[0].argument?.type === 'CallExpression' &&
-		n.body.body[0].argument.arguments.length === n.params.length &&
+		n.body.body[0].argument.arguments?.length === n.params?.length &&
 		n.body.body[0].argument.callee.type === 'Identifier' &&
 		candidateFilter(n));
 
