@@ -66,7 +66,7 @@ function evalInVm(stringToEval) {
 				else {
 					// To exclude results based on randomness or timing, eval again and compare results
 					const res2 = (new VM(vmOptions)).run(stringToEval);
-					assert.deepEqual(res, res2);
+					assert.deepEqual(res.toString(), res2.toString());
 					cache[cacheName] = createNewNode(res);
 				}
 			}
