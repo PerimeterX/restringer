@@ -67,6 +67,10 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 		const src = context ? `${context}\n${nodeSrc}` : nodeSrc;
 		const newNode = evalInVm(src);
 		if (newNode !== badValue && newNode.type !== 'FunctionDeclaration' && newNode.name !== 'undefined') {
+			// Prevent resolving a function's toString as it might be an anti-debugging mechanism
+			// which will spring if the code is beautified
+			if (c.callee.type === 'MemberExpression' && (c.callee.property?.name || c.callee.property?.value) === 'toString' &&
+				(new RegExp('^function ')).test(newNode?.value)) continue;
 			arb.markNode(c, newNode);
 			modifiedRanges.push(c.range);
 		}
