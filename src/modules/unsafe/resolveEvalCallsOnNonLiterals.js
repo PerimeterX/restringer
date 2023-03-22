@@ -1,6 +1,8 @@
 const {parseCode} = require('flast');
 const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
+const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
+const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 
 /**
  * Resolve eval call expressions where the argument isn't a literal.
@@ -19,8 +21,14 @@ function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
 		candidateFilter(n));
 
 	for (const c of candidates) {
-		const argument = c.arguments[0];
-		const src = `var __a_ = ${argument.src}\n;__a_`;
+		// The code inside the eval might contain references to outside code that should be included.
+		const contextNodes = getDeclarationWithContext(c, true);
+		// In case any of the target candidate is included in the context it should be removed.
+		for (const redundantNode in [c, c?.parentNode, c?.parentNode?.parentNode]) {
+			if (contextNodes.includes(redundantNode)) contextNodes.splice(contextNodes.indexOf(redundantNode), 1);
+		}
+		const context = contextNodes.length ? createOrderedSrc(contextNodes) : '';
+		const src = `${context}\n;var __a_ = ${createOrderedSrc([c.arguments[0]])}\n;__a_`;
 		const newNode = evalInVm(src);
 		const targetNode = c.parentNode.type === 'ExpressionStatement' ? c.parentNode : c;
 		let replacementNode = newNode;

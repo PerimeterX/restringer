@@ -11,7 +11,7 @@ const badTypes = [        // Types of objects which can't be resolved in the deo
 ];
 
 const disableObjects = {  // APIs that should be disabled when running scripts in eval to avoid inconsistencies.
-	Date: {},
+	Date: class {},
 	debugger: {},
 };
 

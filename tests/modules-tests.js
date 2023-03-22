@@ -627,7 +627,7 @@ function xor(b, c) {
 		enabled: true,
 		name: 'resolveEvalCallsOnNonLiterals - TP-1',
 		func: __dirname + '/../src/modules/unsafe/resolveEvalCallsOnNonLiterals',
-		source: `eval(function() {return 'atob'}());`,
+		source: `eval(function(a) {return a}('atob'));`,
 		expected: `atob;`,
 	},
 	{
