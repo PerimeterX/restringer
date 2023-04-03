@@ -235,6 +235,13 @@ case 1: console.log(1); a = 2; break;}}})();`,
 	},
 	{
 		enabled: true,
+		name: 'replaceNewFuncCallsWithLiteralContent - TP-1',
+		func: __dirname + '/../src/modules/safe/replaceNewFuncCallsWithLiteralContent',
+		source: `new Function("!function() {console.log('hello world')}()")();`,
+		expected: `!function () {\n  console.log('hello world');\n}();`,
+	},
+	{
+		enabled: true,
 		name: 'replaceBooleanExpressionsWithIf - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceBooleanExpressionsWithIf',
 		source: `x && y && z();`,
