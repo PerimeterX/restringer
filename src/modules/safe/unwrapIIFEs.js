@@ -24,7 +24,7 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 			n.parentNode.type === 'UnaryExpression')) &&
 		candidateFilter(n));
 
-	for (const c of candidates) {
+	candidatesLoop: for (const c of candidates) {
 		let targetNode = c;
 		let replacementNode = c.callee.body;
 		if (replacementNode.type === 'BlockStatement') {
@@ -33,6 +33,8 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 			if (replacementNode.body?.length === 1 && replacementNode.body[0].argument) replacementNode = replacementNode.body[0].argument;
 			// IIFEs with multiple statements or expressions
 			else while (targetNode && !targetNode.body) {
+				// Skip cases where IIFE is used to initialize or set a value
+				if (targetNode.parentKey === 'init' || targetNode.type === 'AssignmentExpression' ) continue candidatesLoop;
 				targetChild = targetNode;
 				targetNode = targetNode.parentNode;
 			}

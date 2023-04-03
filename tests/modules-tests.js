@@ -408,6 +408,26 @@ case 1: console.log(1); a = 2; break;}}})();`,
 	},
 	{
 		enabled: true,
+		name: 'unwrapIIFEs - TN-1 (unary declarator init)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `var b = !function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `var b = !function() {\n\tvar a = 'message';\n\tconsole.log(a);\n}();`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TN-2 (unary assignment right)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `b = !function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `b = !function() {\n\tvar a = 'message';\n\tconsole.log(a);\n}();`,
+	},
+	{
+		enabled: true,
 		name: 'unwrapSimpleOperations - TP-1',
 		func: __dirname + '/../src/modules/safe/unwrapSimpleOperations',
 		source: `function add(b,c){return b + c;}
