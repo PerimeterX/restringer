@@ -398,6 +398,16 @@ case 1: console.log(1); a = 2; break;}}})();`,
 	},
 	{
 		enabled: true,
+		name: 'unwrapIIFEs - TP-3 (inline unwrapping)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `!function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `var a = 'message';\nconsole.log(a);`,
+	},
+	{
+		enabled: true,
 		name: 'unwrapSimpleOperations - TP-1',
 		func: __dirname + '/../src/modules/safe/unwrapSimpleOperations',
 		source: `function add(b,c){return b + c;}
