@@ -13,6 +13,7 @@ module.exports = {
 	replaceFunctionShellsWithWrappedValueIIFE: require(__dirname + '/replaceFunctionShellsWithWrappedValueIIFE'),
 	replaceIdentifierWithFixedAssignedValue: require(__dirname + '/replaceIdentifierWithFixedAssignedValue'),
 	replaceIdentifierWithFixedValueNotAssignedAtDeclaration: require(__dirname + '/replaceIdentifierWithFixedValueNotAssignedAtDeclaration'),
+	replaceNewFuncCallsWithLiteralContent: require(__dirname + '/replaceNewFuncCallsWithLiteralContent'),
 	replaceSequencesWithExpressions: require(__dirname + '/replaceSequencesWithExpressions'),
 	resolveDeterministicIfStatements: require(__dirname + '/resolveDeterministicIfStatements'),
 	resolveFunctionConstructorCalls: require(__dirname + '/resolveFunctionConstructorCalls'),

@@ -235,6 +235,13 @@ case 1: console.log(1); a = 2; break;}}})();`,
 	},
 	{
 		enabled: true,
+		name: 'replaceNewFuncCallsWithLiteralContent - TP-1',
+		func: __dirname + '/../src/modules/safe/replaceNewFuncCallsWithLiteralContent',
+		source: `new Function("!function() {console.log('hello world')}()")();`,
+		expected: `!function () {\n  console.log('hello world');\n}();`,
+	},
+	{
+		enabled: true,
 		name: 'replaceBooleanExpressionsWithIf - TP-1',
 		func: __dirname + '/../src/modules/safe/replaceBooleanExpressionsWithIf',
 		source: `x && y && z();`,
@@ -388,6 +395,36 @@ case 1: console.log(1); a = 2; break;}}})();`,
   return b => c(b - 40);
 })();`,
 		expected: `var a = b => c(b - 40);`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TP-3 (inline unwrapping)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `!function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `var a = 'message';\nconsole.log(a);`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TN-1 (unary declarator init)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `var b = !function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `var b = !function() {\n\tvar a = 'message';\n\tconsole.log(a);\n}();`,
+	},
+	{
+		enabled: true,
+		name: 'unwrapIIFEs - TN-2 (unary assignment right)',
+		func: __dirname + '/../src/modules/safe/unwrapIIFEs',
+		source: `b = !function() {
+	var a = 'message';
+	console.log(a);
+}();`,
+		expected: `b = !function() {\n\tvar a = 'message';\n\tconsole.log(a);\n}();`,
 	},
 	{
 		enabled: true,
