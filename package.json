@@ -1,6 +1,6 @@
 {
   "name": "restringer",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
   "bin": {
@@ -38,6 +38,7 @@
   "homepage": "https://github.com/PerimeterX/Restringer#readme",
   "devDependencies": {
     "eslint": "^8.42.0",
+    "flast": "^1.3.4",
     "husky": "^8.0.3"
   }
 }
