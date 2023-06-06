@@ -11,10 +11,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.0.1",
-    "jsdom": "^18.0.1",
-    "obfuscation-detector": "^1.0.0",
-    "vm2": "^3.9.5"
+    "jsdom": "^22.1.0",
+    "obfuscation-detector": "^1.1.0",
+    "vm2": "^3.9.19"
   },
   "scripts": {
     "test": "node --trace-warnings tests/testRestringer.js"
@@ -31,14 +30,14 @@
     "javascript",
     "AST"
   ],
-  "author": "ben.baryo@perimeterx.com",
+  "author": "ben.baryo@humansecurity.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PerimeterX/Restringer/issues"
   },
   "homepage": "https://github.com/PerimeterX/Restringer#readme",
   "devDependencies": {
-    "eslint": "^8.19.0",
-    "husky": "^8.0.1"
+    "eslint": "^8.42.0",
+    "husky": "^8.0.3"
   }
 }
