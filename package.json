@@ -1,6 +1,6 @@
 {
   "name": "restringer",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
   "bin": {
@@ -11,9 +11,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.3.4",
+    "flast": "^1.4.0",
     "jsdom": "^22.1.0",
-    "obfuscation-detector": "^1.1.0",
+    "obfuscation-detector": "^1.1.2",
     "vm2": "^3.9.19"
   },
   "scripts": {

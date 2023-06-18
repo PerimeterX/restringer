@@ -19,6 +19,7 @@ module.exports = [
 	},
 	{
 		enabled: true,
+		looped: true,
 		name: 'removeRedundantBlockStatements - TP-3',
 		func: __dirname + '/../src/modules/safe/removeRedundantBlockStatements',
 		source: `if (a) {{do_a();}{do_b(); do_c();}{do_d();}}`,
