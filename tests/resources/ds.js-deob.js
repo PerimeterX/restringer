@@ -1097,8 +1097,8 @@ var _0x2cb1 = function (_0x4b5899, _0x33789e) {
             _0xa832f4 = _0xa832f4.slice(1, -1);
           }
           try {
-            var _0x1901fb = _0x3f78bb[0].replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent);
-            _0xa832f4 = _0x5f513e.read ? _0x5f513e.read(_0xa832f4, _0x1901fb) : _0x5f513e(_0xa832f4, _0x1901fb) || _0xa832f4.replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent);
+            var _0x1901fb = _0x3f78bb[0].replace(_0x42e676, decodeURIComponent);
+            _0xa832f4 = _0x5f513e.read ? _0x5f513e.read(_0xa832f4, _0x1901fb) : _0x5f513e(_0xa832f4, _0x1901fb) || _0xa832f4.replace(_0x42e676, decodeURIComponent);
             if (this.json)
               try {
                 _0xa832f4 = JSON.parse(_0xa832f4);
