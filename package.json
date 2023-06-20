@@ -11,9 +11,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.4.0",
+    "flast": "^1.5.0",
     "jsdom": "^22.1.0",
-    "obfuscation-detector": "^1.1.2",
+    "obfuscation-detector": "^1.1.4",
     "vm2": "^3.9.19"
   },
   "scripts": {
