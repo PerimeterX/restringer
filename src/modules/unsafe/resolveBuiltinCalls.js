@@ -5,6 +5,34 @@ const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
 const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
 
+const availableSafeImplementations = Object.keys(safeImplementations);
+
+function isCallWithOnlyLiteralArguments(node) {
+	return node.type === 'CallExpression' && !node.arguments.find(a => a.type !== 'Literal');
+}
+
+function isBuiltinIdentifier(node) {
+	return node.type === 'Identifier' && !node.declNode && !skipBuiltinFunctions.includes(node.name);
+}
+
+function isSafeCall(node) {
+	return node.type === 'CallExpression' && availableSafeImplementations.includes((node.callee.name));
+}
+
+function isBuiltinMemberExpression(node) {
+	return node.type === 'MemberExpression' &&
+	!node.object.declNode &&
+	!skipBuiltinFunctions.includes(node.object?.name) &&
+	!skipIdentifiers.includes(node.object?.name) &&
+	!skipProperties.includes(node.property?.name || node.property?.value);
+}
+
+function isUnwantedNode(node) {
+	return Boolean(node.callee?.declNode || node?.callee?.object?.declNode ||
+		'ThisExpression' === (node.callee?.object?.type || node.callee?.type) ||
+		'constructor' === (node.callee?.property?.name || node.callee?.property?.value));
+}
+
 /**
  * Resolve calls to builtin functions (like atob or String(), etc...).
  * Use safe implmentations of known functions when available.
@@ -13,47 +41,26 @@ const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirnam
  * @return {Arborist}
  */
 function resolveBuiltinCalls(arb, candidateFilter = () => true) {
-	const availableSafeImplementations = Object.keys(safeImplementations);
-	const callsWithOnlyLiteralArugments = arb.ast.filter(n =>
-		n.type === 'CallExpression' &&
-		!n.arguments.find(a => a.type !== 'Literal') &&
-		candidateFilter(n));
-
-	const candidates = callsWithOnlyLiteralArugments.filter(n =>
-		n.callee.type === 'Identifier' &&
-		!n.callee.declNode &&
-		!skipBuiltinFunctions.includes(n.callee.name));
-
-	candidates.push(...callsWithOnlyLiteralArugments.filter(n =>
-		n.callee.type === 'MemberExpression' &&
-		!n.callee.object.declNode &&
-		!skipBuiltinFunctions.includes(n.callee.object?.name) &&
-		!skipIdentifiers.includes(n.callee.object?.name) &&
-		!skipProperties.includes(n.callee.property?.name || n.callee.property?.value)));
-
-	candidates.push(...arb.ast.filter(n =>
-		n.type === 'CallExpression' &&
-		availableSafeImplementations.includes((n.callee.name))));
-
-	for (const c of candidates) {
-		try {
-			const callee = c.callee;
-			if (callee?.declNode || callee?.object?.declNode) continue;
-			if ((callee?.object?.type || callee.type ) === 'ThisExpression' ||
-				(callee?.property?.name || callee?.property?.value) === 'constructor') continue;
-			const safeImplementation = safeImplementations[callee.name];
-			if (safeImplementation) {
-				const args = c.arguments.map(a => a.value);
-				const tempValue = safeImplementation(...args);
-				if (tempValue) {
-					arb.markNode(c, createNewNode(tempValue));
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (!isUnwantedNode(n) && candidateFilter(n) && (isSafeCall(n) ||
+			(isCallWithOnlyLiteralArguments(n) && (isBuiltinIdentifier(n.callee) || isBuiltinMemberExpression(n.callee)))
+		)) {
+			try {
+				const safeImplementation = safeImplementations[n.callee.name];
+				if (safeImplementation) {
+					const args = n.arguments.map(a => a.value);
+					const tempValue = safeImplementation(...args);
+					if (tempValue) {
+						arb.markNode(n, createNewNode(tempValue));
+					}
+				} else {
+					const replacementNode = evalInVm(n.src);
+					if (replacementNode !== badValue) arb.markNode(n, replacementNode);
 				}
-			} else {
-				const replacementNode = evalInVm(c.src);
-				if (replacementNode !== badValue) arb.markNode(c, replacementNode);
+			} catch (e) {
+				logger.debug(e.message);
 			}
-		} catch (e) {
-			logger.debug(e.message);
 		}
 	}
 	return arb;

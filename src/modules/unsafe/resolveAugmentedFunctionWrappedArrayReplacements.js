@@ -24,7 +24,8 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter =
 					c.type === 'MemberExpression' && c.object.type === 'Identifier')
 					.map(n => n.object);
 
-				for (const ac of arrCandidates) {
+				for (let j = 0; j < arrCandidates.length; j++) {
+					const ac = arrCandidates[j];
 					// If a direct reference to a global variable pointing at an array
 					let arrRef;
 					if (!ac.declNode) continue;
