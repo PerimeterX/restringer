@@ -7,7 +7,7 @@ const {propertiesThatModifyContent} = require(__dirname + '/../config');
  */
 function areReferencesModified(ast, refs) {
 	// Verify no reference is on the left side of an assignment
-	return Boolean(refs.find(r =>
+	return refs.some(r =>
 		(r.parentKey === 'left' && ['AssignmentExpression', 'ForInStatement', 'ForOfStatement'].includes(r.parentNode.type)) ||
 		// Verify no reference is part of an update expression
 		r.parentNode.type === 'UpdateExpression' ||
@@ -20,11 +20,11 @@ function areReferencesModified(ast, refs) {
 			propertiesThatModifyContent.includes(r.parentNode.property?.value || r.parentNode.property?.name)) ||
 		// Verify there are no member expressions among the references which are being assigned to
 		(r.type === 'MemberExpression' &&
-			ast.find(n => n.type === 'AssignmentExpression' &&
+			ast.some(n => n.type === 'AssignmentExpression' &&
 				n.left.type === 'MemberExpression' &&
 				n.left.object?.name === r.object?.name &&
 				(n.left.property?.name || n.left.property?.value === r.property?.name || r.property?.value) &&
-				(n.left.object.declNode && (r.object.declNode || r.object) === n.left.object.declNode)))));
+				(n.left.object.declNode && (r.object.declNode || r.object) === n.left.object.declNode))));
 }
 
 module.exports = areReferencesModified;

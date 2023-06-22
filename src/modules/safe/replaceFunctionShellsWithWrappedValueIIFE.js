@@ -5,18 +5,17 @@
  * @return {Arborist}
  */
 function replaceFunctionShellsWithWrappedValueIIFE(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'FunctionExpression' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'FunctionExpression' &&
 		n.parentKey === 'callee' &&
 		!n.parentNode.arguments.length &&
 		n.body?.body?.length &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type) &&
-		candidateFilter(n))
-		.map(n => n.parentNode);
-
-	for (const c of candidates) {
-		arb.markNode(c, c.callee.body.body[0].argument);
+		candidateFilter(n)) {
+			arb.markNode(n.parentNode, n.parentNode.callee.body.body[0].argument);
+		}
 	}
 	return arb;
 }

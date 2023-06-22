@@ -6,41 +6,39 @@
  * @return {Arborist}
  */
 function replaceSequencesWithExpressions(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'ExpressionStatement' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'ExpressionStatement' &&
 		n.expression.type === 'SequenceExpression' &&
-		candidateFilter(n)
-	);
-
-	for (const c of candidates) {
-		const parent = c.parentNode;
-		const statements = c.expression.expressions.map(e => ({
-			type: 'ExpressionStatement',
-			expression: e
-		}));
-
-		if (parent.type === 'BlockStatement') {
-			// Insert between other statements
-			const currentIdx = parent.body.indexOf(c);
-			const replacementNode = {
-				type: 'BlockStatement',
-				body: [
-					...parent.body.slice(0, currentIdx),
-					...statements,
-					...parent.body.slice(currentIdx + 1)
-				],
-			};
-			arb.markNode(parent, replacementNode);
-		} else {
-			// Replace expression with new block statement
-			const blockStatement = {
-				type: 'BlockStatement',
-				body: statements
-			};
-			arb.markNode(c, blockStatement);
+		candidateFilter(n)) {
+			const parent = n.parentNode;
+			const statements = n.expression.expressions.map(e => ({
+				type: 'ExpressionStatement',
+				expression: e
+			}));
+			if (parent.type === 'BlockStatement') {
+				// Insert between other statements
+				const currentIdx = parent.body.indexOf(n);
+				/** @type {ASTNode} */
+				const replacementNode = {
+					type: 'BlockStatement',
+					body: [
+						...parent.body.slice(0, currentIdx),
+						...statements,
+						...parent.body.slice(currentIdx + 1)
+					],
+				};
+				arb.markNode(parent, replacementNode);
+			} else {
+				// Replace expression with new block statement
+				const blockStatement = {
+					type: 'BlockStatement',
+					body: statements
+				};
+				arb.markNode(n, blockStatement);
+			}
 		}
 	}
-
 	return arb;
 }
 

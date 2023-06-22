@@ -8,38 +8,38 @@
  * @return {Arborist}
  */
 function resolveRedundantLogicalExpressions(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'IfStatement' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'IfStatement' &&
 		n.test.type === 'LogicalExpression' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		if (c.test.operator === '&&') {
-			if (c.test.left.type === 'Literal') {
-				if (c.test.left.value) {
-					arb.markNode(c.test, c.test.right);
-				} else {
-					arb.markNode(c.test, c.test.left);
+		candidateFilter(n)) {
+			if (n.test.operator === '&&') {
+				if (n.test.left.type === 'Literal') {
+					if (n.test.left.value) {
+						arb.markNode(n.test, n.test.right);
+					} else {
+						arb.markNode(n.test, n.test.left);
+					}
+				} else if (n.test.right.type === 'Literal') {
+					if (n.test.right.value) {
+						arb.markNode(n.test, n.test.left);
+					} else {
+						arb.markNode(n.test, n.test.right);
+					}
 				}
-			} else if (c.test.right.type === 'Literal') {
-				if (c.test.right.value) {
-					arb.markNode(c.test, c.test.left);
-				} else {
-					arb.markNode(c.test, c.test.right);
-				}
-			}
-		} else if (c.test.operator === '||') {
-			if (c.test.left.type === 'Literal') {
-				if (c.test.left.value) {
-					arb.markNode(c.test, c.test.left);
-				} else {
-					arb.markNode(c.test, c.test.right);
-				}
-			} else if (c.test.right.type === 'Literal') {
-				if (c.test.right.value) {
-					arb.markNode(c.test, c.test.right);
-				} else {
-					arb.markNode(c.test, c.test.left);
+			} else if (n.test.operator === '||') {
+				if (n.test.left.type === 'Literal') {
+					if (n.test.left.value) {
+						arb.markNode(n.test, n.test.left);
+					} else {
+						arb.markNode(n.test, n.test.right);
+					}
+				} else if (n.test.right.type === 'Literal') {
+					if (n.test.right.value) {
+						arb.markNode(n.test, n.test.right);
+					} else {
+						arb.markNode(n.test, n.test.left);
+					}
 				}
 			}
 		}

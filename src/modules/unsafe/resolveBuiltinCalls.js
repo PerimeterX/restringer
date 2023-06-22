@@ -49,8 +49,8 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 					arb.markNode(c, createNewNode(tempValue));
 				}
 			} else {
-				const newNode = evalInVm(c.src);
-				if (newNode !== badValue) arb.markNode(c, newNode);
+				const replacementNode = evalInVm(c.src);
+				if (replacementNode !== badValue) arb.markNode(c, replacementNode);
 			}
 		} catch (e) {
 			logger.debug(e.message);

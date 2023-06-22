@@ -71,19 +71,19 @@ function handleUnary(c, arb) {
  * @return {Arborist}
  */
 function unwrapSimpleOperations(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		(matchBinaryOrLogical(n) || matchUnary(n)) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		switch (c.type) {
-			case 'BinaryExpression':
-			case 'LogicalExpression':
-				handleBinaryOrLogical(c, arb);
-				break;
-			case 'UnaryExpression':
-				handleUnary(c, arb);
-				break;
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if ((matchBinaryOrLogical(n) || matchUnary(n)) &&
+		candidateFilter(n)) {
+			switch (n.type) {
+				case 'BinaryExpression':
+				case 'LogicalExpression':
+					handleBinaryOrLogical(n, arb);
+					break;
+				case 'UnaryExpression':
+					handleUnary(n, arb);
+					break;
+			}
 		}
 	}
 	return arb;

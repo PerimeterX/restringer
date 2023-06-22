@@ -5,19 +5,19 @@
  * @return {Arborist}
  */
 function replaceFunctionShellsWithWrappedValue(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'FunctionDeclaration' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'FunctionDeclaration' &&
 		n.body?.body?.length &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const replacementNode = c.body.body[0].argument;
-		for (const ref of (c.id?.references || [])) {
-			// Make sure the function is called and not just referenced in another call expression
-			if (ref.parentNode.type === 'CallExpression' && ref.parentNode.callee === ref) {
-				arb.markNode(ref.parentNode, replacementNode);
+		candidateFilter(n)) {
+			const replacementNode = n.body.body[0].argument;
+			for (const ref of (n.id?.references || [])) {
+				// Make sure the function is called and not just referenced in another call expression
+				if (ref.parentNode.type === 'CallExpression' && ref.parentNode.callee === ref) {
+					arb.markNode(ref.parentNode, replacementNode);
+				}
 			}
 		}
 	}

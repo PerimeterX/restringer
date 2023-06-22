@@ -69,13 +69,15 @@ function isNodeAnAssignmentToProperty(n) {
 }
 
 /**
- * @param {ASTNode[]} nodesArr
+ * @param {ASTNode[]} nodes
  * @return {ASTNode[]} Nodes which aren't contained in other nodes from the array
  */
-function removeRedundantNodes(nodesArr) {
+function removeRedundantNodes(nodes) {
+	/** @type {ASTNode[]} */
 	const keep = [];
-	for (const targetNode of nodesArr) {
-		if (!nodesArr.find(n => n !== targetNode && n.range[0] <= targetNode.range[0] && n.range[1] >= targetNode.range[1])) {
+	for (let i = 0; i < nodes.length; i++) {
+		const targetNode = nodes[i];
+		if (!nodes.some(n => n !== targetNode && n.start <= targetNode.start && n.end >= targetNode.end)) {
 			keep.push(targetNode);
 		}
 	}
@@ -95,9 +97,13 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 	const cacheNameSrc = `context-${srcHash}`;
 	let cached = cache[cacheNameId] || cache[cacheNameSrc];
 	if (!cached) {
+		/** @type {ASTNode[]} */
 		const stack = [originNode];   // The working stack for nodes to be reviewed
+		/** @type {ASTNode[]} */
 		const collected = [];         // These will be our context
+		/** @type {ASTNode[]} */
 		const seenNodes = [];         // Collected to avoid re-iterating over the same nodes
+		/** @type {number[][]} */
 		const collectedRanges = [];   // Collected to prevent collecting nodes from within collected nodes.
 		while (stack.length) {
 			const node = stack.shift();
@@ -114,6 +120,7 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 			}
 
 			// For each node, whether collected or not, target relevant relative nodes for further review.
+			/** @type {ASTNode[]} */
 			const targetNodes = [node];
 			switch (node.type) {
 				case 'Identifier': {
@@ -167,7 +174,7 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 					// Collect the scope itself instead of just the node, if the scope isn't the global scope
 					// noinspection JSUnresolvedVariable
 					const s = targetNode.scope.block;
-					if (!(seenNodes.includes(s) || stack.includes(s) || irrelevantTypesToAvoidIteratingOver.includes(s))) stack.push(s);
+					if (!(seenNodes.includes(s) || stack.includes(s) || irrelevantTypesToAvoidIteratingOver.includes(s.type))) stack.push(s);
 				}
 				for (const childNode of targetNode.childNodes) {
 					if (!(

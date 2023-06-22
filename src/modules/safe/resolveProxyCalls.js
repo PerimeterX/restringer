@@ -16,32 +16,32 @@
  * @return {Arborist}
  */
 function resolveProxyCalls(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'FunctionDeclaration' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'FunctionDeclaration' &&
 		n.body?.body?.length === 1 &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		n.body.body[0].argument?.type === 'CallExpression' &&
 		n.body.body[0].argument.arguments?.length === n.params?.length &&
 		n.body.body[0].argument.callee.type === 'Identifier' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const funcName = c.id;
-		const ret = c.body.body[0].argument;
-		let transitiveArguments = true;
-		try {
-			for (let i = 0; i < c.params.length; i++) {
-				if (c.params[i]?.name !== ret?.arguments[i]?.name) {
-					transitiveArguments = false;
-					break;
+		candidateFilter(n)) {
+			const funcName = n.id;
+			const ret = n.body.body[0].argument;
+			let transitiveArguments = true;
+			try {
+				for (let j = 0; j < n.params.length; j++) {
+					if (n.params[j]?.name !== ret?.arguments[j]?.name) {
+						transitiveArguments = false;
+						break;
+					}
 				}
+			} catch {
+				transitiveArguments = false;
 			}
-		} catch {
-			transitiveArguments = false;
-		}
-		if (transitiveArguments) {
-			for (const ref of funcName.references || []) {
-				arb.markNode(ref, ret.callee);
+			if (transitiveArguments) {
+				for (const ref of funcName.references || []) {
+					arb.markNode(ref, ret.callee);
+				}
 			}
 		}
 	}

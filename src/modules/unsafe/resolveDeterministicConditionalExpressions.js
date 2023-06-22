@@ -9,15 +9,15 @@ const evalInVm = require(__dirname + '/../utils/evalInVm');
  * @return {Arborist}
  */
 function resolveDeterministicConditionalExpressions(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'ConditionalExpression' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'ConditionalExpression' &&
 		n.test.type === 'Literal' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const newNode = evalInVm(`Boolean(${c.test.src});`);
-		if (newNode.type === 'Literal') {
-			arb.markNode(c, newNode.value ? c.consequent : c.alternate);
+		candidateFilter(n)) {
+			const replacementNode = evalInVm(`Boolean(${n.test.src});`);
+			if (replacementNode.type === 'Literal') {
+				arb.markNode(n, replacementNode.value ? n.consequent : n.alternate);
+			}
 		}
 	}
 	return arb;

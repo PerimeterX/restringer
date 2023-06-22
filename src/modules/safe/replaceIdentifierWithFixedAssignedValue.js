@@ -7,17 +7,17 @@ const areReferencesModified = require(__dirname + '/../utils/areReferencesModifi
  * @return {Arborist}
  */
 function replaceIdentifierWithFixedAssignedValue(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n?.declNode?.parentNode?.init?.type === 'Literal' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n?.declNode?.parentNode?.init?.type === 'Literal' &&
 		!(n.parentKey === 'property' && n.parentNode.type === 'ObjectExpression') &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const valueNode = c.declNode.parentNode.init;
-		const refs = c.declNode.references;
-		if (!areReferencesModified(arb.ast, refs)) {
-			for (const ref of refs) {
-				arb.markNode(ref, valueNode);
+		candidateFilter(n)) {
+			const valueNode = n.declNode.parentNode.init;
+			const refs = n.declNode.references;
+			if (!areReferencesModified(arb.ast, refs)) {
+				for (const ref of refs) {
+					arb.markNode(ref, valueNode);
+				}
 			}
 		}
 	}

@@ -17,22 +17,22 @@ const {badValue} = require(__dirname + '/../config');
  *   const a = getArr();
  *   console.log(`${a[0]} + ${a[1]} = ${a[2]}`);
  * @param {Arborist} arb
+ * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveFunctionToArray(arb) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'VariableDeclarator' &&
-		n.init?.type === 'CallExpression' &&
-		n.id?.references &&
-		!n.id.references.find(r => r.parentNode.type !== 'MemberExpression'));
-
-	for (const c of candidates) {
-		const targetNode = c.init.callee?.declNode?.parentNode || c.init;
-		const isContained = [c.init, c.init?.parentNode].includes(targetNode);
-		const src = createOrderedSrc(getDeclarationWithContext(targetNode, isContained)) + `\n${createOrderedSrc([c.init])}`;
-		const newNode = evalInVm(src);
-		if (newNode !== badValue) {
-			arb.markNode(c.init, newNode);
+function resolveFunctionToArray(arb,  candidateFilter = () => true) {
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'VariableDeclarator' && n.init?.type === 'CallExpression' && n.id?.references &&
+		!n.id.references.some(r => r.parentNode.type !== 'MemberExpression') &&
+		candidateFilter(n)) {
+			const targetNode = n.init.callee?.declNode?.parentNode || n.init;
+			const isContained = [n.init, n.init?.parentNode].includes(targetNode);
+			const src = createOrderedSrc(getDeclarationWithContext(targetNode, isContained)) + `\n${createOrderedSrc([n.init])}`;
+			const replacementNode = evalInVm(src);
+			if (replacementNode !== badValue) {
+				arb.markNode(n.init, replacementNode);
+			}
 		}
 	}
 	return arb;

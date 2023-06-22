@@ -11,21 +11,21 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * @return {Arborist}
  */
 function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		(n.type === 'UnaryExpression' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if ((n.type === 'UnaryExpression' &&
 			((n.argument.type === 'Literal' && /^\D/.test(n.argument.raw[0])) ||
 				n.argument.type === 'ArrayExpression')) ||
 		(n.type === 'BinaryExpression' &&
 			n.operator === '+' &&
 			(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
 			![n.left?.type, n.right?.type].includes('ThisExpression')) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		if (getDescendants(c).find(n => n.type === 'ThisExpression')) continue;
-		const newNode = evalInVm(c.src);
-		if (newNode !== badValue) {
-			arb.markNode(c, newNode);
+		candidateFilter(n)) {
+			if (getDescendants(n).find(n => n.type === 'ThisExpression')) continue;
+			const replacementNode = evalInVm(n.src);
+			if (replacementNode !== badValue) {
+				arb.markNode(n, replacementNode);
+			}
 		}
 	}
 	return arb;

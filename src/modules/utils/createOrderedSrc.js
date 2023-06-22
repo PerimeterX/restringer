@@ -10,14 +10,15 @@ const sortByNodeId = (a, b) => a.nodeId > b.nodeId ? 1 : b.nodeId > a.nodeId ? -
  * @return {string} Combined source code of the nodes.
  */
 function createOrderedSrc(nodes, preserveOrder = false) {
-	nodes.forEach((n, idx) => {
+	for (let i = 0; i < nodes.length; i++)  {
+		const n = nodes[i];
 		if (n.type === 'CallExpression') {
 			if (n.parentNode.type === 'ExpressionStatement') {
-				nodes[idx] = n.parentNode;
+				nodes[i] = n.parentNode;
 				if (!preserveOrder && n.callee.type === 'FunctionExpression') {
 					// Set nodeId to place IIFE just after its argument's declaration
 					const argDeclNodeId = n.arguments.find(a => a.nodeId === Math.max(...n.arguments.filter(arg => arg?.declNode?.nodeId).map(arg => arg.nodeId)))?.nodeId;
-					nodes[idx].nodeId = argDeclNodeId ? argDeclNodeId + 1 : nodes[idx].nodeId + largeNumber;
+					nodes[i].nodeId = argDeclNodeId ? argDeclNodeId + 1 : nodes[i].nodeId + largeNumber;
 				}
 			} else if (n.callee.type === 'FunctionExpression') {
 				if (!preserveOrder) {
@@ -27,28 +28,29 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 					const newNode = generateFlatAST(`(${funcSrc});`)[1];
 					if (newNode) {
 						newNode.nodeId = n.nodeId + largeNumber;
-						nodes[idx] = newNode;
+						nodes[i] = newNode;
 					}
-				} else nodes[idx] = n;
+				} else nodes[i] = n;
 			}
 		}  else if (n.type === 'FunctionExpression' && !n.id) {
 			if (n.parentNode.type === 'VariableDeclarator') {
 				const funcStartRegexp = new RegExp('function[^(]*');
 				const funcSrc = n.src.replace(funcStartRegexp, 'function ' + n.parentNode.id.name);
-				const newNode = generateFlatAST(`(${funcSrc});`)[1];
-				if (newNode) {
-					newNode.nodeId = n.nodeId;
-					nodes[idx] = newNode;
+				const parsedNode = generateFlatAST(`(${funcSrc});`)[1];
+				if (parsedNode) {
+					parsedNode.nodeId = n.nodeId;
+					nodes[i] = parsedNode;
 				}
 			}
 		}
-	});
+	}
 	const orderedNodes = [...new Set(nodes)].sort(sortByNodeId);
 	let output = '';
-	orderedNodes.forEach(n => {
+	for (let i = 0; i < orderedNodes.length; i++)  {
+		const n = orderedNodes[i];
 		const addSemicolon = ['VariableDeclarator', 'AssignmentExpression'].includes(n.type);
 		output += (n.type === 'VariableDeclarator' ? `${n.parentNode.kind} ` : '') + n.src + (addSemicolon ? ';' : '') + '\n';
-	});
+	}
 	return output;
 }
 

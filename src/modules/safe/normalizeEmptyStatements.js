@@ -5,15 +5,14 @@
  * @return {Arborist}
  */
 function normalizeEmptyStatements(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'EmptyStatement' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		// A for loop is sometimes used to assign variables without providing a loop body, just an empty statement.
-		// If we delete that empty statement the syntax breaks
-		// e.g. for (var i = 0, b = 8;;); - this is a valid for statement.
-		if (!/For.*Statement/.test(c.parentNode.type)) arb.markNode(c);
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'EmptyStatement' && candidateFilter(n)) {
+			// A for loop is sometimes used to assign variables without providing a loop body, just an empty statement.
+			// If we delete that empty statement the syntax breaks
+			// e.g. for (var i = 0, b = 8;;); - this is a valid for statement.
+			if (!/For.*Statement/.test(n.parentNode.type)) arb.markNode(n);
+		}
 	}
 	return arb;
 }

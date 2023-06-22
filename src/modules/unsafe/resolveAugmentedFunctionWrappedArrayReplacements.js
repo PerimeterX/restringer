@@ -11,49 +11,49 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * @return {Arborist}
  */
 function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'FunctionDeclaration' && n.id &&
-		candidateFilter(n));
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'FunctionDeclaration' && n.id &&
+		candidateFilter(n)) {
+			const descendants = getDescendants(n);
+			if (descendants.find(d =>
+				d.type === 'AssignmentExpression' &&
+				d.left?.name === n.id?.name)) {
+				const arrDecryptor = n;
+				const arrCandidates = descendants.filter(c =>
+					c.type === 'MemberExpression' && c.object.type === 'Identifier')
+					.map(n => n.object);
 
-	for (const c of candidates) {
-		const descendants = getDescendants(c);
-		if (descendants.find(d =>
-			d.type === 'AssignmentExpression' &&
-			d.left?.name === c.id?.name)) {
-			const arrDecryptor = c;
-			const arrCandidates = descendants.filter(n =>
-				n.type === 'MemberExpression' && n.object.type === 'Identifier')
-				.map(n => n.object);
-
-			for (const ac of arrCandidates) {
-				// If a direct reference to a global variable pointing at an array
-				let arrRef;
-				if (!ac.declNode) continue;
-				if (ac.declNode.scope.type === 'global') {
-					if (ac.declNode.parentNode?.init?.type === 'ArrayExpression') {
-						arrRef = ac.declNode.parentNode?.parentNode || ac.declNode.parentNode;
+				for (const ac of arrCandidates) {
+					// If a direct reference to a global variable pointing at an array
+					let arrRef;
+					if (!ac.declNode) continue;
+					if (ac.declNode.scope.type === 'global') {
+						if (ac.declNode.parentNode?.init?.type === 'ArrayExpression') {
+							arrRef = ac.declNode.parentNode?.parentNode || ac.declNode.parentNode;
+						}
+					} else if (ac.declNode.parentNode?.init?.type === 'CallExpression') {
+						arrRef = ac.declNode.parentNode.init.callee?.declNode?.parentNode;
 					}
-				} else if (ac.declNode.parentNode?.init?.type === 'CallExpression') {
-					arrRef = ac.declNode.parentNode.init.callee?.declNode?.parentNode;
-				}
-				if (arrRef) {
-					const iife = arb.ast.find(n =>
-						n.type === 'ExpressionStatement' &&
-						n.expression.type === 'CallExpression' &&
-						n.expression.callee.type === 'FunctionExpression' &&
-						n.expression.arguments.length &&
-						n.expression.arguments[0].type === 'Identifier' &&
-						n.expression.arguments[0].declNode === ac.declNode);
-					if (iife) {
-						const context = [arrRef.src, arrDecryptor.src, iife.src].join('\n');
-						const skipScopes = [arrRef.scope, arrDecryptor.scope, iife.expression.callee.scope];
-						const replacementCandidates = arb.ast.filter(n =>
-							n?.callee?.name === arrDecryptor.id.name &&
-							!skipScopes.includes(n.scope));
-						for (const rc of replacementCandidates) {
-							const src = `${context}\n${rc.src}`;
-							const newNode = evalInVm(src);
-							if (newNode !== badValue) arb.markNode(rc, newNode);
+					if (arrRef) {
+						const iife = arb.ast.find(c =>
+							c.type === 'ExpressionStatement' &&
+							c.expression.type === 'CallExpression' &&
+							c.expression.callee.type === 'FunctionExpression' &&
+							c.expression.arguments.length &&
+							c.expression.arguments[0].type === 'Identifier' &&
+							c.expression.arguments[0].declNode === ac.declNode);
+						if (iife) {
+							const context = [arrRef.src, arrDecryptor.src, iife.src].join('\n');
+							const skipScopes = [arrRef.scope, arrDecryptor.scope, iife.expression.callee.scope];
+							const replacementCandidates = arb.ast.filter(c =>
+								c?.callee?.name === arrDecryptor.id.name &&
+								!skipScopes.includes(c.scope));
+							for (const rc of replacementCandidates) {
+								const src = `${context}\n${rc.src}`;
+								const replacementNode = evalInVm(src);
+								if (replacementNode !== badValue) arb.markNode(rc, replacementNode);
+							}
 						}
 					}
 				}

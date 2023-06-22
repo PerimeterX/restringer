@@ -12,22 +12,19 @@ const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/d
  * @return {Arborist}
  */
 function resolveDefiniteBinaryExpressions(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'BinaryExpression' &&
-		doesBinaryExpressionContainOnlyLiterals(n) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const newNode = evalInVm(c.src);
-		if (newNode !== badValue) {
-			// Fix issue where a number below zero would be replaced with a string
-			if (newNode.type === 'UnaryExpression' && typeof c?.left?.value === 'number' && typeof c?.right?.value === 'number') {
-				// noinspection JSCheckFunctionSignatures
-				const v = parseInt(newNode.argument.value);
-				newNode.argument.value = v;
-				newNode.argument.raw = `${v}`;
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'BinaryExpression' && doesBinaryExpressionContainOnlyLiterals(n) && candidateFilter(n)) {
+			const replacementNode = evalInVm(n.src);
+			if (replacementNode !== badValue) {
+				// Fix issue where a number below zero would be replaced with a string
+				if (replacementNode.type === 'UnaryExpression' && typeof n?.left?.value === 'number' && typeof n?.right?.value === 'number') {
+					const v = parseInt(replacementNode.argument.value + '');
+					replacementNode.argument.value = v;
+					replacementNode.argument.raw = `${v}`;
+				}
+				arb.markNode(n, replacementNode);
 			}
-			arb.markNode(c, newNode);
 		}
 	}
 	return arb;

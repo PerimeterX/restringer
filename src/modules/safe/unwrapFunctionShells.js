@@ -12,20 +12,20 @@
  * @return {Arborist}
  */
 function unwrapFunctionShells(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		['FunctionDeclaration', 'FunctionExpression'].includes(n.type) &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (['FunctionDeclaration', 'FunctionExpression'].includes(n.type) &&
 		n.body?.body?.length === 1 &&
 		n.body.body[0].type === 'ReturnStatement' &&
 		(n.body.body[0].argument?.callee?.property?.name || n.body.body[0].argument?.callee?.property?.value) === 'apply' &&
 		n.body.body[0].argument.arguments?.length === 2 &&
 		n.body.body[0].argument.callee.object.type === 'FunctionExpression' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const replacementNode = c.body.body[0].argument.callee.object;
-		if (c.id && !replacementNode.id) replacementNode.id = c.id;
-		if (c.params.length && !replacementNode.params.length) replacementNode.params.push(...c.params);
-		arb.markNode(c, replacementNode);
+		candidateFilter(n)) {
+			const replacementNode = n.body.body[0].argument.callee.object;
+			if (n.id && !replacementNode.id) replacementNode.id = n.id;
+			if (n.params.length && !replacementNode.params.length) replacementNode.params.push(...n.params);
+			arb.markNode(n, replacementNode);
+		}
 	}
 	return arb;
 }
