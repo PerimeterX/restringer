@@ -1,5 +1,5 @@
-const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/doesBinaryExpressionContainOnlyLiterals');
 
 /**

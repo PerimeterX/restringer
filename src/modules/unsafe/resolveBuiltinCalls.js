@@ -1,6 +1,6 @@
-const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
 const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirname + '/../config');

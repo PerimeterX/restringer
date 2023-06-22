@@ -1,4 +1,4 @@
-const evalInVm = require(__dirname + '/evalInVm');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const getCache = require(__dirname + '/../utils/getCache');
 const getCalleeName = require(__dirname + '/../utils/getCalleeName');
 const isNodeInRanges = require(__dirname + '/../utils/isNodeInRanges');

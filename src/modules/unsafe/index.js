@@ -1,6 +1,4 @@
 module.exports = {
-	evalInVm: require(__dirname + '/evalInVm'),
-	evalWithDom: require(__dirname + '/evalWithDom'),
 	normalizeRedundantNotOperator: require(__dirname + '/normalizeRedundantNotOperator'),
 	resolveAugmentedFunctionWrappedArrayReplacements: require(__dirname + '/resolveAugmentedFunctionWrappedArrayReplacements'),
 	resolveBuiltinCalls: require(__dirname + '/resolveBuiltinCalls'),

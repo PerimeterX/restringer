@@ -1,4 +1,4 @@
-const evalInVm = require(__dirname + '/evalInVm');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const {badValue, skipProperties} = require(__dirname + '/../config');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');

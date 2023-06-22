@@ -1,6 +1,6 @@
 const {parseCode} = require('flast');
-const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 

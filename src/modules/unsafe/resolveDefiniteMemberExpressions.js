@@ -1,5 +1,5 @@
-const evalInVm = require(__dirname + '/evalInVm');
 const {badValue} = require(__dirname + '/../config');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 
 /**
  * Replace definite member expressions with their intended value.

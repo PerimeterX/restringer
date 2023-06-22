@@ -16,7 +16,6 @@
  */
 const {
 	unsafe: {
-		evalInVm,
 		resolveFunctionToArray,
 	},
 	config: {
@@ -24,6 +23,7 @@ const {
 	},
 	utils: {
 		createOrderedSrc,
+		evalInVm,
 		getDeclarationWithContext,
 	},
 } = require(__dirname + '/../modules');

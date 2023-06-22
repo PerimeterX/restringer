@@ -1,4 +1,4 @@
-const evalInVm = require(__dirname + '/evalInVm');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 
 /**
  * Evaluate resolvable (independent) conditional expressions and replace them with their unchanged resolution.

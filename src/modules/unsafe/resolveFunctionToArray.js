@@ -2,7 +2,7 @@
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
-const evalInVm = require(__dirname + '/evalInVm');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const {
 	createOrderedSrc,
 	getDeclarationWithContext,

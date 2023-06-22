@@ -4,6 +4,8 @@ module.exports = {
 	createNewNode: require(__dirname + '/createNewNode'),
 	createOrderedSrc: require(__dirname + '/createOrderedSrc'),
 	doesBinaryExpressionContainOnlyLiterals: require(__dirname + '/doesBinaryExpressionContainOnlyLiterals'),
+	evalInVm: require(__dirname + '/evalInVm'),
+	evalWithDom: require(__dirname + '/evalWithDom'),
 	generateHash: require(__dirname + '/generateHash'),
 	getCache: require(__dirname + '/getCache'),
 	getCalleeName: require(__dirname + '/getCalleeName'),
