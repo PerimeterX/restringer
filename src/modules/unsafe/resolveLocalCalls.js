@@ -6,6 +6,28 @@ const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
 const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
 
+let appearances = {};
+
+/**
+ * @param {ASTNode} a
+ * @param {ASTNode} b
+ */
+function sortByApperanceFrequency(a, b) {
+	a = getCalleeName(a);
+	b = getCalleeName(b);
+	return appearances[a] < appearances[b] ? 1 : appearances[b] < appearances[a] ? -1 : 0;
+}
+
+/**
+ * @param {ASTNode} node
+ * @return {number}
+ */
+function countAppearances(node) {
+	const callee = getCalleeName(node);
+	if (!appearances[callee]) appearances[callee] = 0;
+	return ++appearances[callee];
+}
+
 /**
  * Collect all available context on call expressions where the callee is defined in the script and attempt
  * to resolve their value.
@@ -14,30 +36,27 @@ const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__
  * @return {Arborist}
  */
 function resolveLocalCalls(arb, candidateFilter = () => true) {
+	appearances = {};
 	const cache = getCache(arb.ast[0].scriptHash);
-	const candidates = arb.ast.filter(n =>
-		n.type === 'CallExpression' &&
+	const candidates = [];
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'CallExpression' &&
 		(n.callee?.declNode ||
 			(n.callee?.object?.declNode &&
 				!skipProperties.includes(n.callee.property?.value || n.callee.property?.name)) ||
 			n.callee?.object?.type === 'Literal') &&
-		candidateFilter(n));
-
-	const frequency = {};
-	candidates.map(c => getCalleeName(c)).forEach(name => {
-		if (!frequency[name]) frequency[name] = 0;
-		frequency[name]++;
-	});
-	const sortByFrequency = (a, b) => {
-		a = getCalleeName(a);
-		b = getCalleeName(b);
-		return frequency[a] < frequency[b] ? 1 : frequency[b] < frequency[a] ? -1 : 0;
-	};
+		countAppearances(n) &&
+		candidateFilter(n)) {
+			candidates.push(n);
+		}
+	}
+	candidates.sort(sortByApperanceFrequency);
 
 	const modifiedRanges = [];
-	for (const c of candidates.sort(sortByFrequency)) {
-		if (c.arguments.find(a => badArgumentTypes.includes(a.type))) continue;
-		if (isNodeInRanges(c, modifiedRanges)) continue;
+	for (let i = 0; i < candidates.length; i++) {
+		const c = candidates[i];
+		if (c.arguments.some(a => badArgumentTypes.includes(a.type)) || isNodeInRanges(c, modifiedRanges)) continue;
 		const callee = c.callee?.object || c.callee;
 		const declNode = c.callee?.declNode || c.callee?.object?.declNode;
 		if (declNode?.parentNode?.body?.body?.length && declNode.parentNode?.body?.body[0].type === 'ReturnStatement') {
@@ -53,7 +72,7 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 			// Skip call expressions with problematic values
 			if (skipIdentifiers.includes(callee.name) ||
 				(callee.type === 'ArrayExpression' && !callee.elements.length) ||
-				!!(callee.arguments || []).find(a => skipIdentifiers.includes(a) || a?.type === 'ThisExpression')) continue;
+				(callee.arguments || []).some(a => skipIdentifiers.includes(a) || a?.type === 'ThisExpression')) continue;
 			if (declNode) {
 				// Verify the declNode isn't a simple wrapper for an identifier
 				if (declNode.parentNode.type === 'FunctionDeclaration' &&
