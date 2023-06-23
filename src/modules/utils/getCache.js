@@ -13,4 +13,8 @@ function getCache(currentScriptHash) {
 	return cache;
 }
 
+getCache.flush = function() {
+	cache = {};
+};
+
 module.exports = getCache;
