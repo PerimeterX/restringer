@@ -8,18 +8,18 @@ const createNewNode = require(__dirname + '/../utils/createNewNode');
  * @return {Arborist}
  */
 function parseTemplateLiteralsIntoStringLiterals(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'TemplateLiteral' &&
-		!n.expressions.find(exp => exp.type !== 'Literal') &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		let newStringLiteral = '';
-		for (let i = 0; i < c.expressions.length; i++) {
-			newStringLiteral += c.quasis[i].value.raw + c.expressions[i].value;
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'TemplateLiteral' &&
+			!n.expressions.some(exp => exp.type !== 'Literal') &&
+			candidateFilter(n)) {
+			let newStringLiteral = '';
+			for (let j = 0; j < n.expressions.length; j++) {
+				newStringLiteral += n.quasis[j].value.raw + n.expressions[j].value;
+			}
+			newStringLiteral += n.quasis.slice(-1)[0].value.raw;
+			arb.markNode(n, createNewNode(newStringLiteral));
 		}
-		newStringLiteral += c.quasis.slice(-1)[0].value.raw;
-		arb.markNode(c, createNewNode(newStringLiteral));
 	}
 	return arb;
 }

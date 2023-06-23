@@ -189,7 +189,10 @@ class REstringer {
 	 * @param {Array<Function|string>} processors An array of either imported deobfuscation methods or the name of internal methods.
 	 */
 	_runProcessors(processors) {
-		processors.forEach(proc => this.script = runLoop(this.script, [proc], 1));
+		for (let i = 0; i < processors.length; i++) {
+			const processor = processors[i];
+			this.script = runLoop(this.script, [processor], 1);
+		}
 	}
 }
 

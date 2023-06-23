@@ -1,5 +1,5 @@
-const {unsafe: {evalWithDom}, safe: {removeDeadNodes}} = require(__dirname + '/../modules');
 const {Arborist} = require('flast');
+const {safe: {removeDeadNodes}, utils: {evalWithDom}} = require(__dirname + '/../modules');
 
 const lineWithFinalAssignmentRegex = /(\w{3})\[.*]\s*=.*\((\w{3})\).*=\s*\1\s*\+\s*['"]/ms;
 const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;

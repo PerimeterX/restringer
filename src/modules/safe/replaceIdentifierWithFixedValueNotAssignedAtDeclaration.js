@@ -9,14 +9,15 @@ const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/g
  * @return {Arborist}
  */
 function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.parentNode?.type === 'VariableDeclarator' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.parentNode?.type === 'VariableDeclarator' &&
 		!n.parentNode.init &&
 		n?.references?.length &&
 		n.references.filter(r =>
 			r.parentNode.type === 'AssignmentExpression' &&
 			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r).length === 1 &&
-		!n.references.find(r =>
+		!n.references.some(r =>
 			(/For.*Statement/.test(r.parentNode.type) &&
 				r.parentKey === 'left') ||
 			// This covers cases like:
@@ -26,19 +27,19 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateF
 				r.parentNode.parentNode?.parentNode?.type,
 				r.parentNode.parentNode?.parentNode?.parentNode?.type,
 			].includes('ConditionalExpression')) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const assignmentNode = c.references.find(r =>
-			r.parentNode.type === 'AssignmentExpression' &&
-			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r);
-		const valueNode = assignmentNode.parentNode.right;
-		if (valueNode.type !== 'Literal') continue;
-		const refs = c.references.filter(r => r !== assignmentNode);
-		if (!areReferencesModified(arb.ast, refs)) {
-			for (const ref of refs) {
-				if (ref.parentNode.type === 'CallExpression' && ref.parentKey === 'callee') continue;
-				arb.markNode(ref, valueNode);
+		candidateFilter(n)) {
+			const assignmentNode = n.references.find(r =>
+				r.parentNode.type === 'AssignmentExpression' &&
+				getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r);
+			const valueNode = assignmentNode.parentNode.right;
+			if (valueNode.type === 'Literal') {
+				const refs = n.references.filter(r => r !== assignmentNode);
+				if (!areReferencesModified(arb.ast, refs)) {
+					for (const ref of refs) {
+						if (ref.parentNode.type === 'CallExpression' && ref.parentKey === 'callee') continue;
+						arb.markNode(ref, valueNode);
+					}
+				}
 			}
 		}
 	}

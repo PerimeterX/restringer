@@ -1,4 +1,4 @@
-const evalInVm = require(__dirname + '/evalInVm');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 const {badValue, skipProperties} = require(__dirname + '/../config');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
@@ -20,56 +20,56 @@ const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/g
  * @return {Arborist}
  */
 function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'MemberExpression' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'MemberExpression' &&
 		['Identifier', 'Literal'].includes(n.property.type) &&
 		!skipProperties.includes(n.property?.name || n.property?.value) &&
 		(!(n.parentKey === 'left' && n.parentNode.type === 'AssignmentExpression')) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		// If this member expression is the callee of a call expression - skip it
-		if (c.parentNode.type === 'CallExpression' && c.parentKey === 'callee') continue;
-		// If this member expression is a part of another member expression - get the first parentNode
-		// which has a declaration in the code;
-		// E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be selected;
-		// a.b.c.d --> if the candidate is c.d, the 'a' identifier will be selected;
-		let relevantIdentifier = getMainDeclaredObjectOfMemberExpression(c);
-		if (relevantIdentifier && relevantIdentifier.declNode) {
-			// Skip if the relevant identifier is on the left side of an assignment.
-			if (relevantIdentifier.parentNode.parentNode.type === 'AssignmentExpression' &&
-				relevantIdentifier.parentNode.parentKey === 'left') continue;
-			const declNode = relevantIdentifier.declNode;
-			// Skip if the identifier was declared as a function's parameter.
-			if (/Function/.test(declNode.parentNode.type) &&
-				(declNode.parentNode.params || []).find(p => p === declNode)) continue;
-			const prop = c.property;
-			if (prop.type === 'Identifier' && prop.declNode?.references && areReferencesModified(arb.ast, prop.declNode.references)) continue;
-			const context = createOrderedSrc(getDeclarationWithContext(relevantIdentifier.declNode.parentNode));
-			if (context) {
-				const src = `${context}\n${c.src}`;
-				const newNode = evalInVm(src);
-				if (newNode !== badValue) {
-					let isEmptyReplacement = false;
-					switch (newNode.type) {
-						case 'ArrayExpression':
-							if (!newNode.elements.length) isEmptyReplacement = true;
-							break;
-						case 'ObjectExpression':
-							if (!newNode.properties.length) isEmptyReplacement = true;
-							break;
-						case 'Literal':
-							if (
-								!String(newNode.value).length ||  // ''
-								newNode.raw === 'null'            // null
-							) isEmptyReplacement = true;
-							break;
-						case 'Identifier':
-							if (newNode.name === 'undefined') isEmptyReplacement = true;
-							break;
-					}
-					if (!isEmptyReplacement) {
-						arb.markNode(c, newNode);
+		candidateFilter(n)) {
+			// If this member expression is the callee of a call expression - skip it
+			if (n.parentNode.type === 'CallExpression' && n.parentKey === 'callee') continue;
+			// If this member expression is a part of another member expression - get the first parentNode
+			// which has a declaration in the code;
+			// E.g. a.b[c.d] --> if candidate is c.d, the c identifier will be selected;
+			// a.b.c.d --> if the candidate is c.d, the 'a' identifier will be selected;
+			let relevantIdentifier = getMainDeclaredObjectOfMemberExpression(n);
+			if (relevantIdentifier && relevantIdentifier.declNode) {
+				// Skip if the relevant identifier is on the left side of an assignment.
+				if (relevantIdentifier.parentNode.parentNode.type === 'AssignmentExpression' &&
+					relevantIdentifier.parentNode.parentKey === 'left') continue;
+				const declNode = relevantIdentifier.declNode;
+				// Skip if the identifier was declared as a function's parameter.
+				if (/Function/.test(declNode.parentNode.type) &&
+					(declNode.parentNode.params || []).find(p => p === declNode)) continue;
+				const prop = n.property;
+				if (prop.type === 'Identifier' && prop.declNode?.references && areReferencesModified(arb.ast, prop.declNode.references)) continue;
+				const context = createOrderedSrc(getDeclarationWithContext(relevantIdentifier.declNode.parentNode));
+				if (context) {
+					const src = `${context}\n${n.src}`;
+					const replacementNode = evalInVm(src);
+					if (replacementNode !== badValue) {
+						let isEmptyReplacement = false;
+						switch (replacementNode.type) {
+							case 'ArrayExpression':
+								if (!replacementNode.elements.length) isEmptyReplacement = true;
+								break;
+							case 'ObjectExpression':
+								if (!replacementNode.properties.length) isEmptyReplacement = true;
+								break;
+							case 'Literal':
+								if (
+									!String(replacementNode.value).length ||  // ''
+									replacementNode.raw === 'null'            // null
+								) isEmptyReplacement = true;
+								break;
+							case 'Identifier':
+								if (replacementNode.name === 'undefined') isEmptyReplacement = true;
+								break;
+						}
+						if (!isEmptyReplacement) {
+							arb.markNode(n, replacementNode);
+						}
 					}
 				}
 			}

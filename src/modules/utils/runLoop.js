@@ -30,8 +30,10 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 		while (arborist.ast?.length && scriptSnapshot !== script && currentIteration < maxIterations && !hasGlobalMaxIterationBeenReached()) {
 			const cycleStartTime = Date.now();
 			scriptSnapshot = script;
-			arborist.ast.forEach(n => n.scriptHash = scriptHash);   // Mark each node with the script hash to distinguish cache of different scripts.
-			for (const func of funcs) {
+			// Mark each node with the script hash to distinguish cache of different scripts.
+			for (let i = 0; i < arborist.ast.length; i++) arborist.ast[i].scriptHash = scriptHash;
+			for (let i = 0; i <  funcs.length; i++) {
+				const func = funcs[i];
 				const funcStartTime = +new Date();
 				try {
 					logger.debug(`\t[!] Running ${func.name}...`);
@@ -45,7 +47,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 						arborist.applyChanges();
 						script = arborist.script;
 						scriptHash = generateHash(script);
-						arborist.ast.forEach(n => n.scriptHash = scriptHash);
+						for (let j = 0; j < arborist.ast.length; j++) arborist.ast[j].scriptHash = scriptHash;
 					}
 				} catch (e) {
 					logger.error(`[-] Error in ${func.name} (iteration #${globalIterationsCounter}): ${e}\n${e.stack}`);

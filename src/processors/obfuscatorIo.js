@@ -14,28 +14,28 @@ const freezeReplacementString = 'function () {return "bypassed!"}';
  * @return {Arborist}
  */
 function freezeUnbeautifiedValues(arb) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'Literal' &&
-		['newState', 'removeCookie'].includes(n.value));
-
-	for (const c of candidates) {
-		let targetNode;
-		switch (c.value) {
-			case 'newState':
-				if (c.parentNode?.parentNode?.parentNode?.type === 'FunctionExpression') {
-					targetNode = c.parentNode.parentNode.parentNode;
-				}
-				break;
-			case 'removeCookie':
-				targetNode = c.parentNode?.value;
-				break;
-		}
-		if (targetNode) {
-			arb.markNode(targetNode, {
-				type: 'Literal',
-				value: freezeReplacementString,
-				raw: `"${freezeReplacementString}"`,
-			});
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'Literal' &&
+		['newState', 'removeCookie'].includes(n.value)) {
+			let targetNode;
+			switch (n.value) {
+				case 'newState':
+					if (n.parentNode?.parentNode?.parentNode?.type === 'FunctionExpression') {
+						targetNode = n.parentNode.parentNode.parentNode;
+					}
+					break;
+				case 'removeCookie':
+					targetNode = n.parentNode?.value;
+					break;
+			}
+			if (targetNode) {
+				arb.markNode(targetNode, {
+					type: 'Literal',
+					value: freezeReplacementString,
+					raw: `"${freezeReplacementString}"`,
+				});
+			}
 		}
 	}
 	return arb;

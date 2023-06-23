@@ -1,4 +1,5 @@
-const evalInVm = require(__dirname + '/evalInVm');
+const getVM = require(__dirname + '/../utils/getVM');
+const evalInVm = require(__dirname + '/../utils/evalInVm');
 
 /**
  * Evaluate resolvable (independent) conditional expressions and replace them with their unchanged resolution.
@@ -9,15 +10,17 @@ const evalInVm = require(__dirname + '/evalInVm');
  * @return {Arborist}
  */
 function resolveDeterministicConditionalExpressions(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'ConditionalExpression' &&
+	let sharedVM;
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'ConditionalExpression' &&
 		n.test.type === 'Literal' &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const newNode = evalInVm(`Boolean(${c.test.src});`);
-		if (newNode.type === 'Literal') {
-			arb.markNode(c, newNode.value ? c.consequent : c.alternate);
+		candidateFilter(n)) {
+			sharedVM = sharedVM || getVM();
+			const replacementNode = evalInVm(`Boolean(${n.test.src});`, sharedVM);
+			if (replacementNode.type === 'Literal') {
+				arb.markNode(n, replacementNode.value ? n.consequent : n.alternate);
+			}
 		}
 	}
 	return arb;

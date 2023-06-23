@@ -9,41 +9,41 @@
  * @return {Arborist}
  */
 function separateChainedDeclarators(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'VariableDeclaration' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'VariableDeclaration' &&
 		n.declarations.length > 1 &&
 		!n.parentNode.type.match(/For.*Statement/) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const decls = [];
-		for (const d of c.declarations) {
-			decls.push({
-				type: 'VariableDeclaration',
-				kind: c.kind,
-				declarations: [d],
-			});
+		candidateFilter(n)) {
+			const decls = [];
+			for (const d of n.declarations) {
+				decls.push({
+					type: 'VariableDeclaration',
+					kind: n.kind,
+					declarations: [d],
+				});
+			}
+			// Since we're inserting new nodes, we'll need to replace the parent node
+			let replacementNode;
+			if (Array.isArray(n.parentNode[n.parentKey])) {
+				const replacedArr = n.parentNode[n.parentKey];
+				const idx = replacedArr.indexOf(n);
+				replacementNode = {
+					...n.parentNode,
+					[n.parentKey]: replacedArr.slice(0, idx).concat(decls).concat(replacedArr.slice(idx + 1)),
+				};
+			} else {
+				// If the parent node isn't ready to accept multiple nodes, inject a block statement to hold them.
+				replacementNode = {
+					...n.parentNode,
+					[n.parentKey]: {
+						type: 'BlockStatement',
+						body: decls,
+					},
+				};
+			}
+			arb.markNode(n.parentNode, replacementNode);
 		}
-		// Since we're inserting new nodes, we'll need to replace the parent node
-		let replacementNode;
-		if (Array.isArray(c.parentNode[c.parentKey])) {
-			const replacedArr = c.parentNode[c.parentKey];
-			const idx = replacedArr.indexOf(c);
-			replacementNode = {
-				...c.parentNode,
-				[c.parentKey]: replacedArr.slice(0, idx).concat(decls).concat(replacedArr.slice(idx + 1)),
-			};
-		} else {
-			// If the parent node isn't ready to accept multiple nodes, inject a block statement to hold them.
-			replacementNode = {
-				...c.parentNode,
-				[c.parentKey]: {
-					type: 'BlockStatement',
-					body: decls,
-				},
-			};
-		}
-		arb.markNode(c.parentNode, replacementNode);
 	}
 	return arb;
 }

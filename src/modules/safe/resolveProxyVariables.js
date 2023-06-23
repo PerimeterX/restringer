@@ -10,20 +10,16 @@ const areReferencesModified = require(__dirname + '/../utils/areReferencesModifi
  * @return {Arborist}
  */
 function resolveProxyVariables(arb, candidateFilter = () => true) {
-	const candidates = [
-		...new Set(arb.ast.filter(n =>
-			n.type === 'VariableDeclarator' &&
-			n?.init?.type === 'Identifier' &&
-			candidateFilter(n)))
-	];
-
-	for (const c of candidates) {
-		const refs = c.id.references || [];
-		// Remove proxy assignments if there are no more references
-		if (!refs.length) arb.markNode(c);
-		else if (areReferencesModified(arb.ast, refs)) continue;
-		else for (const ref of refs) {
-			arb.markNode(ref, c.init);
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'VariableDeclarator' && n?.init?.type === 'Identifier' && candidateFilter(n)) {
+			const refs = n.id.references || [];
+			// Remove proxy assignments if there are no more references
+			if (!refs.length) arb.markNode(n);
+			else if (areReferencesModified(arb.ast, refs)) continue;
+			else for (const ref of refs) {
+				arb.markNode(ref, n.init);
+			}
 		}
 	}
 	return arb;

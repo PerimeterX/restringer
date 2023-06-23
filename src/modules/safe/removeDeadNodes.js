@@ -9,17 +9,17 @@ const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'Function
  * @return {Arborist}
  */
 function removeDeadNodes(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'Identifier' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'Identifier' &&
 		relevantParents.includes(n.parentNode.type) &&
 		(!n?.declNode?.references?.length && !n?.references?.length) &&
-		candidateFilter(n))
-		.map(n => n.parentNode);
-
-	for (const c of candidates) {
-		// Do not remove root nodes as they might be referenced in another script
-		if (c.parentNode.type === 'Program') continue;
-		arb.markNode(c?.parentNode?.type === 'ExpressionStatement' ? c.parentNode : c);
+		candidateFilter(n)) {
+			const parent = n.parentNode;
+			// Do not remove root nodes as they might be referenced in another script
+			if (parent.parentNode.type === 'Program') continue;
+			arb.markNode(parent?.parentNode?.type === 'ExpressionStatement' ? parent.parentNode : parent);
+		}
 	}
 	return arb;
 }

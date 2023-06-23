@@ -149,7 +149,7 @@ var _yh = _yg(this, function () {
   };
   return a();
 });
-true;
+_yh();
 var _yi = function () {
   var a = true;
   return function (b, c) {

@@ -9,41 +9,41 @@ const {badIdentifierCharsRegex, validIdentifierBeginning} = require(__dirname + 
  * @return {Arborist}
  */
 function normalizeComputed(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.computed &&   // Filter for only member expressions using bracket notation
-		// Ignore member expressions with properties which can't be non-computed, like arr[2] or window['!obj']
-		// or those having another variable reference as their property like window[varHoldingFuncName]
-		(n.type === 'MemberExpression' &&
-			n.property.type === 'Literal' &&
-			validIdentifierBeginning.test(n.property.value) &&
-			!badIdentifierCharsRegex.test(n.property.value)) ||
-		/**
-		 * Ignore the same cases for method names and object properties, for example
-		 * class A {
-		 *  ['!hello']() {} // Can't change the name of this method
-		 *  ['miao']() {}   // This can be changed to 'miao() {}'
-		 *  }
-		 *  const obj = {
-		 *    ['!hello']: 1,  // Will be ignored
-		 *    ['miao']: 4     // Will be changed to 'miao: 4'
-		 *  };
-		 */
-		(['MethodDefinition', 'Property'].includes(n.type) &&
-			n.key.type === 'Literal' &&
-			validIdentifierBeginning.test(n.key.value) &&
-			!badIdentifierCharsRegex.test(n.key.value)) &&
-		candidateFilter(n));
-
-	for (const c of candidates) {
-		const relevantProperty = c.type === 'MemberExpression' ? 'property' : 'key';
-		arb.markNode(c, {
-			...c,
-			computed: false,
-			[relevantProperty]: {
-				type: 'Identifier',
-				name: c[relevantProperty].value,
-			},
-		});
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.computed &&   // Filter for only member expressions using bracket notation
+			// Ignore member expressions with properties which can't be non-computed, like arr[2] or window['!obj']
+			// or those having another variable reference as their property like window[varHoldingFuncName]
+			(n.type === 'MemberExpression' &&
+				n.property.type === 'Literal' &&
+				validIdentifierBeginning.test(n.property.value) &&
+				!badIdentifierCharsRegex.test(n.property.value)) ||
+			/**
+			 * Ignore the same cases for method names and object properties, for example
+			 * class A {
+			 *  ['!hello']() {} // Can't change the name of this method
+			 *  ['miao']() {}   // This can be changed to 'miao() {}'
+			 *  }
+			 *  const obj = {
+			 *    ['!hello']: 1,  // Will be ignored
+			 *    ['miao']: 4     // Will be changed to 'miao: 4'
+			 *  };
+			 */
+			(['MethodDefinition', 'Property'].includes(n.type) &&
+				n.key.type === 'Literal' &&
+				validIdentifierBeginning.test(n.key.value) &&
+				!badIdentifierCharsRegex.test(n.key.value)) &&
+			candidateFilter(n)) {
+			const relevantProperty = n.type === 'MemberExpression' ? 'property' : 'key';
+			arb.markNode(n, {
+				...n,
+				computed: false,
+				[relevantProperty]: {
+					type: 'Identifier',
+					name: n[relevantProperty].value,
+				},
+			});
+		}
 	}
 	return arb;
 }

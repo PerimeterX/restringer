@@ -1,21 +1,31 @@
 const fs = require('node:fs');
 const assert = require('node:assert');
 const {REstringer} = require(__dirname + '/..');
+const {parseCode, generateCode} = require('flast');
 const obfuscatedSamples = require(__dirname + '/obfuscated-samples');
-
 const resourcePath = __dirname + '/resources';
+
+function normalizeCode(code) {
+	let normalized;
+	try {
+		normalized = generateCode(parseCode(code));
+	} catch {
+		normalized = code.replace(/[\n\r]/g, ' ');
+		normalized = normalized.replace(/\s{2,}/g, ' ');
+	}
+	return normalized;
+}
 
 function testSampleDeobfuscation(testSampleName, testSampleFilename) {
 	process.stdout.write(`Testing '${testSampleName}' obfuscated sample...`.padEnd(60, '.'));
 	console.time(' PASS');
 	const obfuscatedSource = fs.readFileSync(testSampleFilename, 'utf-8');
-	const deobfuscatedTarget = fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8')
-		.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
+	const deobfuscatedTarget = normalizeCode(fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8'));
 	const restringer = new REstringer(obfuscatedSource);
 	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();
-	const deobfuscationResult = restringer.script.replace(/[\n\r]/g, ' ').replace(/\s{2,}/g, ' ');
-	assert.equal(deobfuscationResult, deobfuscatedTarget);
+	const deobfuscationResult = normalizeCode(restringer.script);
+	assert.equal(deobfuscationResult, deobfuscatedTarget, `Unexpected output for ${testSampleName}`);
 	console.timeEnd(' PASS');
 }
 

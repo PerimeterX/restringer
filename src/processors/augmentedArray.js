@@ -16,7 +16,6 @@
  */
 const {
 	unsafe: {
-		evalInVm,
 		resolveFunctionToArray,
 	},
 	config: {
@@ -24,6 +23,7 @@ const {
 	},
 	utils: {
 		createOrderedSrc,
+		evalInVm,
 		getDeclarationWithContext,
 	},
 } = require(__dirname + '/../modules');
@@ -36,37 +36,37 @@ const {
  * @return {Arborist}
  */
 function replaceArrayWithStaticAugmentedVersion(arb) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'CallExpression' &&
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'CallExpression' &&
 		n.callee.type === 'FunctionExpression' &&
 		n.arguments.length > 1 && n.arguments[0].type === 'Identifier' &&
-		n.arguments[1].type === 'Literal' && !Number.isNaN(parseInt(n.arguments[1].value)));
-
-	for (const c of candidates) {
-		let targetNode = c;
-		while (targetNode && (targetNode.type !== 'ExpressionStatement' && targetNode.parentNode.type !== 'SequenceExpression')) {
-			targetNode = targetNode?.parentNode;
-		}
-		const relevantArrayIdentifier = c.arguments.find(n => n.type === 'Identifier');
-		const declKind = /function/i.test(relevantArrayIdentifier.declNode.parentNode.type) ? '' : 'var ';
-		const ref = !declKind ? `${relevantArrayIdentifier.name}()` : relevantArrayIdentifier.name;
-		// The context for this eval is the relevant array and the IIFE augmenting it (the candidate).
-		const contextNodes = getDeclarationWithContext(c, true);
-		const context = `${contextNodes.length ? createOrderedSrc(contextNodes) : ''}`;
-		// By adding the name of the array after the context, the un-shuffled array is procured.
-		const src = `${context};\n${createOrderedSrc([targetNode])}\n${ref};`;
-		const newNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
-		if (newNode !== badValue) {
-			arb.markNode(targetNode || c);
-			if (relevantArrayIdentifier.declNode.parentNode.type === 'FunctionDeclaration') {
-				arb.markNode(relevantArrayIdentifier.declNode.parentNode.body, {
-					type: 'BlockStatement',
-					body: [{
-						type: 'ReturnStatement',
-						argument: newNode,
-					}],
-				});
-			} else arb.markNode(relevantArrayIdentifier.declNode.parentNode.init, newNode);
+		n.arguments[1].type === 'Literal' && !Number.isNaN(parseInt(n.arguments[1].value))) {
+			let targetNode = n;
+			while (targetNode && (targetNode.type !== 'ExpressionStatement' && targetNode.parentNode.type !== 'SequenceExpression')) {
+				targetNode = targetNode?.parentNode;
+			}
+			const relevantArrayIdentifier = n.arguments.find(n => n.type === 'Identifier');
+			const declKind = /function/i.test(relevantArrayIdentifier.declNode.parentNode.type) ? '' : 'var ';
+			const ref = !declKind ? `${relevantArrayIdentifier.name}()` : relevantArrayIdentifier.name;
+			// The context for this eval is the relevant array and the IIFE augmenting it (the candidate).
+			const contextNodes = getDeclarationWithContext(n, true);
+			const context = `${contextNodes.length ? createOrderedSrc(contextNodes) : ''}`;
+			// By adding the name of the array after the context, the un-shuffled array is procured.
+			const src = `${context};\n${createOrderedSrc([targetNode])}\n${ref};`;
+			const replacementNode = evalInVm(src);  // The new node will hold the un-shuffled array's assignment
+			if (replacementNode !== badValue) {
+				arb.markNode(targetNode || n);
+				if (relevantArrayIdentifier.declNode.parentNode.type === 'FunctionDeclaration') {
+					arb.markNode(relevantArrayIdentifier.declNode.parentNode.body, {
+						type: 'BlockStatement',
+						body: [{
+							type: 'ReturnStatement',
+							argument: replacementNode,
+						}],
+					});
+				} else arb.markNode(relevantArrayIdentifier.declNode.parentNode.init, replacementNode);
+			}
 		}
 	}
 	return arb;

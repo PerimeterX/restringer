@@ -7,57 +7,54 @@
  * @return {Arborist}
  */
 function rearrangeSequences(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		(
+	for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if ((
 			n.type === 'ReturnStatement' && n.argument?.type === 'SequenceExpression' ||
 			n.type === 'IfStatement' && n.test.type === 'SequenceExpression'
-		) &&
-		candidateFilter(n)
-	);
+		) && candidateFilter(n)) {
+			const parent = n.parentNode;
+			const { expressions } = n.argument || n.test;
 
-	for (const c of candidates) {
-		const parent = c.parentNode;
-		const { expressions } = c.argument || c.test;
+			const statements = expressions.slice(0, -1).map(e => ({
+				type: 'ExpressionStatement',
+				expression: e
+			}));
 
-		const statements = expressions.slice(0, -1).map(e => ({
-			type: 'ExpressionStatement',
-			expression: e
-		}));
-
-		const replacementNode = c.type === 'IfStatement' ? {
-			type: 'IfStatement',
-			test: expressions[expressions.length - 1],
-			consequent: c.consequent,
-			alternate: c.alternate
-		} : {
-			type: 'ReturnStatement',
-			argument: expressions[expressions.length - 1]
-		};
-
-		if (parent.type === 'BlockStatement') {
-			const currentIdx = parent.body.indexOf(c);
-			const replacementParent = {
-				type: 'BlockStatement',
-				body: [
-					...parent.body.slice(0, currentIdx),
-					...statements,
-					replacementNode,
-					...parent.body.slice(currentIdx + 1)
-				],
+			const replacementNode = n.type === 'IfStatement' ? {
+				type: 'IfStatement',
+				test: expressions[expressions.length - 1],
+				consequent: n.consequent,
+				alternate: n.alternate
+			} : {
+				type: 'ReturnStatement',
+				argument: expressions[expressions.length - 1]
 			};
-			arb.markNode(parent, replacementParent);
-		} else {
-			const replacementParent = {
-				type: 'BlockStatement',
-				body: [
-					...statements,
-					replacementNode
-				]
-			};
-			arb.markNode(c, replacementParent);
+
+			if (parent.type === 'BlockStatement') {
+				const currentIdx = parent.body.indexOf(n);
+				const replacementParent = {
+					type: 'BlockStatement',
+					body: [
+						...parent.body.slice(0, currentIdx),
+						...statements,
+						replacementNode,
+						...parent.body.slice(currentIdx + 1)
+					],
+				};
+				arb.markNode(parent, replacementParent);
+			} else {
+				const replacementParent = {
+					type: 'BlockStatement',
+					body: [
+						...statements,
+						replacementNode
+					]
+				};
+				arb.markNode(n, replacementParent);
+			}
 		}
 	}
-
 	return arb;
 }
 

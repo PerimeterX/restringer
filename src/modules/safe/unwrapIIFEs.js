@@ -5,8 +5,9 @@
  * @return {Arborist}
  */
 function unwrapIIFEs(arb, candidateFilter = () => true) {
-	const candidates = arb.ast.filter(n =>
-		n.type === 'CallExpression' &&
+	candidatesLoop: for (let i = 0; i < arb.ast.length; i++) {
+		const n = arb.ast[i];
+		if (n.type === 'CallExpression' &&
 		!n.arguments.length &&
 		['ArrowFunctionExpression', 'FunctionExpression'].includes(n.callee.type) &&
 		!n.callee.id &&
@@ -22,32 +23,31 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 		(n.parentKey === 'ExpressionStatement' ||
 			n.parentKey === 'argument' &&
 			n.parentNode.type === 'UnaryExpression')) &&
-		candidateFilter(n));
-
-	candidatesLoop: for (const c of candidates) {
-		let targetNode = c;
-		let replacementNode = c.callee.body;
-		if (replacementNode.type === 'BlockStatement') {
-			let targetChild = replacementNode;
-			// IIFEs with a single return statement
-			if (replacementNode.body?.length === 1 && replacementNode.body[0].argument) replacementNode = replacementNode.body[0].argument;
-			// IIFEs with multiple statements or expressions
-			else while (targetNode && !targetNode.body) {
-				// Skip cases where IIFE is used to initialize or set a value
-				if (targetNode.parentKey === 'init' || targetNode.type === 'AssignmentExpression' ) continue candidatesLoop;
-				targetChild = targetNode;
-				targetNode = targetNode.parentNode;
+		candidateFilter(n)) {
+			let targetNode = n;
+			let replacementNode = n.callee.body;
+			if (replacementNode.type === 'BlockStatement') {
+				let targetChild = replacementNode;
+				// IIFEs with a single return statement
+				if (replacementNode.body?.length === 1 && replacementNode.body[0].argument) replacementNode = replacementNode.body[0].argument;
+				// IIFEs with multiple statements or expressions
+				else while (targetNode && !targetNode.body) {
+					// Skip cases where IIFE is used to initialize or set a value
+					if (targetNode.parentKey === 'init' || targetNode.type === 'AssignmentExpression' ) continue candidatesLoop;
+					targetChild = targetNode;
+					targetNode = targetNode.parentNode;
+				}
+				if (!targetNode || !targetNode.body) targetNode = n;
+				else {
+					// Place the wrapped code instead of the wrapper node
+					replacementNode = {
+						...targetNode,
+						body: [...targetNode.body.filter(t => t !== targetChild), ...replacementNode.body],
+					};
+				}
 			}
-			if (!targetNode || !targetNode.body) targetNode = c;
-			else {
-				// Place the wrapped code instead of the wrapper node
-				replacementNode = {
-					...targetNode,
-					body: [...targetNode.body.filter(n => n !== targetChild), ...replacementNode.body],
-				};
-			}
+			arb.markNode(targetNode, replacementNode);
 		}
-		arb.markNode(targetNode, replacementNode);
 	}
 	return arb;
 }

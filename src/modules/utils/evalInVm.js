@@ -1,4 +1,4 @@
-const {VM} = require('vm2');
+const getVM = require(__dirname + '/getVM');
 const assert = require('node:assert');
 const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
@@ -9,11 +9,6 @@ const createNewNode = require(__dirname + '/../utils/createNewNode');
 const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
 	'Promise',
 ];
-
-const disableObjects = {  // APIs that should be disabled when running scripts in eval to avoid inconsistencies.
-	Date: class {},
-	debugger: {},
-};
 
 const matchingObjectKeys = {
 	[Object.keys(console).sort().join('')]: {type: 'Identifier', name: 'console'},
@@ -35,29 +30,30 @@ const trapStrings = [     // Rules for diffusing code traps.
 	},
 ];
 
-const vmOptions = {
-	timeout: 5 * 1000,
-	sandbox: {...disableObjects},
-	wasm: false,
-};
-
 let cache = {};
 const maxCacheSize = 100;
+
+/** @typedef {import('vm2')} VM */
 
 /**
  * Eval a string in a ~safe~ VM environment
  * @param {string} stringToEval
+ * @param {VM} [vm] (optional) an existing vm loaded with context.
  * @return {ASTNode|badValue} A node based on the eval result if successful; badValue string otherwise.
  */
-function evalInVm(stringToEval) {
+function evalInVm(stringToEval, vm) {
 	const cacheName = `eval-${generateHash(stringToEval)}`;
 	if (cache[cacheName] === undefined) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};
 		cache[cacheName] = badValue;
 		try {
 			// Break known trap strings
-			trapStrings.forEach(ts => stringToEval = stringToEval.replace(ts.trap, ts.replaceWith));
-			const res = (new VM(vmOptions)).run(stringToEval);
+			for (let i = 0; i < trapStrings.length; i++) {
+				const ts = trapStrings[i];
+				stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
+			}
+			let v = vm || getVM();
+			const res = v.run(stringToEval);
 			// noinspection JSUnresolvedVariable
 			if (!res?.VMError && !badTypes.includes(getObjType(res))) {
 				// If the result is a builtin object / function, return a matching identifier
@@ -65,7 +61,8 @@ function evalInVm(stringToEval) {
 				if (matchingObjectKeys[objKeys]) cache[cacheName] = matchingObjectKeys[objKeys];
 				else {
 					// To exclude results based on randomness or timing, eval again and compare results
-					const res2 = (new VM(vmOptions)).run(stringToEval);
+					v = vm || getVM();
+					const res2 = v.run(stringToEval);
 					assert.deepEqual(res.toString(), res2.toString());
 					cache[cacheName] = createNewNode(res);
 				}

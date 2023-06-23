@@ -5,7 +5,8 @@
  */
 function isNodeInRanges(targetNode, ranges) {
 	const [nodeStart, nodeEnd] = targetNode.range;
-	for (const [rangeStart, rangeEnd] of ranges) {
+	for (let i = 0; i < ranges.length; i++) {
+		const [rangeStart, rangeEnd] = ranges[i];
 		if (nodeStart >= rangeStart && nodeEnd <= rangeEnd) return true;
 	}
 	return false;
