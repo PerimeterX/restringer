@@ -38,7 +38,10 @@ const standaloneNodeTypes = ['ExpressionStatement', 'AssignmentExpression', 'Var
  * @return {boolean} True if any of the descendants are marked for modification; false otherwise.
  */
 function areDescendantsModified(targetNode) {
-	for (const n of getDescendants(targetNode)) if (n.isMarked) return true;
+	const descendants = getDescendants(targetNode);
+	for (let i = 0; i < descendants.length; i++) {
+		if (descendants[i].isMarked) return true;
+	}
 	return false;
 }
 
@@ -63,9 +66,10 @@ function isNodeAnAssignmentToProperty(n) {
 	!isConsequentOrAlternate(n.parentNode) &&
 	((n.parentNode.parentNode.type === 'AssignmentExpression' &&  // e.g. targetNode.prop = value
 			n.parentNode.parentKey === 'left') ||
-		(n.parentKey === 'object' &&  // e.g. targetNode.push(value) <-- this changes the value of targetNode
-			(propertiesThatModifyContent.includes(n.parentNode.property?.value || n.parentNode.property.name) ||
-				n.parentNode.property.isMarked)));  // Collect references which are marked, so they will prevent the context from collecting
+		(n.parentKey === 'object' &&
+			(n.parentNode.property.isMarked ||  // Marked references won't be collected
+				// propertiesThatModifyContent - e.g. targetNode.push(value) - changes the value of targetNode
+				propertiesThatModifyContent.includes(n.parentNode.property?.value || n.parentNode.property.name))));
 }
 
 /**
@@ -76,8 +80,10 @@ function removeRedundantNodes(nodes) {
 	/** @type {ASTNode[]} */
 	const keep = [];
 	for (let i = 0; i < nodes.length; i++) {
-		const targetNode = nodes[i];
-		if (!nodes.some(n => n !== targetNode && n.start <= targetNode.start && n.end >= targetNode.end)) {
+		const targetNode = nodes[i],
+			targetStart = targetNode.start,
+			targetEnd = targetNode.end;
+		if (!nodes.some(n => n !== targetNode && n.start <= targetStart && n.end >= targetEnd)) {
 			keep.push(targetNode);
 		}
 	}
@@ -91,20 +97,31 @@ function removeRedundantNodes(nodes) {
  * the context of the origin node.
  */
 function getDeclarationWithContext(originNode, excludeOriginNode = false) {
+	/** @type {ASTNode[]} */
+	const stack = [originNode];   // The working stack for nodes to be reviewed
+	/** @type {ASTNode[]} */
+	const collected = [];         // These will be our context
+	/** @type {ASTNode[]} */
+	const seenNodes = [];         // Collected to avoid re-iterating over the same nodes
+	/** @type {number[][]} */
+	const collectedRanges = [];   // Collected to prevent collecting nodes from within collected nodes.
+	/**
+	 * @param {ASTNode} node
+	 */
+	function addToStack(node) {
+		if (!(
+			seenNodes.includes(node) ||
+			stack.includes(node) ||
+			irrelevantTypesToAvoidIteratingOver.includes(node.type))) {
+			stack.push(node);
+		}
+	}
 	const cache = getCache(originNode.scriptHash);
 	const srcHash = generateHash(originNode.src);
 	const cacheNameId = `context-${originNode.nodeId}-${srcHash}`;
 	const cacheNameSrc = `context-${srcHash}`;
 	let cached = cache[cacheNameId] || cache[cacheNameSrc];
 	if (!cached) {
-		/** @type {ASTNode[]} */
-		const stack = [originNode];   // The working stack for nodes to be reviewed
-		/** @type {ASTNode[]} */
-		const collected = [];         // These will be our context
-		/** @type {ASTNode[]} */
-		const seenNodes = [];         // Collected to avoid re-iterating over the same nodes
-		/** @type {number[][]} */
-		const collectedRanges = [];   // Collected to prevent collecting nodes from within collected nodes.
 		while (stack.length) {
 			const node = stack.shift();
 			if (seenNodes.includes(node)) continue;
@@ -124,27 +141,27 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 			const targetNodes = [node];
 			switch (node.type) {
 				case 'Identifier': {
-					const refs = node.references || [];
+					const refs = node.references;
 					// Review the declaration of an identifier
 					if (node.declNode && node.declNode.parentNode) {
 						targetNodes.push(node.declNode.parentNode);
 					}
-					else if (refs.length && node.parentNode) targetNodes.push(node.parentNode);
-					// Review call expression that receive the identifier as an argument for possible augmenting functions
-					targetNodes.push(...refs.filter(r =>
-						r.parentNode.type === 'CallExpression' &&
-						r.parentKey === 'arguments')
-						.map(r => r.parentNode));
-					// Review direct assignments to the identifier
-					targetNodes.push(...refs.filter(r =>
-						r.parentNode.type === 'AssignmentExpression' &&
-						r.parentKey === 'left' &&
-						node.parentNode.type !== 'FunctionDeclaration' &&   // Skip function reassignments
-						!isConsequentOrAlternate(r))
-						.map(r => r.parentNode));
-					// Review assignments to property
-					targetNodes.push(...refs.filter(isNodeAnAssignmentToProperty)
-						.map(r => r.parentNode.parentNode));
+					else if (refs?.length && node.parentNode) targetNodes.push(node.parentNode);
+					for (let i = 0; i < refs?.length; i++) {
+						const ref = refs[i];
+						// Review call expression that receive the identifier as an argument for possible augmenting functions
+						if ((ref.parentKey === 'arguments' && ref.parentNode.type === 'CallExpression') ||
+							// Review direct assignments to the identifier
+							(ref.parentKey === 'left' &&
+								ref.parentNode.type === 'AssignmentExpression' &&
+								node.parentNode.type !== 'FunctionDeclaration' &&   // Skip function reassignments
+								!isConsequentOrAlternate(ref))) {
+							targetNodes.push(ref.parentNode);
+							// Review assignments to property
+						} else if (isNodeAnAssignmentToProperty(ref)) {
+							targetNodes.push(ref.parentNode.parentNode);
+						}
+					}
 					break;
 				}
 				case 'MemberExpression':
@@ -154,50 +171,53 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 					// Review the parent node of anonymous functions
 					if (!node.id) {
 						let targetParent = node;
-						while (!standaloneNodeTypes.includes(targetParent.type) && targetParent.parentNode) {
+						while (targetParent.parentNode && !standaloneNodeTypes.includes(targetParent.type)) {
 							targetParent = targetParent.parentNode;
 						}
 						if (standaloneNodeTypes.includes(targetParent.type)) targetNodes.push(targetParent);
 					}
 			}
 
-			for (const targetNode of targetNodes) {
+			for (let i = 0; i < targetNodes.length; i++) {
+				const targetNode = targetNodes[i];
 				if (!seenNodes.includes(targetNode)) stack.push(targetNode);
 				// noinspection JSUnresolvedVariable
 				if (targetNode === targetNode.scope.block) {
 					// Collect out-of-scope variables used inside the scope
-					// noinspection JSUnresolvedVariable
-					stack.push(
-						...targetNode.scope.through.map(n => n.identifier)
-							.filter(n => !(seenNodes.includes(n) || stack.includes(n) || irrelevantTypesToAvoidIteratingOver.includes(n))));
+					// noinspection JSUnresolvedReference
+					for (let j = 0; j < targetNode.scope.through.length; j++) {
+						// noinspection JSUnresolvedReference
+						addToStack(targetNode.scope.through[j].identifier);
+					}
 				} else if (targetNode.scope.scopeId && originNode.scope !== targetNode.scope) {
 					// Collect the scope itself instead of just the node, if the scope isn't the global scope
 					// noinspection JSUnresolvedVariable
-					const s = targetNode.scope.block;
-					if (!(seenNodes.includes(s) || stack.includes(s) || irrelevantTypesToAvoidIteratingOver.includes(s.type))) stack.push(s);
+					addToStack(targetNode.scope.block);
 				}
-				for (const childNode of targetNode.childNodes) {
-					if (!(
-						seenNodes.includes(childNode) ||
-						stack.includes(childNode) ||
-						irrelevantTypesToAvoidIteratingOver.includes(childNode.type))) {
-						stack.push(childNode);
-					}
+				for (let j = 0; j < targetNode?.childNodes.length; j++) {
+					addToStack(targetNode.childNodes[j]);
 				}
 			}
 		}
-		cached = [...new Set(collected.filter(n => !irrelevantTypesToBeFilteredOut.includes(n.type)))];
-		if (excludeOriginNode) cached = cached.filter(n => !isNodeInRanges(n, [originNode.range]));
-		// A fix to ignore reassignments in cases where functions are overwritten as part of an anti-debugging mechanism
-		const functionNameReassignment = [];
-		cached.filter(n =>
-			n.type === 'FunctionDeclaration' &&
-			n.id && (n.id.references || []).filter(r =>
-				r.parentNode.type === 'AssignmentExpression' &&
-				r.parentKey === 'left').forEach(ref => functionNameReassignment.push(ref.parentNode)));
+		cached = [];
+		for (let i = 0; i < collected.length; i++) {
+			const n = collected[i];
+			if (!(
+				cached.includes(n) ||
+				irrelevantTypesToBeFilteredOut.includes(n.type)) &&
+				!(excludeOriginNode && isNodeInRanges(n, [originNode.range]))) {
+				// A fix to ignore reassignments in cases where functions are overwritten as part of an anti-debugging mechanism
+				if (n.type === 'FunctionDeclaration' && n.id && n.references?.length) {
+					for (let j = 0; j < n.references.length; j++) {
+						const ref = n.references[j];
+						if (!(ref.parentKey === 'left' && ref.parentNode.type === 'AssignmentExpression')) {
+							cached.push(n);
+						}
+					}
+				} else cached.push(n);
+			}
+		}
 		cached = removeRedundantNodes(cached);
-
-		if (functionNameReassignment.length) cached = cached.filter(n => !functionNameReassignment.includes(n));
 		cache[cacheNameId] = cached;        // Caching context for the same node
 		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
 	}
