@@ -21,7 +21,7 @@ function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
 			(n.left.type !== 'MemberExpression' && Number.isNaN(parseFloat(n.left?.value))) &&
 			![n.left?.type, n.right?.type].includes('ThisExpression')) &&
 		candidateFilter(n)) {
-			if (getDescendants(n).find(n => n.type === 'ThisExpression')) continue;
+			if (getDescendants(n).some(n => n.type === 'ThisExpression')) continue;
 			const replacementNode = evalInVm(n.src);
 			if (replacementNode !== badValue) {
 				arb.markNode(n, replacementNode);
