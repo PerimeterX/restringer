@@ -1,3 +1,4 @@
+const getVM = require(__dirname + '/../utils/getVM');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const getCache = require(__dirname + '/../utils/getCache');
 const getCalleeName = require(__dirname + '/../utils/getCalleeName');
@@ -7,6 +8,7 @@ const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationW
 const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
 
 let appearances = {};
+const cacheLimit = 100;
 
 /**
  * @param {ASTNode} a
@@ -69,6 +71,7 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 		}
 		const cacheName = `rlc-${callee.name || callee.value}-${declNode?.nodeId}`;
 		if (!cache[cacheName]) {
+			cache[cacheName] = badValue;
 			// Skip call expressions with problematic values
 			if (skipIdentifiers.includes(callee.name) ||
 				(callee.type === 'ArrayExpression' && !callee.elements.length) ||
@@ -78,13 +81,17 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 				if (declNode.parentNode.type === 'FunctionDeclaration' &&
 					declNode.parentNode?.body?.body?.length &&
 					['Identifier', 'Literal'].includes(declNode.parentNode.body.body[0]?.argument?.type)) continue;
-				cache[cacheName] = createOrderedSrc(getDeclarationWithContext(declNode.parentNode));
+				const contextVM = getVM();
+				try {
+					contextVM.run(createOrderedSrc(getDeclarationWithContext(declNode.parentNode)));
+					if (Object.keys(cache) >= cacheLimit) cache.flush();
+					cache[cacheName] = contextVM;
+				} catch {}
 			}
 		}
-		const context = cache[cacheName];
+		const contextVM = cache[cacheName];
 		const nodeSrc = createOrderedSrc([c]);
-		const src = context ? `${context}\n${nodeSrc}` : nodeSrc;
-		const replacementNode = evalInVm(src);
+		const replacementNode = contextVM === badValue ? evalInVm(nodeSrc) : evalInVm(nodeSrc, contextVM);
 		if (replacementNode !== badValue && replacementNode.type !== 'FunctionDeclaration' && replacementNode.name !== 'undefined') {
 			// Prevent resolving a function's toString as it might be an anti-debugging mechanism
 			// which will spring if the code is beautified

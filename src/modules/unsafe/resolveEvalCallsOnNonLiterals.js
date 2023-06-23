@@ -1,5 +1,6 @@
 const {parseCode} = require('flast');
 const {badValue} = require(__dirname + '/../config');
+const getVM = require(__dirname + '/../utils/getVM');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
@@ -13,6 +14,7 @@ const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationW
  * @return {Arborist}
  */
 function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
+	let sharedVM;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'CallExpression' &&
@@ -28,7 +30,8 @@ function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
 			}
 			const context = contextNodes.length ? createOrderedSrc(contextNodes) : '';
 			const src = `${context}\n;var __a_ = ${createOrderedSrc([n.arguments[0]])}\n;__a_`;
-			const newNode = evalInVm(src);
+			sharedVM = sharedVM || getVM();
+			const newNode = evalInVm(src, sharedVM);
 			const targetNode = n.parentNode.type === 'ExpressionStatement' ? n.parentNode : n;
 			let replacementNode = newNode;
 			try {
