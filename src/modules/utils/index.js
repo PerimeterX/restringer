@@ -13,6 +13,7 @@ module.exports = {
 	getDescendants: require(__dirname + '/getDescendants'),
 	getMainDeclaredObjectOfMemberExpression: require(__dirname + '/getMainDeclaredObjectOfMemberExpression'),
 	getObjType: require(__dirname + '/getObjType'),
+	getVM: require(__dirname + '/getVM'),
 	isNodeInRanges: require(__dirname + '/isNodeInRanges'),
 	isNodeMarked: require(__dirname + '/isNodeMarked'),
 	logger: require(__dirname + '/logger'),
