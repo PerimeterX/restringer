@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/PerimeterX/Restringer#readme",
   "devDependencies": {
-    "eslint": "^8.42.0",
+    "eslint": "^8.45.0",
     "husky": "^8.0.3"
   }
 }
