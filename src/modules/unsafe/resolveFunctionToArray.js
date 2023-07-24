@@ -2,7 +2,7 @@
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
-const getVM = require(__dirname + '/../utils/getVM');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const {
 	createOrderedSrc,
@@ -22,7 +22,7 @@ const {badValue} = require(__dirname + '/../config');
  * @return {Arborist}
  */
 function resolveFunctionToArray(arb,  candidateFilter = () => true) {
-	let sharedVM;
+	let sharedSb;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'VariableDeclarator' && n.init?.type === 'CallExpression' && n.id?.references &&
@@ -32,8 +32,8 @@ function resolveFunctionToArray(arb,  candidateFilter = () => true) {
 			let src = '';
 			if (![n.init, n.init?.parentNode].includes(targetNode)) src += createOrderedSrc(getDeclarationWithContext(targetNode));
 			src += `\n${createOrderedSrc([n.init])}`;
-			sharedVM = sharedVM || getVM();
-			const replacementNode = evalInVm(src, sharedVM);
+			sharedSb = sharedSb || new Sandbox();
+			const replacementNode = evalInVm(src, sharedSb);
 			if (replacementNode !== badValue) {
 				arb.markNode(n.init, replacementNode);
 			}

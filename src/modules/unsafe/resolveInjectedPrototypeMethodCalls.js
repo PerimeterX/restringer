@@ -1,6 +1,6 @@
 const {badValue} = require(__dirname + '/../config');
-const getVM = require(__dirname + '/../utils/getVM');
 const logger = require(__dirname + '/../utils/logger');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
 const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
@@ -26,14 +26,14 @@ function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) 
 			try {
 				const methodName = n.left.property?.name || n.left.property?.value;
 				const context = getDeclarationWithContext(n);
-				const contextVM = getVM();
-				contextVM.run(createOrderedSrc(context));
+				const contextSb = new Sandbox();
+				contextSb.run(createOrderedSrc(context));
 				for (let j = 0; j < arb.ast.length; j++) {
 					const ref = arb.ast[j];
 					if (ref.type === 'CallExpression' &&
 						ref.callee.type === 'MemberExpression' &&
 						(ref.callee.property?.name || ref.callee.property?.value) === methodName) {
-						const replacementNode = evalInVm(`\n${createOrderedSrc([ref])}`, contextVM);
+						const replacementNode = evalInVm(`\n${createOrderedSrc([ref])}`, contextSb);
 						if (replacementNode !== badValue) arb.markNode(ref, replacementNode);
 					}
 				}

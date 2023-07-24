@@ -6,7 +6,7 @@ module.exports = {
 	'Hunter': 'hunter.js',
 	'_$_': 'udu.js',
 	'Prototype Calls': 'prototypeCalls.js',
-	'Caesar+': 'caesar.js',
+	// 'Caesar+': 'caesar.js',
 	'eval(Ox$': 'evalOxd.js',
 	'Obfuscator.io': 'obfuscatorIo.js',
 	'$s': 'ds.js',

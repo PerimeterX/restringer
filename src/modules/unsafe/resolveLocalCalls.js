@@ -1,4 +1,4 @@
-const getVM = require(__dirname + '/../utils/getVM');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const getCache = require(__dirname + '/../utils/getCache');
 const getCalleeName = require(__dirname + '/../utils/getCalleeName');
@@ -81,11 +81,11 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 				if (declNode.parentNode.type === 'FunctionDeclaration' &&
 					declNode.parentNode?.body?.body?.length &&
 					['Identifier', 'Literal'].includes(declNode.parentNode.body.body[0]?.argument?.type)) continue;
-				const contextVM = getVM();
+				const contextSb = new Sandbox();
 				try {
-					contextVM.run(createOrderedSrc(getDeclarationWithContext(declNode.parentNode)));
+					contextSb.run(createOrderedSrc(getDeclarationWithContext(declNode.parentNode)));
 					if (Object.keys(cache) >= cacheLimit) cache.flush();
-					cache[cacheName] = contextVM;
+					cache[cacheName] = contextSb;
 				} catch {}
 			}
 		}

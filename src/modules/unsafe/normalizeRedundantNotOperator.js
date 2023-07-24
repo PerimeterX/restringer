@@ -1,5 +1,5 @@
 const {badValue} = require(__dirname + '/../config');
-const getVM = require(__dirname + '/../utils/getVM');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const canUnaryExpressionBeResolved = require(__dirname + '/../utils/canUnaryExpressionBeResolved');
 
@@ -12,7 +12,7 @@ const relevantNodeTypes = ['Literal', 'ArrayExpression', 'ObjectExpression', 'Un
  * @return {Arborist}
  */
 function normalizeRedundantNotOperator(arb, candidateFilter = () => true) {
-	let sharedVM;
+	let sharedSB;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.operator === '!' &&
@@ -20,8 +20,8 @@ function normalizeRedundantNotOperator(arb, candidateFilter = () => true) {
 		relevantNodeTypes.includes(n.argument.type) &&
 		candidateFilter(n)) {
 			if (canUnaryExpressionBeResolved(n.argument)) {
-				sharedVM = sharedVM || getVM();
-				const replacementNode = evalInVm(n.src, sharedVM);
+				sharedSB = sharedSB || new Sandbox();
+				const replacementNode = evalInVm(n.src, sharedSB);
 				if (replacementNode !== badValue) arb.markNode(n, replacementNode);
 			}
 		}

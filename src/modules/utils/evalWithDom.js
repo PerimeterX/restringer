@@ -1,7 +1,7 @@
 // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
 
 const fs = require('node:fs');
-const {NodeVM} = require('vm2');
+const Sandbox = require(__dirname + '/sandbox');
 const {JSDOM} = require('jsdom');
 const logger = require(__dirname + '/../utils/logger');
 const generateHash = require(__dirname + '/../utils/generateHash');
@@ -22,11 +22,7 @@ function evalWithDom(stringToEval, injectjQuery = false) {
 	if (!cache[cacheName]) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};
 		let out = '';
-		const vm = new NodeVM({
-			console: 'redirect',
-			timeout: 100 * 1000,
-			sandbox: {JSDOM},
-		});
+		const vm = new Sandbox();
 		try {
 			// Set up the DOM, and allow script to run wild: <img src='I_too_like_to_run_scripts_dangerously.jpg'/>
 			let runString = 'const dom = new JSDOM(`<html><head></head><body></body></html>`, {runScripts: \'dangerously\'}); ' +

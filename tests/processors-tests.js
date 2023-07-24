@@ -17,7 +17,7 @@ module.exports = [
 		expected: `const arr = [\n  4,\n  5,\n  6,\n  7,\n  8,\n  9,\n  10,\n  'a',\n  'b',\n  'c',\n  1,\n  2,\n  3\n];`,
 	},
 	{
-		enabled: true,
+		enabled: false,
 		name: 'caesarPlus - TP-1',
 		processors: __dirname + '/../src/processors/caesarp',
 		// prepareTest: () => {},

@@ -1,5 +1,5 @@
 const {badValue} = require(__dirname + '/../config');
-const getVM = require(__dirname + '/../utils/getVM');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/doesBinaryExpressionContainOnlyLiterals');
 
@@ -13,12 +13,12 @@ const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/d
  * @return {Arborist}
  */
 function resolveDefiniteBinaryExpressions(arb, candidateFilter = () => true) {
-	let sharedVM;
+	let sharedSb;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'BinaryExpression' && doesBinaryExpressionContainOnlyLiterals(n) && candidateFilter(n)) {
-			sharedVM = sharedVM || getVM();
-			const replacementNode = evalInVm(n.src, sharedVM);
+			sharedSb = sharedSb || new Sandbox();
+			const replacementNode = evalInVm(n.src, sharedSb);
 			if (replacementNode !== badValue) {
 				// Fix issue where a number below zero would be replaced with a string
 				if (replacementNode.type === 'UnaryExpression' && typeof n?.left?.value === 'number' && typeof n?.right?.value === 'number') {
