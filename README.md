@@ -82,7 +82,7 @@ that can solve specific problems.
 The basic structure of such a deobfuscator would be an array of deobfuscation modules 
 (either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via the [runLoop](src/modules/utils/runLoop.js) util function.
 
-Unsafe modules run code through `eval` (using [vm2](https://www.npmjs.com/package/vm2) to be on the safe side) while safe modules do not.
+Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.com/package/isolated-vm) to be on the safe side) while safe modules do not.
 
 ```javascript
 const {
