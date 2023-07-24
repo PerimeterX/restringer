@@ -1,5 +1,5 @@
 const {badValue} = require(__dirname + '/../config');
-const getVM = require(__dirname + '/../utils/getVM');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const getDescendants = require(__dirname + '/../utils/getDescendants');
 
@@ -51,11 +51,11 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter =
 							const replacementCandidates = arb.ast.filter(c =>
 								c?.callee?.name === arrDecryptor.id.name &&
 								!skipScopes.includes(c.scope));
-							const contextVM = getVM();
-							contextVM.run(context);
+							const sb = new Sandbox();
+							sb.run(context);
 							for (let p = 0; p < replacementCandidates.length; p++) {
 								const rc = replacementCandidates[p];
-								const replacementNode = evalInVm(`\n${rc.src}`, contextVM);
+								const replacementNode = evalInVm(`\n${rc.src}`, sb);
 								if (replacementNode !== badValue) arb.markNode(rc, replacementNode);
 							}
 						}

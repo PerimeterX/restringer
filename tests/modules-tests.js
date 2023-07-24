@@ -546,8 +546,8 @@ function xor(b, c) {
 		func: __dirname + '/../src/modules/utils/evalInVm',
 		prepareTest: a => [a],
 		prepareResult: b => b,
-		source: `function a() {return console;} a();`,
-		expected: {type: 'Identifier', name: 'console'},
+		source: `'hello ' + 'there';`,
+		expected: {type: 'Literal', value: 'hello there', raw: 'hello there'},
 	},
 	{
 		enabled: true,
@@ -557,6 +557,16 @@ function xor(b, c) {
 		prepareTest: a => [a],
 		prepareResult: b => b,
 		source: `Math.random();`,
+		expected: badValue,
+	},
+	{
+		enabled: true,
+		isUtil: true,
+		name: 'evalInVm - TN-2',
+		func: __dirname + '/../src/modules/utils/evalInVm',
+		prepareTest: a => [a],
+		prepareResult: b => b,
+		source: `function a() {return console;} a();`,
 		expected: badValue,
 	},
 	{

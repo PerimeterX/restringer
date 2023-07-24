@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "flast": "^1.5.0",
+    "isolated-vm": "^4.5.0",
     "jsdom": "^22.1.0",
-    "obfuscation-detector": "^1.1.4",
-    "vm2": "^3.9.19"
+    "obfuscation-detector": "^1.1.4"
   },
   "scripts": {
     "test": "node --trace-warnings tests/testRestringer.js"

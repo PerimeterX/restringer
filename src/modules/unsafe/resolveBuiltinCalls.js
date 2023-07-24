@@ -1,6 +1,6 @@
 const {badValue} = require(__dirname + '/../config');
-const getVM = require(__dirname + '/../utils/getVM');
 const logger = require(__dirname + '/../utils/logger');
+const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
 const safeImplementations = require(__dirname + '/../utils/safeImplementations');
@@ -42,7 +42,7 @@ function isUnwantedNode(node) {
  * @return {Arborist}
  */
 function resolveBuiltinCalls(arb, candidateFilter = () => true) {
-	let sharedVM;
+	let sharedSb;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (!isUnwantedNode(n) && candidateFilter(n) && (isSafeCall(n) ||
@@ -57,8 +57,8 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 						arb.markNode(n, createNewNode(tempValue));
 					}
 				} else {
-					sharedVM = sharedVM || getVM();
-					const replacementNode = evalInVm(n.src, sharedVM);
+					sharedSb = sharedSb || new Sandbox();
+					const replacementNode = evalInVm(n.src, sharedSb);
 					if (replacementNode !== badValue) arb.markNode(n, replacementNode);
 				}
 			} catch (e) {

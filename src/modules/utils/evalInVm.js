@@ -1,4 +1,4 @@
-const getVM = require(__dirname + '/getVM');
+const Sandbox = require(__dirname + '/sandbox');
 const assert = require('node:assert');
 const {badValue} = require(__dirname + '/../config');
 const logger = require(__dirname + '/../utils/logger');
@@ -33,15 +33,13 @@ const trapStrings = [     // Rules for diffusing code traps.
 let cache = {};
 const maxCacheSize = 100;
 
-/** @typedef {import('vm2')} VM */
-
 /**
- * Eval a string in a ~safe~ VM environment
+ * Eval a string in an ~isolated~ environment
  * @param {string} stringToEval
- * @param {VM} [vm] (optional) an existing vm loaded with context.
+ * @param {Sandbox} [sb] (optional) an existing sandbox loaded with context.
  * @return {ASTNode|badValue} A node based on the eval result if successful; badValue string otherwise.
  */
-function evalInVm(stringToEval, vm) {
+function evalInVm(stringToEval, sb) {
 	const cacheName = `eval-${generateHash(stringToEval)}`;
 	if (cache[cacheName] === undefined) {
 		if (Object.keys(cache).length >= maxCacheSize) cache = {};
@@ -52,17 +50,18 @@ function evalInVm(stringToEval, vm) {
 				const ts = trapStrings[i];
 				stringToEval = stringToEval.replace(ts.trap, ts.replaceWith);
 			}
-			let v = vm || getVM();
-			const res = v.run(stringToEval);
+			let vm = sb || new Sandbox();
+			let res = vm.run(stringToEval);
 			// noinspection JSUnresolvedVariable
-			if (!res?.VMError && !badTypes.includes(getObjType(res))) {
+			if (vm.isReference(res) && !badTypes.includes(getObjType(res))) {
+				res = res.copySync();
 				// If the result is a builtin object / function, return a matching identifier
 				const objKeys = Object.keys(res).sort().join('');
 				if (matchingObjectKeys[objKeys]) cache[cacheName] = matchingObjectKeys[objKeys];
 				else {
 					// To exclude results based on randomness or timing, eval again and compare results
-					v = vm || getVM();
-					const res2 = v.run(stringToEval);
+					vm = sb || new Sandbox();
+					const res2 = vm.run(stringToEval).copySync();
 					assert.deepEqual(res.toString(), res2.toString());
 					cache[cacheName] = createNewNode(res);
 				}
