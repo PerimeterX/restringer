@@ -87,8 +87,9 @@ Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.co
 ```javascript
 const {
   safe: {normalizeComputed},
-  unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls}
-} = require('restringer').modules;
+  unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls},
+  utils: {runLoop}
+} = require('restringer').deobModules;
 let script = 'obfuscated JS here';
 const deobModules = [
   resolveDefiniteBinaryExpressions,
@@ -101,7 +102,10 @@ console.log(script); // Deobfuscated script
 
 With the additional `candidateFilter` function argument, it's possible to narrow down the targeted nodes:
 ```javascript
-const {unsafe: {resolveLocalCalls}} = require('restringer').modules;
+const {
+  unsafe: {resolveLocalCalls},
+  utils: {runLoop}
+} = require('restringer').deobModules;
 let script = 'obfuscated JS here';
 
 // It's better to define a function with a name that can show up in the log (otherwise you'll get 'undefined')
