@@ -11,10 +11,10 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.5.0",
-    "isolated-vm": "^4.5.0",
+    "flast": "^1.5.2",
+    "isolated-vm": "^4.6.0",
     "jsdom": "^22.1.0",
-    "obfuscation-detector": "^1.1.4"
+    "obfuscation-detector": "^1.1.6"
   },
   "scripts": {
     "test": "node --trace-warnings tests/testRestringer.js"
