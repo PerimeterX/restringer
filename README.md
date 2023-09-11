@@ -116,6 +116,29 @@ script = runLoop(script, [resolveLocalCallsInGlobalScope]);
 console.log(script); // Deobfuscated script
 ```
 
+You can also customize any deobfuscation method while still using REstringer without running the loop yourself:
+```javascript
+const fs = require('node:fs');
+const {REstringer} = require('restringer');
+
+const inputFilename = process.argv[2];
+const code = fs.readFileSync(inputFilename, 'utf-8');
+const res = new REstringer(code);
+
+// res.logger.setLogLevel(res.logger.logLevels.DEBUG);
+res.detectObfuscationType = false;  // Skip obfuscation type detection, including any pre and post processors
+
+const targetFunc = res.unsafeMethods.find(m => m.name === 'resolveLocalCalls');
+let changes = 0;		// Resolve only the first 5 calls
+res.safeMethods[res.unsafeMethods.indexOf(targetFunc)] = function customResolveLocalCalls(n) {return targetFunc(n, () => changes++ < 5)}
+
+res.deobfuscate();
+
+if (res.script !== code) {
+  console.log('[+] Deob successful');
+  fs.writeFileSync(`${inputFilename}-deob.js`, res.script, 'utf-8');
+} else console.log('[-] Nothing deobfuscated :/');
+```
 ***
 
 ## Read More
