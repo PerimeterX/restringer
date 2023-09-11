@@ -8,49 +8,8 @@ const {
 		normalizeScript,
 		logger,
 	},
-	safe: {
-		resolveProxyCalls,
-		normalizeEmptyStatements,
-		removeRedundantBlockStatements,
-		removeDeadNodes,
-		resolveRedundantLogicalExpressions,
-		resolveMemberExpressionReferencesToArrayIndex,
-		resolveMemberExpressionsWithDirectAssignment,
-		parseTemplateLiteralsIntoStringLiterals,
-		resolveDeterministicIfStatements,
-		unwrapFunctionShells,
-		replaceFunctionShellsWithWrappedValue,
-		replaceFunctionShellsWithWrappedValueIIFE,
-		replaceCallExpressionsWithUnwrappedIdentifier,
-		replaceEvalCallsWithLiteralContent,
-		replaceIdentifierWithFixedAssignedValue,
-		replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
-		replaceNewFuncCallsWithLiteralContent,
-		replaceBooleanExpressionsWithIf,
-		replaceSequencesWithExpressions,
-		resolveFunctionConstructorCalls,
-		resolveProxyVariables,
-		resolveProxyReferences,
-		rearrangeSequences,
-		simplifyCalls,
-		simplifyIfStatements,
-		rearrangeSwitches,
-		unwrapIIFEs,
-		unwrapSimpleOperations,
-		separateChainedDeclarators,
-	},
-	unsafe: {
-		resolveMinimalAlphabet,
-		resolveDefiniteBinaryExpressions,
-		resolveAugmentedFunctionWrappedArrayReplacements,
-		resolveMemberExpressionsLocalReferences,
-		resolveDefiniteMemberExpressions,
-		resolveLocalCalls,
-		resolveBuiltinCalls,
-		resolveDeterministicConditionalExpressions,
-		resolveInjectedPrototypeMethodCalls,
-		resolveEvalCallsOnNonLiterals,
-	},
+	safe,
+	unsafe,
 	config: {
 		setGlobalMaxIterations,
 	}
@@ -75,6 +34,50 @@ class REstringer {
 		this._postprocessors = [];
 		this.logger = logger;
 		this.logger.setLogLevel(logger.logLevels.LOG);    // Default log level
+		// Deobfuscation methods that don't use eval
+		this.safeMethods = [
+			safe.rearrangeSequences,
+			safe.separateChainedDeclarators,
+			safe.rearrangeSwitches,
+			safe.normalizeEmptyStatements,
+			safe.removeRedundantBlockStatements,
+			safe.resolveRedundantLogicalExpressions,
+			safe.unwrapSimpleOperations,
+			safe.resolveProxyCalls,
+			safe.resolveProxyVariables,
+			safe.resolveProxyReferences,
+			safe.resolveMemberExpressionReferencesToArrayIndex,
+			safe.resolveMemberExpressionsWithDirectAssignment,
+			safe.parseTemplateLiteralsIntoStringLiterals,
+			safe.resolveDeterministicIfStatements,
+			safe.replaceCallExpressionsWithUnwrappedIdentifier,
+			safe.replaceEvalCallsWithLiteralContent,
+			safe.replaceIdentifierWithFixedAssignedValue,
+			safe.replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
+			safe.replaceNewFuncCallsWithLiteralContent,
+			safe.replaceBooleanExpressionsWithIf,
+			safe.replaceSequencesWithExpressions,
+			safe.resolveFunctionConstructorCalls,
+			safe.replaceFunctionShellsWithWrappedValue,
+			safe.replaceFunctionShellsWithWrappedValueIIFE,
+			safe.simplifyCalls,
+			safe.unwrapFunctionShells,
+			safe.unwrapIIFEs,
+			safe.simplifyIfStatements,
+		];
+		// Deobfuscation methods that use eval
+		this.unsafeMethods = [
+			unsafe.resolveMinimalAlphabet,
+			unsafe.resolveDefiniteBinaryExpressions,
+			unsafe.resolveAugmentedFunctionWrappedArrayReplacements,
+			unsafe.resolveMemberExpressionsLocalReferences,
+			unsafe.resolveDefiniteMemberExpressions,
+			unsafe.resolveBuiltinCalls,
+			unsafe.resolveDeterministicConditionalExpressions,
+			unsafe.resolveInjectedPrototypeMethodCalls,
+			unsafe.resolveLocalCalls,
+			unsafe.resolveEvalCallsOnNonLiterals,
+		];
 	}
 
 	/**
@@ -93,60 +96,6 @@ class REstringer {
 	}
 
 	/**
-	 * @return {Function[]} Deobfuscation methods that don't use eval
-	 */
-	_safeDeobfuscationMethods() {
-		return [
-			rearrangeSequences,
-			separateChainedDeclarators,
-			rearrangeSwitches,
-			normalizeEmptyStatements,
-			removeRedundantBlockStatements,
-			resolveRedundantLogicalExpressions,
-			unwrapSimpleOperations,
-			resolveProxyCalls,
-			resolveProxyVariables,
-			resolveProxyReferences,
-			resolveMemberExpressionReferencesToArrayIndex,
-			resolveMemberExpressionsWithDirectAssignment,
-			parseTemplateLiteralsIntoStringLiterals,
-			resolveDeterministicIfStatements,
-			replaceCallExpressionsWithUnwrappedIdentifier,
-			replaceEvalCallsWithLiteralContent,
-			replaceIdentifierWithFixedAssignedValue,
-			replaceIdentifierWithFixedValueNotAssignedAtDeclaration,
-			replaceNewFuncCallsWithLiteralContent,
-			replaceBooleanExpressionsWithIf,
-			replaceSequencesWithExpressions,
-			resolveFunctionConstructorCalls,
-			replaceFunctionShellsWithWrappedValue,
-			replaceFunctionShellsWithWrappedValueIIFE,
-			simplifyCalls,
-			unwrapFunctionShells,
-			unwrapIIFEs,
-			simplifyIfStatements,
-		];
-	}
-
-	/**
-	 * @return {Function[]} Deobfuscation methods that use eval
-	 */
-	_unsafeDeobfuscationMethods() {
-		return [
-			resolveMinimalAlphabet,
-			resolveDefiniteBinaryExpressions,
-			resolveAugmentedFunctionWrappedArrayReplacements,
-			resolveMemberExpressionsLocalReferences,
-			resolveDefiniteMemberExpressions,
-			resolveBuiltinCalls,
-			resolveDeterministicConditionalExpressions,
-			resolveInjectedPrototypeMethodCalls,
-			resolveLocalCalls,
-			resolveEvalCallsOnNonLiterals,
-		];
-	}
-
-	/**
 	 * Make all changes which don't involve eval first in order to avoid running eval on probelmatic values
 	 * which can only be detected once part of the script is deobfuscated. Once all the safe changes are made,
 	 * continue to the unsafe changes.
@@ -156,8 +105,8 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = runLoop(this.script, this._safeDeobfuscationMethods());
-			script = runLoop(script, this._unsafeDeobfuscationMethods(), 1);
+			script = runLoop(this.script, this.safeMethods);
+			script = runLoop(script, this.unsafeMethods, 1);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -181,7 +130,7 @@ class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.modified && this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = runLoop(this.script, [removeDeadNodes]);
+		if (clean) this.script = runLoop(this.script, [unsafe.removeDeadNodes]);
 		return this.modified;
 	}
 
