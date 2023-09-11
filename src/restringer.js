@@ -33,6 +33,7 @@ const {
 		resolveProxyReferences,
 		rearrangeSequences,
 		simplifyCalls,
+		simplifyIfStatements,
 		rearrangeSwitches,
 		unwrapIIFEs,
 		unwrapSimpleOperations,
@@ -123,6 +124,7 @@ class REstringer {
 			simplifyCalls,
 			unwrapFunctionShells,
 			unwrapIIFEs,
+			simplifyIfStatements,
 		];
 	}
 

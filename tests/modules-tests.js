@@ -537,6 +537,55 @@ function xor(b, c) {
 		source: `func1.apply(this, [arg1, arg2]); func2.call(this, arg1, arg2);`,
 		expected: `func1(arg1, arg2);\nfunc2(arg1, arg2);`,
 	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-1 (empty blocks)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J) {} else {}`,
+		expected: `J;`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-2 (empty block, empty alternate statement)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J) {} else;`,
+		expected: `J;`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-3 (empty block, populated alternate expression)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J) {} else J();`,
+		expected: `if (!J)\n  J();`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-4 (empty block, populated alternate block)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J) {} else {J()}`,
+		expected: `if (!J) {\n  J();\n}`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-5 (empty statements)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J); else;`,
+		expected: `J;`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-6 (empty statement, no alternate)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J);`,
+		expected: `J;`,
+	},
+	{
+		enabled: true,
+		name: 'simplifyIfStatements - TP-7 (empty block, no alternate)',
+		func: __dirname + '/../src/modules/safe/simplifyIfStatements',
+		source: `if (J) {}`,
+		expected: `J;`,
+	},
 
 	// Unsafe
 	{
