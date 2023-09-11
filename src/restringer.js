@@ -34,6 +34,7 @@ class REstringer {
 		this._postprocessors = [];
 		this.logger = logger;
 		this.logger.setLogLevel(logger.logLevels.LOG);    // Default log level
+		this.detectObfuscationType = true;
 		// Deobfuscation methods that don't use eval
 		this.safeMethods = [
 			safe.rearrangeSequences,
@@ -125,7 +126,7 @@ class REstringer {
 	 * @return {boolean} true if the script was modified during deobfuscation; false otherwise.
 	 */
 	deobfuscate(clean = false) {
-		this.determineObfuscationType();
+		if (this.detectObfuscationType) this.determineObfuscationType();
 		this._runProcessors(this._preprocessors);
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
