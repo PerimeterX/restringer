@@ -12,7 +12,7 @@ const areReferencesModified = require(__dirname + '/../utils/areReferencesModifi
 function resolveProxyVariables(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
-		if (n.type === 'VariableDeclarator' && n?.id?.type === 'Identifier' && n?.init?.type === 'Identifier' && candidateFilter(n)) {
+		if (n.type === 'VariableDeclarator' && n?.init?.type === 'Identifier' && candidateFilter(n)) {
 			const refs = n.id.references || [];
 			// Remove proxy assignments if there are no more references
 			if (!refs.length) arb.markNode(n);
