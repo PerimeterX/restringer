@@ -26,6 +26,7 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 		candidateFilter(n)) {
 			let targetNode = n;
 			let replacementNode = n.callee.body;
+
 			if (replacementNode.type === 'BlockStatement') {
 				let targetChild = replacementNode;
 				// IIFEs with a single return statement
@@ -39,11 +40,26 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 				}
 				if (!targetNode || !targetNode.body) targetNode = n;
 				else {
-					// Place the wrapped code instead of the wrapper node
+				    // Place the wrapped code instead of the wrapper node
+				    // Find location for replcement
+				    var loc = targetNode.body.findIndex(t => t === targetChild);
+				    if(loc == -1){
+					// case not in array for some reason, place at end
 					replacementNode = {
-						...targetNode,
-						body: [...targetNode.body.filter(t => t !== targetChild), ...replacementNode.body],
+					    ...targetNode,
+					    body: [...targetNode.body.filter(t => t !== targetChild), ...replacementNode.body],
 					};
+				    }else{
+					//insert body where function used to be
+					replacementNode = {
+					    ...targetNode,
+					    body: [
+						...targetNode.body.slice(0,loc),
+						...replacementNode.body,
+						...targetNode.body.slice(loc+1),
+					    ],
+					};
+				    }
 				}
 			}
 			arb.markNode(targetNode, replacementNode);
