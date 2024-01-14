@@ -23,9 +23,9 @@ function hasGlobalMaxIterationBeenReached() {
 function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 	let scriptSnapshot = '';
 	let currentIteration = 0;
+	let changesCounter = 0;
 	try {
 		let scriptHash = generateHash(script);
-		let changesCounter = 0;
 		let arborist = new Arborist(script, logger.log);
 		while (arborist.ast?.length && scriptSnapshot !== script && currentIteration < maxIterations && !hasGlobalMaxIterationBeenReached()) {
 			const cycleStartTime = Date.now();
@@ -60,6 +60,7 @@ function runLoop(script, funcs, maxIterations = defaultMaxIterations) {
 			++globalIterationsCounter;
 			logger.log(`[+] ==> Cycle ${globalIterationsCounter} completed in ${(Date.now() - cycleStartTime) / 1000} seconds` +
 				` with ${changesCounter ? changesCounter : 'no'} changes (${arborist.ast?.length || '???'} nodes)`);
+			changesCounter =  0;
 		}
 		if (changesCounter) script = arborist.script;
 	} catch (e) {
