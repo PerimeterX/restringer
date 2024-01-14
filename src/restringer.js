@@ -106,8 +106,7 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = runLoop(this.script, this.safeMethods);
-			script = runLoop(script, this.unsafeMethods, 1);
+			script = runLoop(this.script, this.safeMethods.concat(this.unsafeMethods));
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
