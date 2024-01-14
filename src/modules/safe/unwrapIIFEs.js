@@ -37,7 +37,7 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 					targetChild = targetNode;
 					targetNode = targetNode.parentNode;
 				}
-				if (!targetNode || !targetNode.body) targetNode = n;
+				if (!targetNode?.body?.filter) targetNode = n;
 				else {
 					// Place the wrapped code instead of the wrapper node
 					replacementNode = {
