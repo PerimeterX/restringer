@@ -156,11 +156,12 @@ if (require.main === module) {
 			const fs = require('node:fs');
 			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
-			logger.log(`[!] Deobfuscating ${args.inputFilename}...\n`);
 
 			const restringer = new REstringer(content);
 			if (args.quiet) restringer.logger.setLogLevel(logger.logLevels.NONE);
 			else if (args.verbose) restringer.logger.setLogLevel(logger.logLevels.DEBUG);
+			logger.log(`[!] REstringer v${REstringer.__version__}`);
+			logger.log(`[!] Deobfuscating ${args.inputFilename}...`);
 			if (args.maxIterations) {
 				setGlobalMaxIterations(args.maxIterations);
 				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
