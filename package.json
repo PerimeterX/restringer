@@ -1,6 +1,6 @@
 {
   "name": "restringer",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
   "bin": {
@@ -11,10 +11,10 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.5.2",
-    "isolated-vm": "^4.6.0",
-    "jsdom": "^23.2.0",
-    "obfuscation-detector": "^1.1.6"
+    "flast": "^1.6.0",
+    "isolated-vm": "^5.0.1",
+    "jsdom": "^24.1.0",
+    "obfuscation-detector": "^1.1.7"
   },
   "scripts": {
     "test": "node --trace-warnings tests/testRestringer.js"
