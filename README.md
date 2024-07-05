@@ -80,7 +80,7 @@ REstringer is highly modularized. It exposes modules that allow creating custom 
 that can solve specific problems.
 
 The basic structure of such a deobfuscator would be an array of deobfuscation modules 
-(either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via the [runLoop](src/modules/utils/runLoop.js) util function.
+(either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via flAST's applyIteratively utility function.
 
 Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.com/package/isolated-vm) to be on the safe side) while safe modules do not.
 
@@ -88,15 +88,15 @@ Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.co
 const {
   safe: {normalizeComputed},
   unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls},
-  utils: {runLoop}
 } = require('restringer').deobModules;
+const {applyIteratively} = require('flast').utils;
 let script = 'obfuscated JS here';
 const deobModules = [
   resolveDefiniteBinaryExpressions,
   resolveLocalCalls,
   normalizeComputed,
 ];
-script = runLoop(script, deobModules);
+script = applyIteratively(script, deobModules);
 console.log(script); // Deobfuscated script
 ```
 
@@ -104,15 +104,15 @@ With the additional `candidateFilter` function argument, it's possible to narrow
 ```javascript
 const {
   unsafe: {resolveLocalCalls},
-  utils: {runLoop}
 } = require('restringer').deobModules;
+const {applyIteratively} = require('flast').utils;
 let script = 'obfuscated JS here';
 
-// It's better to define a function with a name that can show up in the log (otherwise you'll get 'undefined')
+// It's better to define a function with a meaningful name that can show up in the log 
 function resolveLocalCallsInGlobalScope(arb) {
   return resolveLocalCalls(arb, n => n.parentNode?.type === 'Program');
 }
-script = runLoop(script, [resolveLocalCallsInGlobalScope]);
+script = applyIteratively(script, [resolveLocalCallsInGlobalScope]);
 console.log(script); // Deobfuscated script
 ```
 
@@ -125,7 +125,7 @@ const inputFilename = process.argv[2];
 const code = fs.readFileSync(inputFilename, 'utf-8');
 const res = new REstringer(code);
 
-// res.logger.setLogLevel(res.logger.logLevels.DEBUG);
+// res.logger.setLogLevelDebug();
 res.detectObfuscationType = false;  // Skip obfuscation type detection, including any pre and post processors
 
 const targetFunc = res.unsafeMethods.find(m => m.name === 'resolveLocalCalls');

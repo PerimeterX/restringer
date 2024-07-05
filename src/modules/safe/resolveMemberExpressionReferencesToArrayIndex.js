@@ -1,4 +1,4 @@
-const logger = require(__dirname + '/../utils/logger');
+const {logger} = require('flast').utils;
 
 const minArrayLength = 20;
 

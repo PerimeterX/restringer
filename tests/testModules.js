@@ -1,6 +1,6 @@
 const assert = require('node:assert');
 const {Arborist} = require('flast');
-const {runLoop, logger} = require(__dirname + '/../src/modules').utils;
+const {logger, applyIteratively} = require('flast').utils;
 
 const tests = {
 	modulesTests: __dirname + '/modules-tests',
@@ -41,7 +41,7 @@ function testModuleInLoop(testName, testFunc, source, expected, prepTest = null,
 	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	const testInput = prepTest ? prepTest(source) : source;
-	const rawResult = runLoop(testInput, [testFunc]);
+	const rawResult = applyIteratively(testInput, [testFunc]);
 	const result = prepRes ? prepRes(rawResult) : rawResult;
 	assert.deepEqual(result, expected);
 	console.timeEnd('PASS');
@@ -58,7 +58,7 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 		if (test.enabled) {
 			// Tests will have the `looped` flag if they only produce the desired result after consecutive runs
 			if (!test.looped) testModuleOnce(`[${moduleName}] ${test.name}`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
-			// Tests will have the `isUtil` flag if they do not return an Arborist instance (i.e. can't use runLoop)
+			// Tests will have the `isUtil` flag if they do not return an Arborist instance (i.e. can't use applyIteratively)
 			if (!test.isUtil) testModuleInLoop(`[${moduleName}] ${test.name} (looped)`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;

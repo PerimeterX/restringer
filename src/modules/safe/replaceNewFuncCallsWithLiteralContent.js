@@ -1,7 +1,6 @@
-const {generateFlatAST} = require('flast');
-const logger = require(__dirname + '/../utils/logger');
 const getCache = require(__dirname + '/../utils/getCache');
 const generateHash = require(__dirname + '/../utils/generateHash');
+const {generateFlatAST, utils: {logger}} = require('flast');
 
 /**
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.

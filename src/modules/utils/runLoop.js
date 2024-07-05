@@ -1,6 +1,5 @@
-const {Arborist} = require('flast');
+const {Arborist, utils: {logger}} = require('flast');
 const generateHash = require(__dirname + '/generateHash');
-const logger = require(__dirname + '/../utils/logger');
 const {defaultMaxIterations, getGlobalMaxIterations} = require(__dirname + '/../config');
 
 let globalIterationsCounter = 0;

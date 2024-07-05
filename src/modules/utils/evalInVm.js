@@ -1,7 +1,7 @@
+const {logger} = require('flast').utils;
 const Sandbox = require(__dirname + '/sandbox');
 const assert = require('node:assert');
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const getObjType = require(__dirname + '/../utils/getObjType');
 const generateHash = require(__dirname + '/../utils/generateHash');
 const createNewNode = require(__dirname + '/../utils/createNewNode');
