@@ -19,7 +19,7 @@ const defaultPrepRes = arb => {arb.applyChanges(); return arb.script;};
  * @param prepRes {function} - (optional) Function for parsing the test output.
  */
 function testModuleOnce(testName, testFunc, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
-	process.stdout.write(`Testing ${testName}... `);
+	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	const testInput = prepTest(source);
 	const rawRes = testFunc(...testInput);
@@ -38,7 +38,7 @@ function testModuleOnce(testName, testFunc, source, expected, prepTest = default
  * @param prepRes {function} - (optional) Function for parsing the test output.
  */
 function testModuleInLoop(testName, testFunc, source, expected, prepTest = null, prepRes = null) {
-	process.stdout.write(`Testing ${testName}... `);
+	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	const testInput = prepTest ? prepTest(source) : source;
 	const rawResult = runLoop(testInput, [testFunc]);
@@ -62,7 +62,7 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 			if (!test.isUtil) testModuleInLoop(`[${moduleName}] ${test.name} (looped)`.padEnd(90, '.'), require(test.func), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;
-			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
+			console.log(`[${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
 		}
 	}
 }

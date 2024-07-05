@@ -17,7 +17,7 @@ function normalizeCode(code) {
 }
 
 function testSampleDeobfuscation(testSampleName, testSampleFilename) {
-	process.stdout.write(`Testing '${testSampleName}' obfuscated sample...`.padEnd(60, '.'));
+	process.stdout.write(`'${testSampleName}' obfuscated sample...`.padEnd(60, '.'));
 	console.time(' PASS');
 	const obfuscatedSource = fs.readFileSync(testSampleFilename, 'utf-8');
 	const deobfuscatedTarget = normalizeCode(fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8'));
