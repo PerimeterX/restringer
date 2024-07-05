@@ -18,7 +18,7 @@ const defaultPrepRes = arb => {arb.applyChanges(); return arb.script;};
  * @param {function} prepRes - (optional) Function for parsing the test output.
  */
 function testProcessor(testName, testProcs, source, expected, prepTest = defaultPrepTest, prepRes = defaultPrepRes) {
-	process.stdout.write(`Testing ${testName}... `);
+	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	let rawRes = prepTest(source);
 	testProcs.preprocessors.forEach(proc => rawRes = proc(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
@@ -39,7 +39,7 @@ for (const [processorName, procTests] of Object.entries(tests)) {
 			testProcessor(`[${processorName}] ${test.name}`.padEnd(90, '.'), require(test.processors), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;
-			console.log(`Testing [${processorName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
+			console.log(`[${processorName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
 		}
 	}
 }

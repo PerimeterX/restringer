@@ -1,4 +1,4 @@
-const runLoop = require(__dirname + '/runLoop');
+const {applyIteratively} = require('flast').utils;
 const normalizeComputed = require(__dirname + '/../safe/normalizeComputed');
 const normalizeEmptyStatements = require(__dirname + '/../safe/normalizeEmptyStatements');
 const normalizeRedundantNotOperator = require(__dirname + '/../unsafe/normalizeRedundantNotOperator');
@@ -9,7 +9,7 @@ const normalizeRedundantNotOperator = require(__dirname + '/../unsafe/normalizeR
  * @return {string} The normalized script.
  */
 function normalizeScript(script) {
-	return runLoop(script, [
+	return applyIteratively(script, [
 		normalizeComputed,
 		normalizeRedundantNotOperator,
 		normalizeEmptyStatements,

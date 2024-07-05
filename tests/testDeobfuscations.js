@@ -12,7 +12,7 @@ const tests = {
  * @param expected {string} - The expected output
  */
 function testCodeSample(testName, source, expected) {
-	process.stdout.write(`Testing ${testName}... `);
+	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	const restringer = new REstringer(source);
 	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
@@ -32,7 +32,7 @@ for (const [moduleName, moduleTests] of Object.entries(tests)) {
 			testCodeSample(`[${moduleName}] ${test.name}`.padEnd(90, '.'), test.source, test.expected);
 		} else {
 			skippedTests++;
-			console.log(`Testing [${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
+			console.log(`[${moduleName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);
 		}
 	}
 }

@@ -1,7 +1,6 @@
-const logger = require(__dirname + '/logger');
-const {generateCode, parseCode} = require('flast');
 const {badValue} = require(__dirname + '/../config');
 const getObjType = require(__dirname + '/getObjType');
+const {generateCode, parseCode, utils: {logger}} = require('flast');
 
 /**
  * Create a node from a value by its type.

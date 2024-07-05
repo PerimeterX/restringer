@@ -2,8 +2,9 @@
 
 const fs = require('node:fs');
 const Sandbox = require(__dirname + '/sandbox');
+// eslint-disable-next-line no-unused-vars
 const {JSDOM} = require('jsdom');
-const logger = require(__dirname + '/../utils/logger');
+const {logger} = require('flast').utils;
 const generateHash = require(__dirname + '/../utils/generateHash');
 
 let jQuerySrc = '';

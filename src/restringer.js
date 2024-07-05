@@ -1,12 +1,11 @@
 #!/usr/bin/env node
+const {logger, applyIteratively} = require('flast').utils;
 const processors = require(__dirname + '/processors');
 const detectObfuscation = require('obfuscation-detector');
 const version = require(__dirname + '/../package').version;
 const {
 	utils: {
-		runLoop,
 		normalizeScript,
-		logger,
 	},
 	safe,
 	unsafe,
@@ -33,7 +32,7 @@ class REstringer {
 		this._preprocessors = [];
 		this._postprocessors = [];
 		this.logger = logger;
-		this.logger.setLogLevel(logger.logLevels.LOG);    // Default log level
+		this.logger.setLogLevelLog();
 		this.detectObfuscationType = true;
 		// Deobfuscation methods that don't use eval
 		this.safeMethods = [
@@ -106,7 +105,7 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = runLoop(this.script, this.safeMethods.concat(this.unsafeMethods));
+			script = applyIteratively(this.script, this.safeMethods.concat(this.unsafeMethods));
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -130,7 +129,7 @@ class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.modified && this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = runLoop(this.script, [unsafe.removeDeadNodes]);
+		if (clean) this.script = applyIteratively(this.script, [unsafe.removeDeadNodes]);
 		return this.modified;
 	}
 
@@ -142,7 +141,7 @@ class REstringer {
 	_runProcessors(processors) {
 		for (let i = 0; i < processors.length; i++) {
 			const processor = processors[i];
-			this.script = runLoop(this.script, [processor], 1);
+			this.script = applyIteratively(this.script, [processor], 1);
 		}
 	}
 }
@@ -158,8 +157,8 @@ if (require.main === module) {
 			const startTime = Date.now();
 
 			const restringer = new REstringer(content);
-			if (args.quiet) restringer.logger.setLogLevel(logger.logLevels.NONE);
-			else if (args.verbose) restringer.logger.setLogLevel(logger.logLevels.DEBUG);
+			if (args.quiet) restringer.logger.setLogLevelNone();
+			else if (args.verbose) restringer.logger.setLogLevelDebug();
 			logger.log(`[!] REstringer v${REstringer.__version__}`);
 			logger.log(`[!] Deobfuscating ${args.inputFilename}...`);
 			if (args.maxIterations) {

@@ -1,5 +1,5 @@
+const {logger} = require('flast').utils;
 const {badValue} = require(__dirname + '/../config');
-const logger = require(__dirname + '/../utils/logger');
 const Sandbox = require(__dirname + '/../utils/sandbox');
 const evalInVm = require(__dirname + '/../utils/evalInVm');
 const createNewNode = require(__dirname + '/../utils/createNewNode');

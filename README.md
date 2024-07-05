@@ -17,6 +17,7 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
   * [Command-Line Usage](#command-line-usage) 
   * [Use as a Module](#use-as-a-module) 
 * [Create Custom Deobfuscators](#create-custom-deobfuscators)
+  * [Boilerplate Code for Starting from Scratch](#boilerplate-code-for-starting-from-scratch)
 * [Read More](#read-more)
 ***
 
@@ -80,7 +81,7 @@ REstringer is highly modularized. It exposes modules that allow creating custom 
 that can solve specific problems.
 
 The basic structure of such a deobfuscator would be an array of deobfuscation modules 
-(either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via the [runLoop](src/modules/utils/runLoop.js) util function.
+(either [safe](src/modules/safe) or [unsafe](src/modules/unsafe)), run via flAST's applyIteratively utility function.
 
 Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.com/package/isolated-vm) to be on the safe side) while safe modules do not.
 
@@ -88,15 +89,15 @@ Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.co
 const {
   safe: {normalizeComputed},
   unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls},
-  utils: {runLoop}
 } = require('restringer').deobModules;
+const {applyIteratively} = require('flast').utils;
 let script = 'obfuscated JS here';
 const deobModules = [
   resolveDefiniteBinaryExpressions,
   resolveLocalCalls,
   normalizeComputed,
 ];
-script = runLoop(script, deobModules);
+script = applyIteratively(script, deobModules);
 console.log(script); // Deobfuscated script
 ```
 
@@ -104,15 +105,15 @@ With the additional `candidateFilter` function argument, it's possible to narrow
 ```javascript
 const {
   unsafe: {resolveLocalCalls},
-  utils: {runLoop}
 } = require('restringer').deobModules;
+const {applyIteratively} = require('flast').utils;
 let script = 'obfuscated JS here';
 
-// It's better to define a function with a name that can show up in the log (otherwise you'll get 'undefined')
+// It's better to define a function with a meaningful name that can show up in the log 
 function resolveLocalCallsInGlobalScope(arb) {
   return resolveLocalCalls(arb, n => n.parentNode?.type === 'Program');
 }
-script = runLoop(script, [resolveLocalCallsInGlobalScope]);
+script = applyIteratively(script, [resolveLocalCallsInGlobalScope]);
 console.log(script); // Deobfuscated script
 ```
 
@@ -125,7 +126,7 @@ const inputFilename = process.argv[2];
 const code = fs.readFileSync(inputFilename, 'utf-8');
 const res = new REstringer(code);
 
-// res.logger.setLogLevel(res.logger.logLevels.DEBUG);
+// res.logger.setLogLevelDebug();
 res.detectObfuscationType = false;  // Skip obfuscation type detection, including any pre and post processors
 
 const targetFunc = res.unsafeMethods.find(m => m.name === 'resolveLocalCalls');
@@ -138,6 +139,40 @@ if (res.script !== code) {
   console.log('[+] Deob successful');
   fs.writeFileSync(`${inputFilename}-deob.js`, res.script, 'utf-8');
 } else console.log('[-] Nothing deobfuscated :/');
+```
+
+*** 
+
+### Boilerplate code for starting from scratch
+```javascript
+const {logger, applyIteratively, treeModifier} = require('flast').utils;
+// Optional loading from file
+// const fs = require('node:fs');
+// const inputFilename = process.argv[2] || 'target.js';
+// const code = fs.readFileSync(inputFilename, 'utf-8');
+const code = `(function() {
+  function createMessage() {return 'Hello' + ' ' + 'there!';}
+  function print(msg) {console.log(msg);}
+  print(createMessage());
+})();`;
+
+logger.setLogLevelDebug();
+let script = code;
+// Use this function to target the relevant nodes
+const f = n => n.type === 'Literal' && replacements[n.value];
+// Use this function to modify the nodes according to your needs.
+// markNode(n) would delete the node, while markNode(n, {...}) would replace the node with the supplied node.
+const m = (n, arb) => arb.markNode(n, {
+  type: 'Literal',
+  value: replacements[n.value],
+});
+const swc = treeModifier(f, m, 'StarWarsChanger');
+script = applyIteratively(script, [swc]);
+if (code !== script) {
+  console.log(script);
+  // fs.writeFileSync(inputFilename + '-deob.js', script, 'utf-8');
+} else console.log(`No changes`);
+
 ```
 ***
 

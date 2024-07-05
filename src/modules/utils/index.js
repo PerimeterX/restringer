@@ -15,9 +15,7 @@ module.exports = {
 	getObjType: require(__dirname + '/getObjType'),
 	isNodeInRanges: require(__dirname + '/isNodeInRanges'),
 	isNodeMarked: require(__dirname + '/isNodeMarked'),
-	logger: require(__dirname + '/logger'),
 	normalizeScript: require(__dirname + '/normalizeScript'),
-	runLoop: require(__dirname + '/runLoop'),
 	safeImplementations: require(__dirname + '/safeImplementations'),
 	sandbox: require(__dirname + '/sandbox'),
 };
