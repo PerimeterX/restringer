@@ -17,6 +17,7 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
   * [Command-Line Usage](#command-line-usage) 
   * [Use as a Module](#use-as-a-module) 
 * [Create Custom Deobfuscators](#create-custom-deobfuscators)
+  * [Boilerplate Code for Starting from Scratch](#boilerplate-code-for-starting-from-scratch)
 * [Read More](#read-more)
 ***
 
@@ -138,6 +139,40 @@ if (res.script !== code) {
   console.log('[+] Deob successful');
   fs.writeFileSync(`${inputFilename}-deob.js`, res.script, 'utf-8');
 } else console.log('[-] Nothing deobfuscated :/');
+```
+
+*** 
+
+### Boilerplate code for starting from scratch
+```javascript
+const {logger, applyIteratively, treeModifier} = require('flast').utils;
+// Optional loading from file
+// const fs = require('node:fs');
+// const inputFilename = process.argv[2] || 'target.js';
+// const code = fs.readFileSync(inputFilename, 'utf-8');
+const code = `(function() {
+  function createMessage() {return 'Hello' + ' ' + 'there!';}
+  function print(msg) {console.log(msg);}
+  print(createMessage());
+})();`;
+
+logger.setLogLevelDebug();
+let script = code;
+// Use this function to target the relevant nodes
+const f = n => n.type === 'Literal' && replacements[n.value];
+// Use this function to modify the nodes according to your needs.
+// markNode(n) would delete the node, while markNode(n, {...}) would replace the node with the supplied node.
+const m = (n, arb) => arb.markNode(n, {
+  type: 'Literal',
+  value: replacements[n.value],
+});
+const swc = treeModifier(f, m, 'StarWarsChanger');
+script = applyIteratively(script, [swc]);
+if (code !== script) {
+  console.log(script);
+  // fs.writeFileSync(inputFilename + '-deob.js', script, 'utf-8');
+} else console.log(`No changes`);
+
 ```
 ***
 
