@@ -3,6 +3,7 @@
   "version": "1.10.4",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
+  "type": "module",
   "bin": {
     "restringer": "./src/restringer.js"
   },
@@ -17,7 +18,7 @@
     "obfuscation-detector": "^1.1.7"
   },
   "scripts": {
-    "test": "node --trace-warnings tests/testRestringer.js"
+    "test": "node --trace-warnings --experimental-json-modules tests/testRestringer.js"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,7 @@
     "javascript",
     "AST"
   ],
-  "author": "ben.baryo@humansecurity.com",
+  "author": "Ben Baryo (ben.baryo@humansecurity.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PerimeterX/Restringer/issues"
