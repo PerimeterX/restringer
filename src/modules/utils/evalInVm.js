@@ -1,10 +1,11 @@
-const {logger} = require('flast').utils;
-const Sandbox = require(__dirname + '/sandbox');
-const assert = require('node:assert');
-const {badValue} = require(__dirname + '/../config');
-const getObjType = require(__dirname + '/../utils/getObjType');
-const generateHash = require(__dirname + '/../utils/generateHash');
-const createNewNode = require(__dirname + '/../utils/createNewNode');
+import {utils} from 'flast';
+const {logger} = utils;
+import {Sandbox} from './sandbox.js';
+import * as assert from 'node:assert';
+import {badValue} from '../config.js';
+import {getObjType} from './getObjType.js';
+import {generateHash} from './generateHash.js';
+import {createNewNode} from './createNewNode.js';
 
 const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
 	'Promise',
@@ -37,7 +38,7 @@ const maxCacheSize = 100;
  * Eval a string in an ~isolated~ environment
  * @param {string} stringToEval
  * @param {Sandbox} [sb] (optional) an existing sandbox loaded with context.
- * @return {ASTNode|badValue} A node based on the eval result if successful; badValue string otherwise.
+ * @return {ASTNode|string} A node based on the eval result if successful; badValue string otherwise.
  */
 function evalInVm(stringToEval, sb) {
 	const cacheName = `eval-${generateHash(stringToEval)}`;
@@ -73,4 +74,4 @@ function evalInVm(stringToEval, sb) {
 	return cache[cacheName];
 }
 
-module.exports = evalInVm;
+export {evalInVm};

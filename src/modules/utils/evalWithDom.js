@@ -1,11 +1,12 @@
 // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
 
-const fs = require('node:fs');
-const Sandbox = require(__dirname + '/sandbox');
+import fs from 'node:fs';
+import {Sandbox} from './sandbox.js';
 // eslint-disable-next-line no-unused-vars
-const {JSDOM} = require('jsdom');
-const {logger} = require('flast').utils;
-const generateHash = require(__dirname + '/../utils/generateHash');
+import {JSDOM} from 'jsdom';
+import {utils} from 'flast';
+const {logger} = utils;
+import {generateHash} from './generateHash.js';
 
 let jQuerySrc = '';
 
@@ -53,4 +54,4 @@ function evalWithDom(stringToEval, injectjQuery = false) {
 	return cache[cacheName];
 }
 
-module.exports = evalWithDom;
+export {evalWithDom};

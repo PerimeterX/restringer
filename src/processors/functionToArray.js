@@ -2,14 +2,8 @@
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
-const {
-	unsafe: {
-		resolveFunctionToArray,
-	},
-} = require(__dirname + '/../modules');
+import {unsafe} from '../modules/index.js';
+const {resolveFunctionToArray} = unsafe;
 
-
-module.exports = {
-	preprocessors: [resolveFunctionToArray],
-	postprocessors: [],
-};
+export const preprocessors = [resolveFunctionToArray.default];
+export const postprocessors = [];

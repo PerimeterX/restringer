@@ -1,8 +1,8 @@
-const assert = require('node:assert');
-const {REstringer} = require(__dirname + '/..');
+import * as assert from 'node:assert';
+import {REstringer} from '../index.js';
 
 const tests = {
-	genericDeobfuscationTests: __dirname + '/deobfuscation-tests',
+	genericDeobfuscationTests: './deobfuscation-tests.js',
 };
 
 /**
@@ -25,7 +25,7 @@ let allTests = 0;
 let skippedTests = 0;
 console.time('tests in');
 for (const [moduleName, moduleTests] of Object.entries(tests)) {
-	const loadedTests = require(moduleTests);
+	const loadedTests = (await import(moduleTests)).default;
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {

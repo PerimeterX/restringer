@@ -1,6 +1,6 @@
-const getDescendants = require(__dirname + '/../utils/getDescendants');
-const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
-const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/getMainDeclaredObjectOfMemberExpression');
+import {getDescendants} from '../utils/getDescendants.js';
+import {areReferencesModified} from '../utils/areReferencesModified.js';
+import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredObjectOfMemberExpression.js';
 
 /**
  * Replace variables which only point at other variables and do not change, with their target.
@@ -37,4 +37,4 @@ function resolveProxyReferences(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveProxyReferences;
+export default resolveProxyReferences;

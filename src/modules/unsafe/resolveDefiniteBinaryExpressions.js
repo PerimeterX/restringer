@@ -1,7 +1,7 @@
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const doesBinaryExpressionContainOnlyLiterals = require(__dirname + '/../utils/doesBinaryExpressionContainOnlyLiterals');
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {doesBinaryExpressionContainOnlyLiterals} from '../utils/doesBinaryExpressionContainOnlyLiterals.js';
 
 /**
  * Resolve definite binary expressions.
@@ -32,4 +32,4 @@ function resolveDefiniteBinaryExpressions(arb, candidateFilter = () => true) {
 	}
 	return arb;
 }
-module.exports = resolveDefiniteBinaryExpressions;
+export default resolveDefiniteBinaryExpressions;

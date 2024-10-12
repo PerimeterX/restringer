@@ -1,9 +1,10 @@
-const {Isolate, Reference} = require('isolated-vm');
+import pkg from 'isolated-vm';
+const {Isolate, Reference} = pkg;
 
 /**
  *
  */
-class Sandbox {
+export class Sandbox {
 	constructor() {
 		// Objects that shouldn't be available when running scripts in eval to avoid security issues or inconsistencies.
 		const replacedItems = {
@@ -43,5 +44,3 @@ class Sandbox {
 		return Object.getPrototypeOf(obj) === Reference.prototype;
 	}
 }
-
-module.exports = Sandbox;

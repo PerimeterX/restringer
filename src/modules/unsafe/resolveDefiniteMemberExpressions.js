@@ -1,6 +1,6 @@
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
 
 /**
  * Replace definite member expressions with their intended value.
@@ -31,4 +31,4 @@ function resolveDefiniteMemberExpressions(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveDefiniteMemberExpressions;
+export default resolveDefiniteMemberExpressions;

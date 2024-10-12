@@ -1,4 +1,4 @@
-module.exports = {
+export const obfuscatedSamples = {
 	// Order by approximate deobfuscation time, ascending
 	'JSFuck': 'jsfuck.js',
 	'Ant & Cockroach': 'ant.js',

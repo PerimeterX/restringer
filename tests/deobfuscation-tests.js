@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	{
 		enabled: true,
 		name: 'Augmented Array Replacements',

@@ -1,14 +1,12 @@
-module.exports = {
-	normalizeRedundantNotOperator: require(__dirname + '/normalizeRedundantNotOperator'),
-	resolveAugmentedFunctionWrappedArrayReplacements: require(__dirname + '/resolveAugmentedFunctionWrappedArrayReplacements'),
-	resolveBuiltinCalls: require(__dirname + '/resolveBuiltinCalls'),
-	resolveDefiniteBinaryExpressions: require(__dirname + '/resolveDefiniteBinaryExpressions'),
-	resolveDefiniteMemberExpressions: require(__dirname + '/resolveDefiniteMemberExpressions'),
-	resolveDeterministicConditionalExpressions: require(__dirname + '/resolveDeterministicConditionalExpressions'),
-	resolveEvalCallsOnNonLiterals: require(__dirname + '/resolveEvalCallsOnNonLiterals'),
-	resolveFunctionToArray: require(__dirname + '/resolveFunctionToArray'),
-	resolveInjectedPrototypeMethodCalls: require(__dirname + '/resolveInjectedPrototypeMethodCalls'),
-	resolveLocalCalls: require(__dirname + '/resolveLocalCalls'),
-	resolveMemberExpressionsLocalReferences: require(__dirname + '/resolveMemberExpressionsLocalReferences'),
-	resolveMinimalAlphabet: require(__dirname + '/resolveMinimalAlphabet'),
-};
+export const normalizeRedundantNotOperator = await import('./normalizeRedundantNotOperator.js');
+export const resolveAugmentedFunctionWrappedArrayReplacements = await import('./resolveAugmentedFunctionWrappedArrayReplacements.js');
+export const resolveBuiltinCalls = await import('./resolveBuiltinCalls.js');
+export const resolveDefiniteBinaryExpressions = await import('./resolveDefiniteBinaryExpressions.js');
+export const resolveDefiniteMemberExpressions = await import('./resolveDefiniteMemberExpressions.js');
+export const resolveDeterministicConditionalExpressions = await import('./resolveDeterministicConditionalExpressions.js');
+export const resolveEvalCallsOnNonLiterals = await import('./resolveEvalCallsOnNonLiterals.js');
+export const resolveFunctionToArray = await import('./resolveFunctionToArray.js');
+export const resolveInjectedPrototypeMethodCalls = await import('./resolveInjectedPrototypeMethodCalls.js');
+export const resolveLocalCalls = await import('./resolveLocalCalls.js');
+export const resolveMemberExpressionsLocalReferences = await import('./resolveMemberExpressionsLocalReferences.js');
+export const resolveMinimalAlphabet = await import('./resolveMinimalAlphabet.js');

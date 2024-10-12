@@ -2,13 +2,14 @@
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import utils from '../utils/index.js';
 const {
 	createOrderedSrc,
 	getDeclarationWithContext,
-} = require(__dirname + '/../utils');
-const {badValue} = require(__dirname + '/../config');
+} = utils;
+import {badValue} from '../config.js';
 
 /**
  * Run the generating function and replace it with the actual array.
@@ -21,7 +22,7 @@ const {badValue} = require(__dirname + '/../config');
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveFunctionToArray(arb,  candidateFilter = () => true) {
+export default function resolveFunctionToArray(arb,  candidateFilter = () => true) {
 	let sharedSb;
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
@@ -41,5 +42,3 @@ function resolveFunctionToArray(arb,  candidateFilter = () => true) {
 	}
 	return arb;
 }
-
-module.exports = resolveFunctionToArray;

@@ -6,4 +6,4 @@ function atob(val) {
 	return Buffer.from(val, 'base64').toString();
 }
 
-module.exports = atob;
+export {atob};

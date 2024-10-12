@@ -1,4 +1,4 @@
-const {propertiesThatModifyContent} = require(__dirname + '/../config');
+import {propertiesThatModifyContent} from '../config.js';
 
 /**
  * @param {ASTNode[]} ast
@@ -27,4 +27,4 @@ function areReferencesModified(ast, refs) {
 				(n.left.object.declNode && (r.object.declNode || r.object) === n.left.object.declNode))));
 }
 
-module.exports = areReferencesModified;
+export {areReferencesModified};

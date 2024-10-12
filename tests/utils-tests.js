@@ -1,6 +1,6 @@
-const {argsAreValid, parseArgs} = require(__dirname + '/../src/utils/parseArgs');
+import {argsAreValid, parseArgs} from '../src/utils/parseArgs.js';
 const consolelog = console.log;
-module.exports = [
+export default [
 	{
 		enabled: true,
 		name: 'parseArgs - TP-1 - defaults',

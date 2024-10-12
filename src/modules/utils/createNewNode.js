@@ -1,6 +1,7 @@
-const {badValue} = require(__dirname + '/../config');
-const getObjType = require(__dirname + '/getObjType');
-const {generateCode, parseCode, utils: {logger}} = require('flast');
+import {badValue} from '../config.js';
+import {getObjType} from './getObjType.js';
+import {generateCode, parseCode, utils} from 'flast';
+const {logger} = utils;
 
 /**
  * Create a node from a value by its type.
@@ -112,4 +113,4 @@ function createNewNode(value) {
 	return newNode;
 }
 
-module.exports = createNewNode;
+export {createNewNode};

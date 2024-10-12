@@ -1,7 +1,7 @@
-const assert = require('node:assert');
+import * as assert from 'node:assert';
 
 const tests = {
-	Utils: __dirname + '/utils-tests',
+	Utils: './utils-tests.js',
 };
 
 /**
@@ -23,7 +23,7 @@ let allTests = 0;
 let skippedTests = 0;
 console.time('tests in');
 for (const [moduleName, moduleTests] of Object.entries(tests)) {
-	const loadedTests = require(moduleTests);
+	const loadedTests = (await import(moduleTests)).default;
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {

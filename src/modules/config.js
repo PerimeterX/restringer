@@ -49,7 +49,7 @@ const skipProperties = [
 // A regex for a valid identifier name.
 const validIdentifierBeginning = /^[A-Za-z$_]/;
 
-module.exports = {
+export {
 	badArgumentTypes,
 	badIdentifierCharsRegex,
 	badValue,

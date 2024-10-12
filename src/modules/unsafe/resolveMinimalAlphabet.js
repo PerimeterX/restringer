@@ -1,6 +1,6 @@
-const {badValue} = require(__dirname + '/../config');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const getDescendants = require(__dirname + '/../utils/getDescendants');
+import {badValue} from '../config.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {getDescendants} from '../utils/getDescendants.js';
 
 /**
  * Resolve unary expressions on values which aren't numbers such as +true, +[], +[...], etc,
@@ -10,7 +10,7 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
+export default function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if ((n.type === 'UnaryExpression' &&
@@ -30,5 +30,3 @@ function resolveMinimalAlphabet(arb, candidateFilter = () => true) {
 	}
 	return arb;
 }
-
-module.exports = resolveMinimalAlphabet;

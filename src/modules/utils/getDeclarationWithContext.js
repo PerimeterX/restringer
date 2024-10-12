@@ -1,8 +1,8 @@
-const getCache = require(__dirname + '/getCache');
-const generateHash = require(__dirname + '/generateHash');
-const isNodeInRanges = require(__dirname + '/isNodeInRanges');
-const getDescendants = require(__dirname + '/../utils/getDescendants');
-const {propertiesThatModifyContent} = require(__dirname + '/../config');
+import {getCache} from './getCache.js';
+import {generateHash} from './generateHash.js';
+import {isNodeInRanges} from './isNodeInRanges.js';
+import {getDescendants} from './getDescendants.js';
+import {propertiesThatModifyContent} from '../config.js';
 
 // Types that give no context by themselves
 const irrelevantTypesToBeFilteredOut = [
@@ -96,7 +96,7 @@ function removeRedundantNodes(nodes) {
  * @return {ASTNode[]} A flat array of all available declarations and call expressions relevant to
  * the context of the origin node.
  */
-function getDeclarationWithContext(originNode, excludeOriginNode = false) {
+export function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 	/** @type {ASTNode[]} */
 	const stack = [originNode];   // The working stack for nodes to be reviewed
 	/** @type {ASTNode[]} */
@@ -223,5 +223,3 @@ function getDeclarationWithContext(originNode, excludeOriginNode = false) {
 	}
 	return cached;
 }
-
-module.exports = getDeclarationWithContext;

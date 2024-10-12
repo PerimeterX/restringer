@@ -1,4 +1,4 @@
-const getDescendants = require(__dirname + '/../utils/getDescendants');
+import {getDescendants} from '../utils/getDescendants.js';
 
 const maxRepetition = 50;
 
@@ -50,4 +50,4 @@ function rearrangeSwitches(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = rearrangeSwitches;
+export default rearrangeSwitches;

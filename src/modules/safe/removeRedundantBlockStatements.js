@@ -36,4 +36,4 @@ function removeRedundantBlockStatements(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = removeRedundantBlockStatements;
+export default removeRedundantBlockStatements;

@@ -1,8 +1,8 @@
-module.exports = [
+export default [
 	{
 		enabled: true,
 		name: 'augmentedArray - TP-1',
-		processors: __dirname + '/../src/processors/augmentedArray',
+		processors: '../src/processors/augmentedArray.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'a', 'b', 'c'];
@@ -19,7 +19,7 @@ module.exports = [
 	{
 		enabled: false,
 		name: 'caesarPlus - TP-1',
-		processors: __dirname + '/../src/processors/caesarp',
+		processors: '../src/processors/caesarp.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `(function() {
@@ -38,7 +38,7 @@ module.exports = [
 	{
 		enabled: true,
 		name: 'functionToArray - TP-1',
-		processors: __dirname + '/../src/processors/functionToArray',
+		processors: '../src/processors/functionToArray.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `function getArr() {return ['One', 'Two', 'Three']} const a = getArr(); console.log(a[0] + ' + ' + a[1] + ' = ' + a[2]);`,
@@ -47,7 +47,7 @@ module.exports = [
 	{
 		enabled: true,
 		name: 'functionToArray - TP-2',
-		processors: __dirname + '/../src/processors/functionToArray',
+		processors: '../src/processors/functionToArray.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `const a = (function(){return ['One', 'Two', 'Three']})(); console.log(a[0] + ' + ' + a[1] + ' = ' + a[2]);`,
@@ -56,7 +56,7 @@ module.exports = [
 	{
 		enabled: true,
 		name: 'functionToArray - TN-1',
-		processors: __dirname + '/../src/processors/functionToArray',
+		processors: '../src/processors/functionToArray.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `function getArr() {return ['One', 'Two', 'Three']} console.log(getArr()[0] + ' + ' + getArr()[1] + ' = ' + getArr()[2]);`,
@@ -65,7 +65,7 @@ module.exports = [
 	{
 		enabled: true,
 		name: 'obfuscatorIo - TP-1',
-		processors: __dirname + '/../src/processors/obfuscatorIo',
+		processors: '../src/processors/obfuscatorIo.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `var a = {
@@ -78,7 +78,7 @@ module.exports = [
 	{
 		enabled: true,
 		name: 'obfuscatorIo - TP-2',
-		processors: __dirname + '/../src/processors/obfuscatorIo',
+		processors: '../src/processors/obfuscatorIo.js',
 		// prepareTest: () => {},
 		// prepareResult: () => {},
 		source: `var a = function (f) {

@@ -89,4 +89,4 @@ function unwrapSimpleOperations(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = unwrapSimpleOperations;
+export default unwrapSimpleOperations;

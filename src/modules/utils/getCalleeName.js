@@ -7,4 +7,4 @@ function getCalleeName(callExpression) {
 	return callee.name || callee.value;
 }
 
-module.exports = getCalleeName;
+export {getCalleeName};

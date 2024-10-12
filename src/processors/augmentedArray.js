@@ -14,19 +14,10 @@
  * This processor will un-shuffle the array by running the IIFE augmenting it, and replace the array with the un-shuffled version,
  * while removing the augmenting IIFE.
  */
-const {
-	unsafe: {
-		resolveFunctionToArray,
-	},
-	config: {
-		badValue
-	},
-	utils: {
-		createOrderedSrc,
-		evalInVm,
-		getDeclarationWithContext,
-	},
-} = require(__dirname + '/../modules');
+import {config, unsafe, utils} from '../modules/index.js';
+const {resolveFunctionToArray} = unsafe;
+const {badValue} = config;
+const {createOrderedSrc, evalInVm, getDeclarationWithContext} = utils.default;
 
 /**
  * Extract the array and the immediately-invoking function expression.
@@ -72,7 +63,5 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 	return arb;
 }
 
-module.exports = {
-	preprocessors: [replaceArrayWithStaticAugmentedVersion, resolveFunctionToArray],
-	postprocessors: [],
-};
+export const preprocessors = [replaceArrayWithStaticAugmentedVersion, resolveFunctionToArray];
+export const postprocessors = [];

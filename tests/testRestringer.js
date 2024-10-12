@@ -1,9 +1,9 @@
 const availableTests = {
-	Utils: __dirname + '/testUtils',
-	Modules: __dirname + '/testModules',
-	Processors: __dirname + '/testProcessors',
-	Deobfuscation: __dirname + '/testDeobfuscations',
-	'Obfuscated Sample': __dirname + '/testObfuscatedSamples',
+	Utils: './testUtils.js',
+	Modules: './testModules.js',
+	Processors: './testProcessors.js',
+	Deobfuscation: './testDeobfuscations.js',
+	'Obfuscated Sample': './testObfuscatedSamples.js',
 };
 
 console.time('\nAll tests completed in');
@@ -11,6 +11,6 @@ console.time('\nAll tests completed in');
 for (const [testName, testFile] of Object.entries(availableTests)) {
 	const padLength = Math.floor((120 - testName.length - 4) / 2);
 	console.log(`\n${'>'.padStart(padLength, '-')} ${testName} ${'<'.padEnd(padLength, '-')}`);
-	require(testFile);
+	await import(testFile);
 }
 console.timeEnd('\nAll tests completed in');

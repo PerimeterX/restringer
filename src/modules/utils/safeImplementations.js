@@ -1,8 +1,5 @@
 /**
  * Safe implementations of functions to be used during deobfuscation
  */
-
-module.exports = {
-	atob: require(__dirname + '/safe-atob'),
-	btoa: require(__dirname + '/safe-btoa'),
-};
+export const atob = (await import('./safe-atob.js')).atob;
+export const btoa = (await import('./safe-btoa.js')).btoa;

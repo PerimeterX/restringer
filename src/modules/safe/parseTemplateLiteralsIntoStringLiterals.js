@@ -1,4 +1,4 @@
-const createNewNode = require(__dirname + '/../utils/createNewNode');
+import {createNewNode} from '../utils/createNewNode.js';
 
 /**
  * E.g.
@@ -24,4 +24,4 @@ function parseTemplateLiteralsIntoStringLiterals(arb, candidateFilter = () => tr
 	return arb;
 }
 
-module.exports = parseTemplateLiteralsIntoStringLiterals;
+export default parseTemplateLiteralsIntoStringLiterals;

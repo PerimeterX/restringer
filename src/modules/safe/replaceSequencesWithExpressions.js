@@ -42,4 +42,4 @@ function replaceSequencesWithExpressions(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = replaceSequencesWithExpressions;
+export default replaceSequencesWithExpressions;

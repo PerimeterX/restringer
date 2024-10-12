@@ -1,6 +1,7 @@
-const getCache = require(__dirname + '/../utils/getCache');
-const generateHash = require(__dirname + '/../utils/generateHash');
-const {generateFlatAST, utils: {logger}} = require('flast');
+import {getCache} from '../utils/getCache.js';
+import {generateHash} from '../utils/generateHash.js';
+import {generateFlatAST, utils} from 'flast';
+const {logger} = utils;
 
 /**
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.
@@ -68,4 +69,4 @@ function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = replaceEvalCallsWithLiteralContent;
+export default replaceEvalCallsWithLiteralContent;

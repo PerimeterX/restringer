@@ -35,4 +35,4 @@ function resolveMemberExpressionsWithDirectAssignment(arb, candidateFilter = () 
 	return arb;
 }
 
-module.exports = resolveMemberExpressionsWithDirectAssignment;
+export default resolveMemberExpressionsWithDirectAssignment;

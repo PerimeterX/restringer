@@ -1,4 +1,4 @@
-function printHelp() {
+export function printHelp() {
 	return `
 REstringer - a JavaScript deobfuscator
 
@@ -18,7 +18,7 @@ optional arguments:
                                   Use <input_filename>-deob.js if no filename is provided.`;
 }
 
-function parseArgs(args) {
+export function parseArgs(args) {
 	let opts;
 	try {
 		const inputFilename = args[0] && args[0][0] !== '-' ? args[0] : '';
@@ -52,7 +52,7 @@ function parseArgs(args) {
  * @param {object} args The parsed arguments
  * @returns {boolean} true if all arguments are valid; false otherwise.
  */
-function argsAreValid(args) {
+export function argsAreValid(args) {
 	if (args.help) console.log(printHelp());
 	else if (!args.inputFilename) console.log(`Error: Input filename must be provided`);
 	else if (args.verbose && args.quiet) console.log(`Error: Don't set both -q and -v at the same time *smh*`);
@@ -60,10 +60,3 @@ function argsAreValid(args) {
 	else return true;
 	return false;
 }
-
-// noinspection JSUnusedGlobalSymbols
-module.exports = {
-	argsAreValid,
-	parseArgs,
-	printHelp,
-};

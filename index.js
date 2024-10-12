@@ -1,5 +1,3 @@
-module.exports = {
-	REstringer: require(__dirname + '/src/restringer'),
-	deobModules: require(__dirname + '/src/modules'),
-	processors: require(__dirname + '/src/processors'),
-};
+export const REstringer = (await import('./src/restringer.js')).REstringer;
+export const deobModules = await import('./src/modules/index.js');
+export const processors = await import('./src/processors/index.js');

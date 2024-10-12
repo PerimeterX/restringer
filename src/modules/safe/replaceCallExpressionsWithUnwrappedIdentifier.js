@@ -35,4 +35,4 @@ function replaceCallExpressionsWithUnwrappedIdentifier(arb, candidateFilter = ()
 	return arb;
 }
 
-module.exports = replaceCallExpressionsWithUnwrappedIdentifier;
+export default replaceCallExpressionsWithUnwrappedIdentifier;

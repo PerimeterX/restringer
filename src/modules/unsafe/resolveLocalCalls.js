@@ -1,11 +1,11 @@
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const getCache = require(__dirname + '/../utils/getCache');
-const getCalleeName = require(__dirname + '/../utils/getCalleeName');
-const isNodeInRanges = require(__dirname + '/../utils/isNodeInRanges');
-const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
-const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
-const {badValue, badArgumentTypes, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {getCache} from '../utils/getCache.js';
+import {getCalleeName} from '../utils/getCalleeName.js';
+import {isNodeInRanges} from '../utils/isNodeInRanges.js';
+import {createOrderedSrc} from '../utils/createOrderedSrc.js';
+import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
+import {badValue, badArgumentTypes, skipIdentifiers, skipProperties} from '../config.js';
 
 let appearances = {};
 const cacheLimit = 100;
@@ -37,7 +37,7 @@ function countAppearances(node) {
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveLocalCalls(arb, candidateFilter = () => true) {
+export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 	appearances = {};
 	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = [];
@@ -103,5 +103,3 @@ function resolveLocalCalls(arb, candidateFilter = () => true) {
 	}
 	return arb;
 }
-
-module.exports = resolveLocalCalls;

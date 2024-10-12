@@ -1,10 +1,11 @@
-const {logger} = require('flast').utils;
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const createNewNode = require(__dirname + '/../utils/createNewNode');
-const safeImplementations = require(__dirname + '/../utils/safeImplementations');
-const {skipBuiltinFunctions, skipIdentifiers, skipProperties} = require(__dirname + '/../config');
+import {utils} from 'flast';
+const {logger} = utils;
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {createNewNode} from '../utils/createNewNode.js';
+import * as safeImplementations from '../utils/safeImplementations.js';
+import {skipBuiltinFunctions, skipIdentifiers, skipProperties} from '../config.js';
 
 const availableSafeImplementations = Object.keys(safeImplementations);
 
@@ -69,4 +70,4 @@ function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveBuiltinCalls;
+export default resolveBuiltinCalls;

@@ -1,5 +1,5 @@
-const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
-const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/getMainDeclaredObjectOfMemberExpression');
+import {areReferencesModified} from '../utils/areReferencesModified.js';
+import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredObjectOfMemberExpression.js';
 
 /**
  * When an identifier holds a static value which is assigned after declaration but doesn't change afterwards,
@@ -46,4 +46,4 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateF
 	return arb;
 }
 
-module.exports = replaceIdentifierWithFixedValueNotAssignedAtDeclaration;
+export default replaceIdentifierWithFixedValueNotAssignedAtDeclaration;

@@ -1,4 +1,4 @@
-const {parseCode} = require('flast');
+import {parseCode} from 'flast';
 
 const largeNumber = 999e8;
 const sortByNodeId = (a, b) => a.nodeId > b.nodeId ? 1 : b.nodeId > a.nodeId ? -1 : 0;
@@ -61,4 +61,4 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 	return output;
 }
 
-module.exports = createOrderedSrc;
+export {createOrderedSrc};

@@ -1,9 +1,12 @@
-const fs = require('node:fs');
-const assert = require('node:assert');
-const {REstringer} = require(__dirname + '/..');
-const {parseCode, generateCode} = require('flast');
-const obfuscatedSamples = require(__dirname + '/obfuscated-samples');
-const resourcePath = __dirname + '/resources';
+import * as fs from 'node:fs';
+import * as assert from 'node:assert';
+import {REstringer} from '../src/restringer.js';
+import {parseCode, generateCode} from 'flast';
+import {obfuscatedSamples} from './obfuscated-samples.js';
+import {fileURLToPath} from 'node:url';
+import {join} from 'node:path';
+const resourcePath = './resources';
+const cwd = fileURLToPath(import.meta.url).split('/').slice(0, -1).join('/');
 
 function normalizeCode(code) {
 	let normalized;
@@ -19,8 +22,8 @@ function normalizeCode(code) {
 function testSampleDeobfuscation(testSampleName, testSampleFilename) {
 	process.stdout.write(`'${testSampleName}' obfuscated sample...`.padEnd(60, '.'));
 	console.time(' PASS');
-	const obfuscatedSource = fs.readFileSync(testSampleFilename, 'utf-8');
-	const deobfuscatedTarget = normalizeCode(fs.readFileSync(`${testSampleFilename}-deob.js`, 'utf-8'));
+	const obfuscatedSource = fs.readFileSync(join(cwd, testSampleFilename), 'utf-8');
+	const deobfuscatedTarget = normalizeCode(fs.readFileSync(`${join(cwd, testSampleFilename)}-deob.js`, 'utf-8'));
 	const restringer = new REstringer(obfuscatedSource);
 	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
 	restringer.deobfuscate();

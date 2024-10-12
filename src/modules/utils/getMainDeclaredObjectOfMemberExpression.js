@@ -12,4 +12,4 @@ function getMainDeclaredObjectOfMemberExpression(memberExpression) {
 	return mainObject;
 }
 
-module.exports = getMainDeclaredObjectOfMemberExpression;
+export {getMainDeclaredObjectOfMemberExpression};

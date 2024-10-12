@@ -1,8 +1,8 @@
-const {Arborist} = require('flast');
-const assert = require('node:assert');
+import {Arborist} from 'flast';
+import * as assert from 'node:assert';
 
 const tests = {
-	processorsTests: __dirname + '/processors-tests',
+	processorsTests: './processors-tests.js',
 };
 
 const defaultPrepTest = c => [new Arborist(c)];
@@ -21,8 +21,8 @@ function testProcessor(testName, testProcs, source, expected, prepTest = default
 	process.stdout.write(`${testName}... `);
 	console.time('PASS');
 	let rawRes = prepTest(source);
-	testProcs.preprocessors.forEach(proc => rawRes = proc(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
-	testProcs.postprocessors.forEach(proc => rawRes = proc(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
+	testProcs.preprocessors.forEach(proc => rawRes = (proc.default || proc)(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
+	testProcs.postprocessors.forEach(proc => rawRes = (proc.default || proc)(...(Array.isArray(rawRes) ? rawRes : [rawRes])));
 	const result = prepRes(rawRes);
 	assert.equal(result, expected);
 	console.timeEnd('PASS');
@@ -32,11 +32,11 @@ let allTests = 0;
 let skippedTests = 0;
 console.time('tests in');
 for (const [processorName, procTests] of Object.entries(tests)) {
-	const loadedTests = require(procTests);
+	const loadedTests = (await import(procTests)).default;
 	for (const test of loadedTests) {
 		allTests++;
 		if (test.enabled) {
-			testProcessor(`[${processorName}] ${test.name}`.padEnd(90, '.'), require(test.processors), test.source, test.expected, test.prepareTest, test.prepareResult);
+			testProcessor(`[${processorName}] ${test.name}`.padEnd(90, '.'), await import(test.processors), test.source, test.expected, test.prepareTest, test.prepareResult);
 		} else {
 			skippedTests++;
 			console.log(`[${processorName}] ${test.name}...`.padEnd(101, '.') + ` SKIPPED: ${test.reason}`);

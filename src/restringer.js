@@ -1,23 +1,28 @@
 #!/usr/bin/env node
-const {logger, applyIteratively} = require('flast').utils;
-const processors = require(__dirname + '/processors');
-const detectObfuscation = require('obfuscation-detector');
-const version = require(__dirname + '/../package').version;
-const {
-	utils: {
-		normalizeScript,
-	},
-	safe,
-	unsafe,
-	config: {
-		setGlobalMaxIterations,
-	}
-} = require(__dirname + '/modules');
+import {utils as flastUtils} from 'flast';
+const {logger, applyIteratively} = flastUtils;
+import {fileURLToPath} from 'node:url';
+import {processors} from './processors/index.js';
+import detectObfuscation from 'obfuscation-detector';
+// eslint-disable-next-line no-unexpected-multiline
+import pkg from '../package.json' assert {type: 'json'};
+const { version } = pkg;
+import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';
+const {normalizeScript} = utils.default;
+const {setGlobalMaxIterations} = config;
+const safe = {};
+for (const funcName in safeMod) {
+	safe[funcName] = safeMod[funcName].default || safeMod[funcName];
+}
+const unsafe = {};
+for (const funcName in unsafeMod) {
+	unsafe[funcName] = unsafeMod[funcName].default || unsafeMod[funcName];
+}
 
 // Silence asyc errors
-process.on('uncaughtException', () => {});
+// process.on('uncaughtException', () => {});
 
-class REstringer {
+export class REstringer {
 	static __version__ = version;
 
 	/**
@@ -88,7 +93,7 @@ class REstringer {
 		if (detectedObfuscationType) {
 			this.obfuscationName = detectedObfuscationType;
 			if (processors[detectedObfuscationType]) {
-				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]());
+				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]);
 			}
 		}
 		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
@@ -146,13 +151,12 @@ class REstringer {
 	}
 }
 
-module.exports = REstringer;
-if (require.main === module) {
-	const {argsAreValid, parseArgs} = require(__dirname + '/utils/parseArgs');
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+	const {argsAreValid, parseArgs} = await import('./utils/parseArgs.js');
 	try {
 		const args = parseArgs(process.argv.slice(2));
 		if (argsAreValid(args)) {
-			const fs = require('node:fs');
+			const fs = await import('node:fs');
 			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
 
