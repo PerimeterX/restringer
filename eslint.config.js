@@ -18,7 +18,9 @@ export default [
 			'tests/resources',
 			'**/jquery*.js',
 			'**/*tmp*.*',
-			'**/*tmp*/'
+			'**/*tmp*/',
+			"eslint.config.js",
+			"node_modules/",
 		],
 	},
 	...compat.extends('eslint:recommended'),
