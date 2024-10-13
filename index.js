@@ -1,3 +1,3 @@
-export const REstringer = (await import('./src/restringer.js')).REstringer;
-export const deobModules = await import('./src/modules/index.js');
-export const processors = await import('./src/processors/index.js');
+export * from './src/restringer.js';
+export * from './src/modules/index.js';
+export * from './src/processors/index.js';
