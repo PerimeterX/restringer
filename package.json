@@ -18,7 +18,8 @@
     "obfuscation-detector": "^2.0.0"
   },
   "scripts": {
-    "test": "node --trace-warnings --no-node-snapshot --experimental-json-modules tests/testRestringer.js"
+    "test": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules",
+    "test:coverage": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules --experimental-test-coverage"
   },
   "repository": {
     "type": "git",
