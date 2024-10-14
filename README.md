@@ -86,11 +86,11 @@ The basic structure of such a deobfuscator would be an array of deobfuscation mo
 Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.com/package/isolated-vm) to be on the safe side) while safe modules do not.
 
 ```javascript
-const {
-  safe: {normalizeComputed},
-  unsafe: {resolveDefiniteBinaryExpressions, resolveLocalCalls},
-} = require('restringer').deobModules;
-const {applyIteratively} = require('flast').utils;
+import {safe, unsafe} from 'restringer';
+const {normalizeComputed} = safe;
+const {resolveDefiniteBinaryExpressions, resolveLocalCalls} = unsafe;
+import {utils} from 'flast';
+const {applyIteratively} = utils;
 let script = 'obfuscated JS here';
 const deobModules = [
   resolveDefiniteBinaryExpressions,
@@ -103,10 +103,10 @@ console.log(script); // Deobfuscated script
 
 With the additional `candidateFilter` function argument, it's possible to narrow down the targeted nodes:
 ```javascript
-const {
-  unsafe: {resolveLocalCalls},
-} = require('restringer').deobModules;
-const {applyIteratively} = require('flast').utils;
+import {unsafe} from 'restringer';
+const {resolveLocalCalls} = unsafe;
+import {utils} from 'flast';
+const {applyIteratively} = utils;
 let script = 'obfuscated JS here';
 
 // It's better to define a function with a meaningful name that can show up in the log 
@@ -119,8 +119,8 @@ console.log(script); // Deobfuscated script
 
 You can also customize any deobfuscation method while still using REstringer without running the loop yourself:
 ```javascript
-const fs = require('node:fs');
-const {REstringer} = require('restringer');
+import fs from 'node:fs';
+import {REstringer} from 'restringer';
 
 const inputFilename = process.argv[2];
 const code = fs.readFileSync(inputFilename, 'utf-8');
@@ -145,9 +145,10 @@ if (res.script !== code) {
 
 ### Boilerplate code for starting from scratch
 ```javascript
-const {logger, applyIteratively, treeModifier} = require('flast').utils;
+import {utils} from 'flast';
+const {applyIteratively, treeModifier, logger} = utils;
 // Optional loading from file
-// const fs = require('node:fs');
+// import fs from 'node:fs';
 // const inputFilename = process.argv[2] || 'target.js';
 // const code = fs.readFileSync(inputFilename, 'utf-8');
 const code = `(function() {
@@ -178,7 +179,6 @@ if (code !== script) {
 
 ## Read More
 * [Processors](src/processors/README.md)
-* [Tests](tests/README.md)
 * [Contribution guide](CONTRIBUTING.md)
 * [Obfuscation Detector](https://github.com/PerimeterX/obfuscation-detector/blob/main/README.md)
 * [flAST](https://github.com/PerimeterX/flast/blob/main/README.md)
