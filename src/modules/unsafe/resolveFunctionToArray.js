@@ -2,13 +2,10 @@
  * Function To Array Replacements
  * The obfuscated script dynamically generates an array which is referenced throughout the script.
  */
+import utils from '../utils/index.js';
 import {Sandbox} from '../utils/sandbox.js';
 import {evalInVm} from '../utils/evalInVm.js';
-import utils from '../utils/index.js';
-const {
-	createOrderedSrc,
-	getDeclarationWithContext,
-} = utils;
+const {createOrderedSrc, getDeclarationWithContext} = utils;
 import {badValue} from '../config.js';
 
 /**
