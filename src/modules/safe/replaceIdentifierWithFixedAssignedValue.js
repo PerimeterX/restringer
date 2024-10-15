@@ -1,4 +1,4 @@
-const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
+import {areReferencesModified} from '../utils/areReferencesModified.js';
 
 /**
  * When an identifier holds a static literal value, replace all references to it with the value.
@@ -24,4 +24,4 @@ function replaceIdentifierWithFixedAssignedValue(arb, candidateFilter = () => tr
 	return arb;
 }
 
-module.exports = replaceIdentifierWithFixedAssignedValue;
+export default replaceIdentifierWithFixedAssignedValue;

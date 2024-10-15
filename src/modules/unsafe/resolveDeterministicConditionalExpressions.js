@@ -1,5 +1,5 @@
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
 
 /**
  * Evaluate resolvable (independent) conditional expressions and replace them with their unchanged resolution.
@@ -26,4 +26,4 @@ function resolveDeterministicConditionalExpressions(arb, candidateFilter = () =>
 	return arb;
 }
 
-module.exports = resolveDeterministicConditionalExpressions;
+export default resolveDeterministicConditionalExpressions;

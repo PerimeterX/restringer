@@ -7,4 +7,4 @@ function getObjType(unknownObject) {
 	return match ? match[1] : '';
 }
 
-module.exports = getObjType;
+export {getObjType};

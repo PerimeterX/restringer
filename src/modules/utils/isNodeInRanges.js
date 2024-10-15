@@ -12,4 +12,4 @@ function isNodeInRanges(targetNode, ranges) {
 	return false;
 }
 
-module.exports = isNodeInRanges;
+export {isNodeInRanges};

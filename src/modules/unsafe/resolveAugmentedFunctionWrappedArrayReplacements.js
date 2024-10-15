@@ -1,7 +1,7 @@
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const getDescendants = require(__dirname + '/../utils/getDescendants');
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {getDescendants} from '../utils/getDescendants.js';
 
 /**
  * A special case of function array replacement where the function is wrapped in another function, the array is
@@ -11,7 +11,7 @@ const getDescendants = require(__dirname + '/../utils/getDescendants');
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter = () => true) {
+export default function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'FunctionDeclaration' && n.id &&
@@ -66,5 +66,3 @@ function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter =
 	}
 	return arb;
 }
-
-module.exports = resolveAugmentedFunctionWrappedArrayReplacements;

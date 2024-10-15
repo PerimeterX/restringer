@@ -29,4 +29,4 @@ function unwrapFunctionShells(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = unwrapFunctionShells;
+export default unwrapFunctionShells;

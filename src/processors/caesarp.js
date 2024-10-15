@@ -1,5 +1,7 @@
-const {Arborist} = require('flast');
-const {safe: {removeDeadNodes}, utils: {evalWithDom}} = require(__dirname + '/../modules');
+import {Arborist} from 'flast';
+import {safe, utils} from '../modules/index.js';
+const {removeDeadNodes} = safe;
+const {evalWithDom} = utils.default;
 
 const lineWithFinalAssignmentRegex = /(\w{3})\[.*]\s*=.*\((\w{3})\).*=\s*\1\s*\+\s*['"]/ms;
 const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;
@@ -50,7 +52,5 @@ function extractInnerLayer(arb) {
 	return arb;
 }
 
-module.exports = {
-	preprocessors: [extractInnerLayer],
-	postprocessors: [removeDeadNodes],
-};
+export const preprocessors = [extractInnerLayer];
+export const postprocessors = [removeDeadNodes.default];

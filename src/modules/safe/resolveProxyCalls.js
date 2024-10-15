@@ -48,4 +48,4 @@ function resolveProxyCalls(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveProxyCalls;
+export default resolveProxyCalls;

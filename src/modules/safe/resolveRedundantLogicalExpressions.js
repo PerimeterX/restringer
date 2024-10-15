@@ -47,4 +47,4 @@ function resolveRedundantLogicalExpressions(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveRedundantLogicalExpressions;
+export default resolveRedundantLogicalExpressions;

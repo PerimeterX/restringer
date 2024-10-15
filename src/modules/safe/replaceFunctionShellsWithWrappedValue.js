@@ -24,4 +24,4 @@ function replaceFunctionShellsWithWrappedValue(arb, candidateFilter = () => true
 	return arb;
 }
 
-module.exports = replaceFunctionShellsWithWrappedValue;
+export default replaceFunctionShellsWithWrappedValue;

@@ -16,4 +16,4 @@ function doesBinaryExpressionContainOnlyLiterals(binaryExpression) {
 	return false;
 }
 
-module.exports = doesBinaryExpressionContainOnlyLiterals;
+export {doesBinaryExpressionContainOnlyLiterals};

@@ -1,4 +1,5 @@
-const {logger} = require('flast').utils;
+import {utils} from 'flast';
+const {logger} = utils;
 
 const minArrayLength = 20;
 
@@ -35,4 +36,4 @@ function resolveMemberExpressionReferencesToArrayIndex(arb, candidateFilter = ()
 	return arb;
 }
 
-module.exports = resolveMemberExpressionReferencesToArrayIndex;
+export default resolveMemberExpressionReferencesToArrayIndex;

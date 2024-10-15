@@ -8,26 +8,14 @@ const badIdentifierCharsRegex = /([:!@#%^&*(){}[\]\\|/`'"]|[^\da-zA-Z_$])/;
 const badValue = '--BAD-VAL--';
 
 // Do not repeate more than this many iterations.
-const defaultMaxIterations = 500;
-
-// The global maximum allowed iterations of runLoop. Value of -1 means unlimited.
-let globalMaxIterations = -1;
-
-/**
- * @return {number} The global maximum allowed iterations of runLoop. Value of -1 means unlimited.
- */
-function getGlobalMaxIterations() {
-	return globalMaxIterations;
-}
+// Behaves like a number, but decrements each time it's used.
+// Use defaultMaxIterations.value = 300 to set a new value.
+const defaultMaxIterations = {
+	value: 500,
+	valueOf() {return this.value--;},
+};
 
 const propertiesThatModifyContent = ['push', 'forEach', 'pop', 'insert', 'add', 'set', 'delete'];
-
-/**
- * @param {number} num The number of allowed iterations across all runs. Set to -1 to disable limit.
- */
-function setGlobalMaxIterations(num) {
-	globalMaxIterations = num;
-}
 
 // Builtin functions that shouldn't be resolved in the deobfuscation context.
 const skipBuiltinFunctions = [
@@ -49,14 +37,12 @@ const skipProperties = [
 // A regex for a valid identifier name.
 const validIdentifierBeginning = /^[A-Za-z$_]/;
 
-module.exports = {
+export {
 	badArgumentTypes,
 	badIdentifierCharsRegex,
 	badValue,
 	defaultMaxIterations,
 	propertiesThatModifyContent,
-	setGlobalMaxIterations,
-	getGlobalMaxIterations,
 	skipBuiltinFunctions,
 	skipIdentifiers,
 	skipProperties,

@@ -18,4 +18,4 @@ function canUnaryExpressionBeResolved(argument) {
 	return true;
 }
 
-module.exports = canUnaryExpressionBeResolved;
+export {canUnaryExpressionBeResolved};

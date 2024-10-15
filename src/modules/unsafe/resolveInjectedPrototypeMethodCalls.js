@@ -1,9 +1,10 @@
-const {logger} = require('flast').utils;
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
-const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
+import {utils} from 'flast';
+const {logger} = utils;
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {createOrderedSrc} from '../utils/createOrderedSrc.js';
+import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
 
 /**
  * Resolve call expressions which are defined on an object's prototype and are applied to an object's instance.
@@ -14,7 +15,7 @@ const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationW
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) {
+export default function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'AssignmentExpression' &&
@@ -44,5 +45,3 @@ function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) 
 	}
 	return arb;
 }
-
-module.exports = resolveInjectedPrototypeMethodCalls;

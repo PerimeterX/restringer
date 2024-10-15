@@ -1,23 +1,26 @@
 #!/usr/bin/env node
-const {logger, applyIteratively} = require('flast').utils;
-const processors = require(__dirname + '/processors');
-const detectObfuscation = require('obfuscation-detector');
-const version = require(__dirname + '/../package').version;
-const {
-	utils: {
-		normalizeScript,
-	},
-	safe,
-	unsafe,
-	config: {
-		setGlobalMaxIterations,
-	}
-} = require(__dirname + '/modules');
+import {utils as flastUtils} from 'flast';
+const {logger, applyIteratively} = flastUtils;
+import {fileURLToPath} from 'node:url';
+import {processors} from './processors/index.js';
+import {detectObfuscation} from 'obfuscation-detector';
+import pkg from '../package.json' assert {type: 'json'};
+const { version } = pkg;
+import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';
+const {normalizeScript} = utils.default;
+const safe = {};
+for (const funcName in safeMod) {
+	safe[funcName] = safeMod[funcName].default || safeMod[funcName];
+}
+const unsafe = {};
+for (const funcName in unsafeMod) {
+	unsafe[funcName] = unsafeMod[funcName].default || unsafeMod[funcName];
+}
 
 // Silence asyc errors
-process.on('uncaughtException', () => {});
+// process.on('uncaughtException', () => {});
 
-class REstringer {
+export class REstringer {
 	static __version__ = version;
 
 	/**
@@ -33,6 +36,7 @@ class REstringer {
 		this._postprocessors = [];
 		this.logger = logger;
 		this.logger.setLogLevelLog();
+		this.maxIterations = config.defaultMaxIterations;
 		this.detectObfuscationType = true;
 		// Deobfuscation methods that don't use eval
 		this.safeMethods = [
@@ -88,7 +92,7 @@ class REstringer {
 		if (detectedObfuscationType) {
 			this.obfuscationName = detectedObfuscationType;
 			if (processors[detectedObfuscationType]) {
-				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]());
+				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]);
 			}
 		}
 		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
@@ -105,7 +109,7 @@ class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = applyIteratively(this.script, this.safeMethods.concat(this.unsafeMethods));
+			script = applyIteratively(this.script, this.safeMethods.concat(this.unsafeMethods), this.maxIterations);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -129,7 +133,7 @@ class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.modified && this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = applyIteratively(this.script, [unsafe.removeDeadNodes]);
+		if (clean) this.script = applyIteratively(this.script, [unsafe.removeDeadNodes], this.maxIterations);
 		return this.modified;
 	}
 
@@ -146,13 +150,12 @@ class REstringer {
 	}
 }
 
-module.exports = REstringer;
-if (require.main === module) {
-	const {argsAreValid, parseArgs} = require(__dirname + '/utils/parseArgs');
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+	const {argsAreValid, parseArgs} = await import('./utils/parseArgs.js');
 	try {
 		const args = parseArgs(process.argv.slice(2));
 		if (argsAreValid(args)) {
-			const fs = require('node:fs');
+			const fs = await import('node:fs');
 			let content = fs.readFileSync(args.inputFilename, 'utf-8');
 			const startTime = Date.now();
 
@@ -162,7 +165,7 @@ if (require.main === module) {
 			logger.log(`[!] REstringer v${REstringer.__version__}`);
 			logger.log(`[!] Deobfuscating ${args.inputFilename}...`);
 			if (args.maxIterations) {
-				setGlobalMaxIterations(args.maxIterations);
+				restringer.maxIterations.value = args.maxIterations;
 				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
 			}
 			if (restringer.deobfuscate()) {

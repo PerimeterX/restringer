@@ -1,4 +1,4 @@
-function printHelp() {
+export function printHelp() {
 	return `
 REstringer - a JavaScript deobfuscator
 
@@ -18,7 +18,7 @@ optional arguments:
                                   Use <input_filename>-deob.js if no filename is provided.`;
 }
 
-function parseArgs(args) {
+export function parseArgs(args) {
 	let opts;
 	try {
 		const inputFilename = args[0] && args[0][0] !== '-' ? args[0] : '';
@@ -37,7 +37,6 @@ function parseArgs(args) {
 			if (opts.outputToFile && /-o|--output/.exec(args[i])) {
 				if (args[i].includes('=')) opts.outputFilename = args[i].split('=')[1];
 				else if (args[i + 1] && args[i + 1][0] !== '-') opts.outputFilename = args[i + 1];
-				break;
 			} else if (opts.maxIterations && /-m|--max-iterations/.exec(args[i])) {
 				if (args[i].includes('=')) opts.maxIterations = Number(args[i].split('=')[1]);
 				else if (args[i + 1] && args[i + 1][0] !== '-') opts.maxIterations = Number(args[i + 1]);
@@ -52,18 +51,11 @@ function parseArgs(args) {
  * @param {object} args The parsed arguments
  * @returns {boolean} true if all arguments are valid; false otherwise.
  */
-function argsAreValid(args) {
+export function argsAreValid(args) {
 	if (args.help) console.log(printHelp());
 	else if (!args.inputFilename) console.log(`Error: Input filename must be provided`);
 	else if (args.verbose && args.quiet) console.log(`Error: Don't set both -q and -v at the same time *smh*`);
-	else if (args.maxIterations !== false && Number.isNaN(parseInt(args.maxIterations))) console.log(`Error: --max-iterations requires a number larger than 0 (e.g. --max-iterations 12)`);
+	else if (args.maxIterations !== false && (Number.isNaN(parseInt(args.maxIterations)) || parseInt(args.maxIterations) <= 0)) console.log(`Error: --max-iterations requires a number larger than 0 (e.g. --max-iterations 12)`);
 	else return true;
 	return false;
 }
-
-// noinspection JSUnusedGlobalSymbols
-module.exports = {
-	argsAreValid,
-	parseArgs,
-	printHelp,
-};

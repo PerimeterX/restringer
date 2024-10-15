@@ -40,4 +40,4 @@ function simplifyIfStatements(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = simplifyIfStatements;
+export default simplifyIfStatements;

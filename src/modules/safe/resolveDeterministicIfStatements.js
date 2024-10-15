@@ -26,4 +26,4 @@ function resolveDeterministicIfStatements(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveDeterministicIfStatements;
+export default resolveDeterministicIfStatements;

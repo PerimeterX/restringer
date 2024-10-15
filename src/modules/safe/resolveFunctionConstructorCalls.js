@@ -1,4 +1,4 @@
-const {generateFlatAST} = require('flast');
+import {generateFlatAST} from 'flast';
 
 /**
  * Typical for packers, function constructor calls where the last argument
@@ -35,4 +35,4 @@ function resolveFunctionConstructorCalls(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveFunctionConstructorCalls;
+export default resolveFunctionConstructorCalls;

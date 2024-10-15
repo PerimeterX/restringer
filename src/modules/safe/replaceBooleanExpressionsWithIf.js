@@ -41,4 +41,4 @@ function replaceBooleanExpressionsWithIf(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = replaceBooleanExpressionsWithIf;
+export default replaceBooleanExpressionsWithIf;

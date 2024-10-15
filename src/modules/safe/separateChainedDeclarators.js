@@ -48,4 +48,4 @@ function separateChainedDeclarators(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = separateChainedDeclarators;
+export default separateChainedDeclarators;

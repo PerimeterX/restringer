@@ -1,4 +1,9 @@
-const relevantParents = ['VariableDeclarator', 'AssignmentExpression', 'FunctionDeclaration', 'ClassDeclaration'];
+const relevantParents = [
+	'VariableDeclarator',
+	'AssignmentExpression',
+	'FunctionDeclaration',
+	'ClassDeclaration',
+];
 
 /**
  * Remove nodes code which is only declared but never used.
@@ -24,4 +29,4 @@ function removeDeadNodes(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = removeDeadNodes;
+export default removeDeadNodes;

@@ -1,9 +1,9 @@
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const {badValue, skipProperties} = require(__dirname + '/../config');
-const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
-const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
-const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
-const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/getMainDeclaredObjectOfMemberExpression');
+import {evalInVm} from '../utils/evalInVm.js';
+import {badValue, skipProperties} from '../config.js';
+import {createOrderedSrc} from '../utils/createOrderedSrc.js';
+import {areReferencesModified} from '../utils/areReferencesModified.js';
+import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
+import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredObjectOfMemberExpression.js';
 
 /**
  * Resolve member expressions to the value they stand for, if they're defined in the script.
@@ -19,7 +19,7 @@ const getMainDeclaredObjectOfMemberExpression = require(__dirname + '/../utils/g
  * @param {Function} candidateFilter (optional) a filter to apply on the candidates list
  * @return {Arborist}
  */
-function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => true) {
+export default function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'MemberExpression' &&
@@ -77,5 +77,3 @@ function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => tr
 	}
 	return arb;
 }
-
-module.exports = resolveMemberExpressionsLocalReferences;

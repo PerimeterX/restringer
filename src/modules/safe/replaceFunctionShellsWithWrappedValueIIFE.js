@@ -20,4 +20,4 @@ function replaceFunctionShellsWithWrappedValueIIFE(arb, candidateFilter = () => 
 	return arb;
 }
 
-module.exports = replaceFunctionShellsWithWrappedValueIIFE;
+export default replaceFunctionShellsWithWrappedValueIIFE;

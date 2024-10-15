@@ -1,7 +1,7 @@
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const canUnaryExpressionBeResolved = require(__dirname + '/../utils/canUnaryExpressionBeResolved');
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {canUnaryExpressionBeResolved} from '../utils/canUnaryExpressionBeResolved.js';
 
 const relevantNodeTypes = ['Literal', 'ArrayExpression', 'ObjectExpression', 'UnaryExpression'];
 
@@ -29,4 +29,4 @@ function normalizeRedundantNotOperator(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = normalizeRedundantNotOperator;
+export default normalizeRedundantNotOperator;

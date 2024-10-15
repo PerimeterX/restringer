@@ -58,4 +58,4 @@ function rearrangeSequences(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = rearrangeSequences;
+export default rearrangeSequences;

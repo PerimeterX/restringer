@@ -17,4 +17,4 @@ function normalizeEmptyStatements(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = normalizeEmptyStatements;
+export default normalizeEmptyStatements;

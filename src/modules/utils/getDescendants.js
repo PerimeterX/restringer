@@ -21,4 +21,4 @@ function getDescendants(targetNode) {
 	return offsprings;
 }
 
-module.exports = getDescendants;
+export {getDescendants};

@@ -52,4 +52,4 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = unwrapIIFEs;
+export default unwrapIIFEs;

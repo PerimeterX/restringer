@@ -1,4 +1,4 @@
-const areReferencesModified = require(__dirname + '/../utils/areReferencesModified');
+import {areReferencesModified} from '../utils/areReferencesModified.js';
 
 /**
  * Replace proxied variables with their intended target.
@@ -25,4 +25,4 @@ function resolveProxyVariables(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveProxyVariables;
+export default resolveProxyVariables;

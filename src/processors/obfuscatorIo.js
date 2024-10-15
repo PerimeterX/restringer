@@ -2,7 +2,7 @@
  * Obfuscator.io obfuscation
  * The obfuscator optionally adds 'debug protection' methods that when triggered, result in an endless loop.
  */
-const augmentedArrayProcessors = require(__dirname + '/augmentedArray');
+import * as augmentedArrayProcessors from './augmentedArray.js';
 
 const freezeReplacementString = 'function () {return "bypassed!"}';
 
@@ -41,7 +41,5 @@ function freezeUnbeautifiedValues(arb) {
 	return arb;
 }
 
-module.exports = {
-	preprocessors: [freezeUnbeautifiedValues, ...augmentedArrayProcessors.preprocessors],
-	postprocessors: [...augmentedArrayProcessors.postprocessors],
-};
+export const preprocessors = [freezeUnbeautifiedValues, ...augmentedArrayProcessors.preprocessors];
+export const postprocessors = [...augmentedArrayProcessors.postprocessors];

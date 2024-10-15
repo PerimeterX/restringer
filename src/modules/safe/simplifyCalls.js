@@ -26,4 +26,4 @@ function simplifyCalls(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = simplifyCalls;
+export default simplifyCalls;

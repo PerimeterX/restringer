@@ -1,32 +1,30 @@
-module.exports = {
-	normalizeComputed: require(__dirname + '/normalizeComputed'),
-	normalizeEmptyStatements: require(__dirname + '/normalizeEmptyStatements'),
-	parseTemplateLiteralsIntoStringLiterals: require(__dirname + '/parseTemplateLiteralsIntoStringLiterals'),
-	rearrangeSequences: require(__dirname + '/rearrangeSequences'),
-	rearrangeSwitches: require(__dirname + '/rearrangeSwitches'),
-	removeDeadNodes: require(__dirname + '/removeDeadNodes'),
-	removeRedundantBlockStatements: require(__dirname + '/removeRedundantBlockStatements'),
-	replaceBooleanExpressionsWithIf: require(__dirname + '/replaceBooleanExpressionsWithIf'),
-	replaceCallExpressionsWithUnwrappedIdentifier: require(__dirname + '/replaceCallExpressionsWithUnwrappedIdentifier'),
-	replaceEvalCallsWithLiteralContent: require(__dirname + '/replaceEvalCallsWithLiteralContent'),
-	replaceFunctionShellsWithWrappedValue: require(__dirname + '/replaceFunctionShellsWithWrappedValue'),
-	replaceFunctionShellsWithWrappedValueIIFE: require(__dirname + '/replaceFunctionShellsWithWrappedValueIIFE'),
-	replaceIdentifierWithFixedAssignedValue: require(__dirname + '/replaceIdentifierWithFixedAssignedValue'),
-	replaceIdentifierWithFixedValueNotAssignedAtDeclaration: require(__dirname + '/replaceIdentifierWithFixedValueNotAssignedAtDeclaration'),
-	replaceNewFuncCallsWithLiteralContent: require(__dirname + '/replaceNewFuncCallsWithLiteralContent'),
-	replaceSequencesWithExpressions: require(__dirname + '/replaceSequencesWithExpressions'),
-	resolveDeterministicIfStatements: require(__dirname + '/resolveDeterministicIfStatements'),
-	resolveFunctionConstructorCalls: require(__dirname + '/resolveFunctionConstructorCalls'),
-	resolveMemberExpressionReferencesToArrayIndex: require(__dirname + '/resolveMemberExpressionReferencesToArrayIndex'),
-	resolveMemberExpressionsWithDirectAssignment: require(__dirname + '/resolveMemberExpressionsWithDirectAssignment'),
-	resolveProxyCalls: require(__dirname + '/resolveProxyCalls'),
-	resolveProxyReferences: require(__dirname + '/resolveProxyReferences'),
-	resolveProxyVariables: require(__dirname + '/resolveProxyVariables'),
-	resolveRedundantLogicalExpressions: require(__dirname + '/resolveRedundantLogicalExpressions'),
-	separateChainedDeclarators: require(__dirname + '/separateChainedDeclarators'),
-	simplifyCalls: require(__dirname + '/simplifyCalls'),
-	simplifyIfStatements: require(__dirname + '/simplifyIfStatements'),
-	unwrapFunctionShells: require(__dirname + '/unwrapFunctionShells'),
-	unwrapIIFEs: require(__dirname + '/unwrapIIFEs'),
-	unwrapSimpleOperations: require(__dirname + '/unwrapSimpleOperations'),
-};
+export const normalizeComputed = await import('./normalizeComputed.js');
+export const normalizeEmptyStatements = await import('./normalizeEmptyStatements.js');
+export const parseTemplateLiteralsIntoStringLiterals = await import('./parseTemplateLiteralsIntoStringLiterals.js');
+export const rearrangeSequences = await import('./rearrangeSequences.js');
+export const rearrangeSwitches = await import('./rearrangeSwitches.js');
+export const removeDeadNodes = await import('./removeDeadNodes.js');
+export const removeRedundantBlockStatements = await import('./removeRedundantBlockStatements.js');
+export const replaceBooleanExpressionsWithIf = await import('./replaceBooleanExpressionsWithIf.js');
+export const replaceCallExpressionsWithUnwrappedIdentifier = await import('./replaceCallExpressionsWithUnwrappedIdentifier.js');
+export const replaceEvalCallsWithLiteralContent = await import('./replaceEvalCallsWithLiteralContent.js');
+export const replaceFunctionShellsWithWrappedValue = await import('./replaceFunctionShellsWithWrappedValue.js');
+export const replaceFunctionShellsWithWrappedValueIIFE = await import('./replaceFunctionShellsWithWrappedValueIIFE.js');
+export const replaceIdentifierWithFixedAssignedValue = await import('./replaceIdentifierWithFixedAssignedValue.js');
+export const replaceIdentifierWithFixedValueNotAssignedAtDeclaration = await import('./replaceIdentifierWithFixedValueNotAssignedAtDeclaration.js');
+export const replaceNewFuncCallsWithLiteralContent = await import('./replaceNewFuncCallsWithLiteralContent.js');
+export const replaceSequencesWithExpressions = await import('./replaceSequencesWithExpressions.js');
+export const resolveDeterministicIfStatements = await import('./resolveDeterministicIfStatements.js');
+export const resolveFunctionConstructorCalls = await import('./resolveFunctionConstructorCalls.js');
+export const resolveMemberExpressionReferencesToArrayIndex = await import('./resolveMemberExpressionReferencesToArrayIndex.js');
+export const resolveMemberExpressionsWithDirectAssignment = await import('./resolveMemberExpressionsWithDirectAssignment.js');
+export const resolveProxyCalls = await import('./resolveProxyCalls.js');
+export const resolveProxyReferences = await import('./resolveProxyReferences.js');
+export const resolveProxyVariables = await import('./resolveProxyVariables.js');
+export const resolveRedundantLogicalExpressions = await import('./resolveRedundantLogicalExpressions.js');
+export const separateChainedDeclarators = await import('./separateChainedDeclarators.js');
+export const simplifyCalls = await import('./simplifyCalls.js');
+export const simplifyIfStatements = await import('./simplifyIfStatements.js');
+export const unwrapFunctionShells = await import('./unwrapFunctionShells.js');
+export const unwrapIIFEs = await import('./unwrapIIFEs.js');
+export const unwrapSimpleOperations = await import('./unwrapSimpleOperations.js');

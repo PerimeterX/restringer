@@ -1,9 +1,9 @@
-const {parseCode} = require('flast');
-const {badValue} = require(__dirname + '/../config');
-const Sandbox = require(__dirname + '/../utils/sandbox');
-const evalInVm = require(__dirname + '/../utils/evalInVm');
-const createOrderedSrc = require(__dirname + '/../utils/createOrderedSrc');
-const getDeclarationWithContext = require(__dirname + '/../utils/getDeclarationWithContext');
+import {parseCode} from 'flast';
+import {badValue} from '../config.js';
+import {Sandbox} from '../utils/sandbox.js';
+import {evalInVm} from '../utils/evalInVm.js';
+import {createOrderedSrc} from '../utils/createOrderedSrc.js';
+import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
 
 /**
  * Resolve eval call expressions where the argument isn't a literal.
@@ -54,4 +54,4 @@ function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
 	return arb;
 }
 
-module.exports = resolveEvalCallsOnNonLiterals;
+export default resolveEvalCallsOnNonLiterals;

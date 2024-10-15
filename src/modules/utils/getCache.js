@@ -17,4 +17,4 @@ getCache.flush = function() {
 	cache = {};
 };
 
-module.exports = getCache;
+export {getCache};

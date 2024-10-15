@@ -3,6 +3,7 @@
   "version": "1.10.4",
   "description": "Deobfuscate Javascript with emphasis on reconstructing strings",
   "main": "index.js",
+  "type": "module",
   "bin": {
     "restringer": "./src/restringer.js"
   },
@@ -11,13 +12,14 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^1.7.1",
+    "flast": "^2.0.0",
     "isolated-vm": "^5.0.1",
-    "jsdom": "^24.1.0",
-    "obfuscation-detector": "^1.1.7"
+    "jsdom": "^25.0.1",
+    "obfuscation-detector": "^2.0.0"
   },
   "scripts": {
-    "test": "node --trace-warnings tests/testRestringer.js"
+    "test": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules",
+    "test:coverage": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules --experimental-test-coverage"
   },
   "repository": {
     "type": "git",
@@ -31,14 +33,16 @@
     "javascript",
     "AST"
   ],
-  "author": "ben.baryo@humansecurity.com",
+  "author": "Ben Baryo (ben.baryo@humansecurity.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PerimeterX/Restringer/issues"
   },
   "homepage": "https://github.com/PerimeterX/Restringer#readme",
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "husky": "^8.0.3"
+    "@babel/eslint-parser": "^7.25.8",
+    "@babel/plugin-syntax-import-assertions": "^7.25.7",
+    "eslint": "^9.12.0",
+    "husky": "^9.1.6"
   }
 }
