@@ -17,26 +17,26 @@ describe('parseArgs tests', () => {
 		});
 	});
 	it('TP-2: All on - short', () => {
-		assert.deepEqual(parseArgs(['input.js', '-h', '-c', '-q', '-v', '-o', '-m']), {
+		assert.deepEqual(parseArgs(['input.js', '-h', '-c', '-q', '-v', '-o', '-m', '1']), {
 			inputFilename: 'input.js',
 			help: true,
 			clean: true,
 			quiet: true,
 			verbose: true,
 			outputToFile: true,
-			maxIterations: true,
+			maxIterations: 1,
 			outputFilename: 'input.js-deob.js'
 		});
 	});
 	it('TP-3: All on - full', () => {
-		assert.deepEqual(parseArgs(['input.js', '--help', '--clean', '--quiet', '--verbose', '--output', '--max-iterations']), {
+		assert.deepEqual(parseArgs(['input.js', '--help', '--clean', '--quiet', '--verbose', '--output', '--max-iterations=1']), {
 			inputFilename: 'input.js',
 			help: true,
 			clean: true,
 			quiet: true,
 			verbose: true,
 			outputToFile: true,
-			maxIterations: true,
+			maxIterations: 1,
 			outputFilename: 'input.js-deob.js'
 		});
 	});

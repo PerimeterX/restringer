@@ -8,7 +8,6 @@ import pkg from '../package.json' assert {type: 'json'};
 const { version } = pkg;
 import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';
 const {normalizeScript} = utils.default;
-const {setGlobalMaxIterations} = config;
 const safe = {};
 for (const funcName in safeMod) {
 	safe[funcName] = safeMod[funcName].default || safeMod[funcName];
@@ -37,6 +36,7 @@ export class REstringer {
 		this._postprocessors = [];
 		this.logger = logger;
 		this.logger.setLogLevelLog();
+		this.maxIterations = config.defaultMaxIterations;
 		this.detectObfuscationType = true;
 		// Deobfuscation methods that don't use eval
 		this.safeMethods = [
@@ -109,7 +109,7 @@ export class REstringer {
 		let modified, script;
 		do {
 			this.modified = false;
-			script = applyIteratively(this.script, this.safeMethods.concat(this.unsafeMethods));
+			script = applyIteratively(this.script, this.safeMethods.concat(this.unsafeMethods), this.maxIterations);
 			if (this.script !== script) {
 				this.modified = true;
 				this.script = script;
@@ -133,7 +133,7 @@ export class REstringer {
 		this._loopSafeAndUnsafeDeobfuscationMethods();
 		this._runProcessors(this._postprocessors);
 		if (this.modified && this.normalize) this.script = normalizeScript(this.script);
-		if (clean) this.script = applyIteratively(this.script, [unsafe.removeDeadNodes]);
+		if (clean) this.script = applyIteratively(this.script, [unsafe.removeDeadNodes], this.maxIterations);
 		return this.modified;
 	}
 
@@ -165,7 +165,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 			logger.log(`[!] REstringer v${REstringer.__version__}`);
 			logger.log(`[!] Deobfuscating ${args.inputFilename}...`);
 			if (args.maxIterations) {
-				setGlobalMaxIterations(args.maxIterations);
+				restringer.maxIterations.value = args.maxIterations;
 				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
 			}
 			if (restringer.deobfuscate()) {
