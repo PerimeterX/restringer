@@ -4,7 +4,7 @@ import {describe, it} from 'node:test';
 
 function getDeobfuscatedCode(code) {
 	const restringer = new REstringer(code);
-	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
+	restringer.logger.setLogLevelNone();
 	restringer.deobfuscate();
 	return restringer.script;
 }
