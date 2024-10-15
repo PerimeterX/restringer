@@ -854,3 +854,110 @@ describe('UTILS: areReferencesModified', async () => {
 		assert.deepStrictEqual(result, expected);
 	});
 });
+describe('UTILS: createNewNode', async () => {
+	const targetModule = (await import('../src/modules/utils/createNewNode.js')).createNewNode;
+	it('Literan: String', () => {
+		const code = 'Baryo';
+		const expected = {type: 'Literal', value: 'Baryo', raw: 'Baryo'};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Literal: Number - positive number', () => {
+		const code = 3;
+		const expected = {type: 'Literal', value: 3, raw: '3'};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Literal: Number - negative number', () => {
+		const code = -3;
+		const expected =  {type: 'UnaryExpression', operator: '-', argument: {type: 'Literal', value: '3', raw: '3'}};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Literal: Number - negative infinity', () => {
+		const code = -Infinity;
+		const expected =  {type: 'UnaryExpression', operator: '-', argument: {type: 'Identifier', name: 'Infinity'}};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Literal: Number - NOT operator', () => {
+		const code = '!3';
+		const expected =  {type: 'UnaryExpression', operator: '!', argument: {type: 'Literal', value: '3', raw: '3'}};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Literal: Number - Identifier', () => {
+		const code1 = Infinity;
+		const expected1 =  {type: 'Identifier', name: 'Infinity'};
+		const result1 = targetModule(code1);
+		assert.deepStrictEqual(result1, expected1);
+		const code2 = NaN;
+		const expected2 =  {type: 'Identifier', name: 'NaN'};
+		const result2 = targetModule(code2);
+		assert.deepStrictEqual(result2, expected2);
+	});
+	it('Literal: Boolean', () => {
+		const code = true;
+		const expected = {type: 'Literal', value: true, 'raw': 'true'};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Array: empty', () => {
+		const code = [];
+		const expected = {type: 'ArrayExpression', elements: []};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Array: populated', () => {
+		const code = [1, 'a'];
+		const expected = {type: 'ArrayExpression', elements: [
+			{type: 'Literal', value: 1, raw: '1'},
+			{type: 'Literal', value: 'a', raw: 'a'}
+		]};
+		const result = targetModule(code);
+		assert.deepEqual(result, expected);
+	});
+	it('Object: empty', () => {
+		const code = {};
+		const expected = {type: 'ObjectExpression', properties: []};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Object: populated', () => {
+		const code = {a: 1};
+		const expected = {type: 'ObjectExpression', properties: [{
+			type: 'Property',
+			key: {type: 'Literal', value: 'a', raw: 'a'},
+			value: {type: 'Literal', value: 1, raw: '1'}
+		}]};
+		const result = targetModule(code);
+		assert.deepEqual(result, expected);
+	});
+	it('Object: populated with BadValue', () => {
+		const code = {a() {}};
+		const expected = badValue;
+		const result = targetModule(code);
+		assert.deepEqual(result, expected);
+	});
+	it('Undefined', () => {
+		const code = undefined;
+		const expected = {type: 'Identifier', name: 'undefined'};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it('Null', () => {
+		const code = null;
+		const expected = {type: 'Literal', raw: 'null'};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+	it.todo('TODO: Implement Function', () => {
+	});
+	it('RegExp', () => {
+		const code = /regexp/gi;
+		const expected = {type: 'Literal', regex: {flags: 'gi', pattern: 'regexp'}};
+		const result = targetModule(code);
+		assert.deepStrictEqual(result, expected);
+	});
+
+});
