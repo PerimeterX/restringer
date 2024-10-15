@@ -4,7 +4,6 @@ const {logger, applyIteratively} = flastUtils;
 import {fileURLToPath} from 'node:url';
 import {processors} from './processors/index.js';
 import {detectObfuscation} from 'obfuscation-detector';
-// eslint-disable-next-line no-unexpected-multiline
 import pkg from '../package.json' assert {type: 'json'};
 const { version } = pkg;
 import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';

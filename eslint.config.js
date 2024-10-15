@@ -3,6 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import js from '@eslint/js';
 import {FlatCompat} from '@eslint/eslintrc';
+import babelParser from "@babel/eslint-parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,13 @@ export default [
 	...compat.extends('eslint:recommended'),
 	{
 		languageOptions: {
+			parser: babelParser,
+			parserOptions: {
+				requireConfigFile: false,
+				babelOptions: {
+					plugins: ['@babel/plugin-syntax-import-assertions'],
+				}
+			},
 			globals: {
 				...globals.browser,
 				...globals.node,
