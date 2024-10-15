@@ -1,4 +1,4 @@
-import {badIdentifierCharsRegex, validIdentifierBeginning} from '../config.js'
+import {badIdentifierCharsRegex, validIdentifierBeginning} from '../config.js';
 
 /**
  * Change all member expressions and class methods which has a property which can support it - to non-computed.
