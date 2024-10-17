@@ -4,8 +4,7 @@ import fs from 'node:fs';
 import {Sandbox} from './sandbox.js';
 // eslint-disable-next-line no-unused-vars
 import {JSDOM} from 'jsdom';
-import {utils} from 'flast';
-const {logger} = utils;
+import {logger} from 'flast';
 import {generateHash} from './generateHash.js';
 
 let jQuerySrc = '';

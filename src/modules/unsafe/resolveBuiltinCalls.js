@@ -1,5 +1,4 @@
-import {utils} from 'flast';
-const {logger} = utils;
+import {logger} from 'flast';
 import {badValue} from '../config.js';
 import {Sandbox} from '../utils/sandbox.js';
 import {evalInVm} from '../utils/evalInVm.js';

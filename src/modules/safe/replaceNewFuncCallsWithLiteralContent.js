@@ -1,7 +1,6 @@
 import {getCache} from '../utils/getCache.js';
 import {generateHash} from '../utils/generateHash.js';
-import {generateFlatAST, utils} from 'flast';
-const {logger} = utils;
+import {generateFlatAST, logger} from 'flast';
 
 /**
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.

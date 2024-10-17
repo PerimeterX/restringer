@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-import {utils as flastUtils} from 'flast';
-const {logger, applyIteratively} = flastUtils;
 import {fileURLToPath} from 'node:url';
+import {logger, applyIteratively} from 'flast';
 import {processors} from './processors/index.js';
 import {detectObfuscation} from 'obfuscation-detector';
-import pkg from '../package.json' assert {type: 'json'};
-const { version } = pkg;
 import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';
 const {normalizeScript} = utils.default;
+import {readFileSync} from 'node:fs';
+const __version__ = JSON.parse(readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8')).version;
 const safe = {};
 for (const funcName in safeMod) {
 	safe[funcName] = safeMod[funcName].default || safeMod[funcName];
@@ -21,7 +20,7 @@ for (const funcName in unsafeMod) {
 // process.on('uncaughtException', () => {});
 
 export class REstringer {
-	static __version__ = version;
+	static __version__ = __version__;
 
 	/**
 	 * @param {string} script The target script to be deobfuscated

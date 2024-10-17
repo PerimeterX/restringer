@@ -12,14 +12,14 @@
     "test": "tests"
   },
   "dependencies": {
-    "flast": "^2.0.0",
+    "flast": "^2.0.2",
     "isolated-vm": "^5.0.1",
     "jsdom": "^25.0.1",
-    "obfuscation-detector": "^2.0.0"
+    "obfuscation-detector": "^2.0.1"
   },
   "scripts": {
-    "test": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules",
-    "test:coverage": "node --test --trace-warnings --no-node-snapshot --experimental-json-modules --experimental-test-coverage"
+    "test": "node --test --trace-warnings --no-node-snapshot",
+    "test:coverage": "node --test --trace-warnings --no-node-snapshot --experimental-test-coverage"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "deobfuscate",
     "deobfuscation",
     "JS",
-    "javascript",
+    "javaScript",
     "AST"
   ],
   "author": "Ben Baryo (ben.baryo@humansecurity.com)",

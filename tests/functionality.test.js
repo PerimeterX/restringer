@@ -12,4 +12,7 @@ describe('Functionality tests', () => {
 		restringer.deobfuscate();
 		assert.strictEqual(restringer.script, 'eval(3);');
 	});
+	it('REstringer.__version__ is populated', () => {
+		assert.ok(REstringer.__version__);
+	});
 });
