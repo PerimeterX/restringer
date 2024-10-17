@@ -1,8 +1,9 @@
-const operators = ['+', '-', '*', '/', '%', '&', '|', '&&', '||', '**', '^'];
-const fixes = ['!', '~', '-', '+', '--', '++'];
+const operators = ['+', '-', '*', '/', '%', '&', '|', '&&', '||', '**', '^',
+	'<=', '>=', '<', '>', '==', '===', '!=',
+	'!==', '<<', '>>', '>>>', 'in', 'instanceof', '??'];
+const fixes = ['!', '~', '-', '+', '--', '++', 'typeof'];
 
 /**
- *
  * @param {ASTNode} n
  * @return {boolean}
  */
@@ -16,7 +17,6 @@ function matchBinaryOrLogical(n) {
 }
 
 /**
- *
  * @param {ASTNode} c
  * @param {Arborist} arb
  */
@@ -34,7 +34,6 @@ function handleBinaryOrLogical(c, arb) {
 }
 
 /**
- *
  * @param {ASTNode} n
  * @return {boolean}
  */
@@ -47,12 +46,10 @@ function matchUnary(n) {
 }
 
 /**
- *
  * @param {ASTNode} c
  * @param {Arborist} arb
  */
 function handleUnary(c, arb) {
-	// noinspection JSUnresolvedVariable
 	const refs = (c.scope.block?.id?.references || []).map(r => r.parentNode);
 	for (const ref of refs) {
 		if (ref.arguments.length === 1) arb.markNode(ref, {
