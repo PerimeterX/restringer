@@ -1,5 +1,4 @@
-import {utils} from 'flast';
-const {logger} = utils;
+import {logger} from 'flast';
 
 const minArrayLength = 20;
 

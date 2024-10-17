@@ -2,6 +2,7 @@
 import {utils as flastUtils} from 'flast';
 const {logger, applyIteratively} = flastUtils;
 import {fileURLToPath} from 'node:url';
+import {logger, applyIteratively} from 'flast';
 import {processors} from './processors/index.js';
 import {detectObfuscation} from 'obfuscation-detector';
 import pkg from '../package.json' assert {type: 'json'};

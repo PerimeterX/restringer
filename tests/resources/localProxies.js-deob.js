@@ -1,11 +1,4 @@
 // this is a comment
-// this is a comment
-// this is a comment
-// this is a comment
-// this is a comment
-// this is a comment
-// this is a comment
-// this is a comment
 var _0x2d93 = [
   'timestamp',
   'int',

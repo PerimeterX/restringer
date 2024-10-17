@@ -1,5 +1,4 @@
-import {utils} from 'flast';
-const {logger} = utils;
+import {logger} from 'flast';
 import {Sandbox} from './sandbox.js';
 import * as assert from 'node:assert';
 import {badValue} from '../config.js';

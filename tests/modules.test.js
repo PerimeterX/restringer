@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
 import assert from 'node:assert';
-import {Arborist, generateFlatAST, utils} from 'flast';
 import {describe, it} from 'node:test';
 import {badValue} from '../src/modules/config.js';
-const {applyIteratively} = utils;
+import {Arborist, generateFlatAST, applyIteratively} from 'flast';
 
 /**
  * Apply a module to a given code snippet.

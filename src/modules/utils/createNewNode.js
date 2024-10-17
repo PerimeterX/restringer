@@ -1,7 +1,6 @@
 import {badValue} from '../config.js';
 import {getObjType} from './getObjType.js';
-import {generateCode, parseCode, utils} from 'flast';
-const {logger} = utils;
+import {generateCode, parseCode, logger} from 'flast';
 
 /**
  * Create a node from a value by its type.

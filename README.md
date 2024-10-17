@@ -86,11 +86,10 @@ The basic structure of such a deobfuscator would be an array of deobfuscation mo
 Unsafe modules run code through `eval` (using [isolated-vm](https://www.npmjs.com/package/isolated-vm) to be on the safe side) while safe modules do not.
 
 ```javascript
+import {applyIteratively} from 'flast';
 import {safe, unsafe} from 'restringer';
 const {normalizeComputed} = safe;
 const {resolveDefiniteBinaryExpressions, resolveLocalCalls} = unsafe;
-import {utils} from 'flast';
-const {applyIteratively} = utils;
 let script = 'obfuscated JS here';
 const deobModules = [
   resolveDefiniteBinaryExpressions,
@@ -105,8 +104,7 @@ With the additional `candidateFilter` function argument, it's possible to narrow
 ```javascript
 import {unsafe} from 'restringer';
 const {resolveLocalCalls} = unsafe;
-import {utils} from 'flast';
-const {applyIteratively} = utils;
+import {applyIteratively} from 'flast';
 let script = 'obfuscated JS here';
 
 // It's better to define a function with a meaningful name that can show up in the log 
@@ -145,8 +143,7 @@ if (res.script !== code) {
 
 ### Boilerplate code for starting from scratch
 ```javascript
-import {utils} from 'flast';
-const {applyIteratively, treeModifier, logger} = utils;
+import {applyIteratively, treeModifier, logger} from 'flast';
 // Optional loading from file
 // import fs from 'node:fs';
 // const inputFilename = process.argv[2] || 'target.js';
