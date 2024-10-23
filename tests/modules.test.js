@@ -467,22 +467,55 @@ describe('SAFE: unwrapSimpleOperations', async () => {
 function minus(b,c){return b - c;}
 function mul(b,c){return b * c;}
 function div(b,c){return b / c;}
-function power(b,c){return b ** c;}
-function and(b,c){return b && c;}
+function mod(b,c){return b % c;}
 function band(b,c){return b & c;}
-function or(b,c){return b || c;}
 function bor(b,c){return b | c;}
+function and(b,c){return b && c;}
+function or(b,c){return b || c;}
+function power(b,c){return b ** c;}
 function xor(b,c){return b ^ c;}
+function lte(b,c){return b <= c;}
+function gte(b,c){return b >= c;}
+function lt(b,c){return b < c;}
+function gt(b,c){return b > c;}
+function equal(b,c){return b == c;}
+function strictEqual(b,c){return b === c;}
+function notEqual(b,c){return b != c;}
+function strictNotEqual(b,c){return b !== c;}
+function leftShift(b,c){return b << c;}
+function rightShift(b,c){return b >> c;}
+function unsignedRightShift(b,c){return b >>> c;}
+function inOp(b,c){return b in c;}
+function instanceofOp(b,c){return b instanceof c;}
+function typeofOp(b){return typeof b;}
+function nullishCoalescingOp(b,c){return b ?? c;}
 add(1, 2);
 minus(1, 2);
 mul(1, 2);
 div(1, 2);
-power(1, 2);
-and(1, 2);
+mod(1, 2);
 band(1, 2);
-or(1, 2);
 bor(1, 2);
-xor(1, 2);`;
+and(1, 2);
+or(1, 2);
+power(1, 2);
+xor(1, 2);
+lte(1, 2);
+gte(1, 2);
+lt(1, 2);
+gt(1, 2);
+equal(1, 2);
+strictEqual(1, 2);
+notEqual(1, 2);
+strictNotEqual(1, 2);
+leftShift(1, 2);
+rightShift(1, 2);
+unsignedRightShift(1, 2);
+inOp(1, 2);
+instanceofOp(1, 2);
+typeofOp(1);
+nullishCoalescingOp(1, 2);
+`;
 		const expected = `function add(b, c) {
   return b + c;
 }
@@ -495,34 +528,98 @@ function mul(b, c) {
 function div(b, c) {
   return b / c;
 }
-function power(b, c) {
-  return b ** c;
-}
-function and(b, c) {
-  return b && c;
+function mod(b, c) {
+  return b % c;
 }
 function band(b, c) {
   return b & c;
 }
-function or(b, c) {
-  return b || c;
-}
 function bor(b, c) {
   return b | c;
 }
+function and(b, c) {
+  return b && c;
+}
+function or(b, c) {
+  return b || c;
+}
+function power(b, c) {
+  return b ** c;
+}
 function xor(b, c) {
   return b ^ c;
+}
+function lte(b, c) {
+  return b <= c;
+}
+function gte(b, c) {
+  return b >= c;
+}
+function lt(b, c) {
+  return b < c;
+}
+function gt(b, c) {
+  return b > c;
+}
+function equal(b, c) {
+  return b == c;
+}
+function strictEqual(b, c) {
+  return b === c;
+}
+function notEqual(b, c) {
+  return b != c;
+}
+function strictNotEqual(b, c) {
+  return b !== c;
+}
+function leftShift(b, c) {
+  return b << c;
+}
+function rightShift(b, c) {
+  return b >> c;
+}
+function unsignedRightShift(b, c) {
+  return b >>> c;
+}
+function inOp(b, c) {
+  return b in c;
+}
+function instanceofOp(b, c) {
+  return b instanceof c;
+}
+function typeofOp(b) {
+  return typeof b;
+}
+function nullishCoalescingOp(b, c) {
+  return b ?? c;
 }
 1 + 2;
 1 - 2;
 1 * 2;
 1 / 2;
-1 ** 2;
-1 && 2;
+1 % 2;
 1 & 2;
-1 || 2;
 1 | 2;
-1 ^ 2;`;
+1 && 2;
+1 || 2;
+1 ** 2;
+1 ^ 2;
+1 <= 2;
+1 >= 2;
+1 < 2;
+1 > 2;
+1 == 2;
+1 === 2;
+1 != 2;
+1 !== 2;
+1 << 2;
+1 >> 2;
+1 >>> 2;
+1 in 2;
+1 instanceof 2;
+typeof 1;
+1 ?? 2;`;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});
