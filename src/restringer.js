@@ -1,6 +1,5 @@
-#!/usr/bin/env node
 import {fileURLToPath} from 'node:url';
-import {logger, applyIteratively} from 'flast';
+import {logger as flastLogger, applyIteratively} from 'flast';
 import {processors} from './processors/index.js';
 import {detectObfuscation} from 'obfuscation-detector';
 import {config, safe as safeMod, unsafe as unsafeMod, utils} from './modules/index.js';
@@ -21,6 +20,7 @@ for (const funcName in unsafeMod) {
 
 export class REstringer {
 	static __version__ = __version__;
+	logger = flastLogger;
 
 	/**
 	 * @param {string} script The target script to be deobfuscated
@@ -33,7 +33,6 @@ export class REstringer {
 		this.obfuscationName = 'Generic';
 		this._preprocessors = [];
 		this._postprocessors = [];
-		this.logger = logger;
 		this.logger.setLogLevelLog();
 		this.maxIterations = config.defaultMaxIterations;
 		this.detectObfuscationType = true;
@@ -94,7 +93,7 @@ export class REstringer {
 				({preprocessors: this._preprocessors, postprocessors: this._postprocessors} = processors[detectedObfuscationType]);
 			}
 		}
-		logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
+		this.logger.log(`[+] Obfuscation type is ${this.obfuscationName}`);
 		return this.obfuscationName;
 	}
 
@@ -146,35 +145,5 @@ export class REstringer {
 			const processor = processors[i];
 			this.script = applyIteratively(this.script, [processor], 1);
 		}
-	}
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-	const {argsAreValid, parseArgs} = await import('./utils/parseArgs.js');
-	try {
-		const args = parseArgs(process.argv.slice(2));
-		if (argsAreValid(args)) {
-			const fs = await import('node:fs');
-			let content = fs.readFileSync(args.inputFilename, 'utf-8');
-			const startTime = Date.now();
-
-			const restringer = new REstringer(content);
-			if (args.quiet) restringer.logger.setLogLevelNone();
-			else if (args.verbose) restringer.logger.setLogLevelDebug();
-			logger.log(`[!] REstringer v${REstringer.__version__}`);
-			logger.log(`[!] Deobfuscating ${args.inputFilename}...`);
-			if (args.maxIterations) {
-				restringer.maxIterations.value = args.maxIterations;
-				restringer.logger.log(`[!] Running at most ${args.maxIterations} iterations`);
-			}
-			if (restringer.deobfuscate()) {
-				logger.log(`[+] Saved ${args.outputFilename}`);
-				logger.log(`[!] Deobfuscation took ${(Date.now() - startTime) / 1000} seconds.`);
-				if (args.outputToFile) fs.writeFileSync(args.outputFilename, restringer.script, {encoding: 'utf-8'});
-				else console.log(restringer.script);
-			} else logger.log(`[-] Nothing was deobfuscated  ¯\\_(ツ)_/¯`);
-		}
-	} catch (e) {
-		logger.error(`[-] Critical Error: ${e}`);
 	}
 }

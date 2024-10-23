@@ -23,13 +23,13 @@ For comments and suggestions feel free to open an issue or find me on Twitter - 
 
 ## Installation 
 ### npm
-```bash
-npm install restringer
+```shell
+npm install -g restringer
 ```
 
 ### Clone The Repo
 Requires Node 16 or newer.
-```bash
+```shell
 git clone git@github.com:PerimeterX/restringer.git
 cd restringer
 npm install
@@ -44,7 +44,6 @@ there's a need to apply specific deobfuscation methods in order to circumvent an
 preventing the script from being deobfuscated.   
 
 ### Command-Line Usage
-
 ```
 Usage: restringer input_filename [-h] [-c] [-q | -v] [-m M] [-o [output_filename]]
 
@@ -55,16 +54,35 @@ optional arguments:
 	-h, --help                      Show this help message and exit.
 	-c, --clean                     Remove dead nodes from script after deobfuscation is complete (unsafe).
 	-q, --quiet                     Suppress output to stdout. Output result only to stdout if the -o option is not set.
-																	Does not go with the -v option.
+									Does not go with the -v option.
 	-m, --max-iterations M          Run at most M iterations
 	-v, --verbose                   Show more debug messages while deobfuscating. Does not go with the -q option.
 	-o, --output [output_filename]  Write deobfuscated script to output_filename. 
-																	Use <input_filename>-deob.js if no filename is provided.
+									<input_filename>-deob.js is used if no filename is provided.
 ```
+Examples:
+- Print the deobfuscated script to stdout.
+  ```shell
+   restringer [target-file.js]
+  ```
+- Save the deobfuscated script to output.js.
+  ```shell
+   restringer [target-file.js] -o output.js
+  ```
+- Deobfuscate and print debug info.
+  ```shell
+   restringer [target-file.js] -v
+  ```
+- Deobfuscate without printing anything but the deobfuscated output.
+  ```shell
+   restringer [target-file.js] -q
+  ```
+
+
 ### Use as a Module
 
 ```javascript
-const {REstringer} = require('restringer');
+import {REstringer} from 'restringer';
 
 const restringer = new REstringer('"RE" + "stringer"');
 if (restringer.deobfuscate()) {
