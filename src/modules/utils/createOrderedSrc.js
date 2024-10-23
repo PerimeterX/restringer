@@ -2,6 +2,24 @@ import {parseCode} from 'flast';
 
 const largeNumber = 999e8;
 const sortByNodeId = (a, b) => a.nodeId > b.nodeId ? 1 : b.nodeId > a.nodeId ? -1 : 0;
+const funcStartRegexp = new RegExp('function[^(]*');
+
+/**
+ * Add a name to a FunctionExpression.
+ * @param {ASTNode} n The target node
+ * @param {string} [name] The new name. Defaults to 'func + n.nodeId'.
+ * @return {ASTNode} The new node with the name set
+ */
+function addNameToFE(n, name) {
+	name = name || 'func' + n.nodeId;
+	const funcSrc = '(' + n.src.replace(funcStartRegexp, 'function ' + name) + ');';
+	const newNode = parseCode(funcSrc);
+	if (newNode) {
+		newNode.nodeId = n.nodeId;
+		newNode.src = funcSrc;
+		return newNode;
+	}
+}
 
 /**
  * Return the source code of the ordered nodes.
@@ -23,30 +41,13 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 				}
 			} else if (n.callee.type === 'FunctionExpression') {
 				if (!preserveOrder) {
-					const altFuncName = (n.parentNode.type === 'VariableDeclarator' ? n.parentNode.id.name : 'func' + n.nodeId);
-					const funcStartRegexp = new RegExp('function[^(]*');
-					const funcSrc = n.callee?.id ? n.src : n.src.replace(funcStartRegexp, 'function ' + altFuncName);
-					const src = `(${funcSrc});`;
-					const newNode = parseCode(src);
-					if (newNode) {
-						newNode.nodeId = n.nodeId + largeNumber;
-						newNode.src = src;
-						nodes[i] = newNode;
-					}
+					const newNode = addNameToFE(n, n.parentNode?.id?.name);
+					newNode.nodeId = newNode.nodeId + largeNumber;
+					nodes[i] = newNode;
 				} else nodes[i] = n;
 			}
-		}  else if (n.type === 'FunctionExpression' && !n.id) {
-			if (n.parentNode.type === 'VariableDeclarator') {
-				const funcStartRegexp = new RegExp('function[^(]*');
-				const funcSrc = n.src.replace(funcStartRegexp, 'function ' + n.parentNode.id.name);
-				const src = `(${funcSrc});`;
-				const parsedNode = parseCode(src);
-				if (parsedNode) {
-					parsedNode.nodeId = n.nodeId;
-					parsedNode.src = src;
-					nodes[i] = parsedNode;
-				}
-			}
+		} else if (n.type === 'FunctionExpression' && !n.id) {
+			nodes[i] = addNameToFE(n, n.parentNode?.id?.name);
 		}
 		n = nodes[i];	// In case the node was replaced
 		if (!parsedNodes.includes(n)) parsedNodes.push(n);
