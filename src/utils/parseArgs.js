@@ -15,7 +15,7 @@ optional arguments:
   -m, --max-iterations M          Run at most M iterations
   -v, --verbose                   Show more debug messages while deobfuscating. Does not go with the -q option.
   -o, --output [output_filename]  Write deobfuscated script to output_filename. 
-                                  Use <input_filename>-deob.js if no filename is provided.`;
+                                  <input_filename>-deob.js is used if no filename is provided.`;
 }
 
 export function parseArgs(args) {
