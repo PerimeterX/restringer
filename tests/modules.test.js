@@ -1137,3 +1137,31 @@ describe('UTILS: createOrderedSrc', async () => {
 		assert.deepStrictEqual(result, expected);
 	});
 });
+describe('UTILS: getCache', async () => {
+	const getCache = (await import('../src/modules/utils/getCache.js')).getCache;
+	it('TP-1: Retain values', () => {
+		const key1 = 'hash1';
+		const key2 = 'hash2';
+		const cache = getCache(key1);
+		assert.deepStrictEqual(cache, {});
+		cache['key1'] = 'value1';
+		const expectedC1 = {key1: 'value1'};
+		assert.deepStrictEqual(cache, expectedC1);
+		const cache2 = getCache(key1);
+		assert.deepStrictEqual(cache2, expectedC1);
+		const cache3 = getCache(key2);
+		assert.deepStrictEqual(cache3, {});
+	});
+	it('TP-2: Flush cache', () => {
+		const key = 'flush1';
+		let cache = getCache(key);
+		assert.deepStrictEqual(cache, {});
+		cache['k'] = 'v';
+		const expectedC1 = {k: 'v'};
+		assert.deepStrictEqual(cache, expectedC1);
+		getCache.flush();
+		cache = getCache(key);
+		assert.deepStrictEqual(cache, {});
+	});
+});
+
