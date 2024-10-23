@@ -1057,3 +1057,83 @@ describe('UTILS: createNewNode', async () => {
 	});
 
 });
+describe('UTILS: createOrderedSrc', async () => {
+	const targetModule = (await import('../src/modules/utils/createOrderedSrc.js')).createOrderedSrc;
+	it('TP-1: Re-order nodes', () => {
+		const code = 'a; b;';
+		const expected = `a\nb\n`;
+		const ast = generateFlatAST(code);
+		const targetNodes = [
+			4, // b()
+			2, // a()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]));
+		assert.deepStrictEqual(result, expected);
+	});
+	it('TP-2: Wrap calls in expressions', () => {
+		const code = 'a();';
+		const expected = `a();\n`;
+		const ast = generateFlatAST(code);const targetNodes = [
+			2, // a()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]));
+		assert.deepStrictEqual(result, expected);
+	});
+	it('TP-3: Push IIFEs to the end in order', () => {
+		const code = '(function(a){})(); a(); (function(b){})(); b();';
+		const expected = `a();\nb();\n(function(a){})();\n(function(b){})();\n`;
+		const ast = generateFlatAST(code);
+		const targetNodes = [
+			10, // (function(b){})()
+			15, // b()
+			7, // a()
+			2, // (function(a){})()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]));
+		assert.deepStrictEqual(result, expected);
+	});
+	it('TP-4: Add dynamic name to IIFEs', () => {
+		const code = '!function(a){}(); a();';
+		const expected = `a();\n(function func3(a){}());\n`;
+		const ast = generateFlatAST(code);const targetNodes = [
+			3, // function(a){}()
+			8, // a()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]));
+		assert.deepStrictEqual(result, expected);
+	});
+	it('TP-5: Add variable name to IIFEs', () => {
+		const code = 'const b = function(a){}(); a();';
+		const expected = `a();\n(function b(a){}());\n`;
+		const ast = generateFlatAST(code);const targetNodes = [
+			4, // function(a){}()
+			9, // a()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]));
+		assert.deepStrictEqual(result, expected);
+	});
+	it(`TP-6: Preserve node order`, () => {
+		const code = '(function(a){})(); a(); (function(b){})(); b();';
+		const expected = `(function(a){})();\na();\n(function(b){})();\nb();\n`;
+		const ast = generateFlatAST(code);
+		const targetNodes = [
+			10, // (function(b){})()
+			7, // a()
+			15, // b()
+			2, // (function(a){})()
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]), true);
+		assert.deepStrictEqual(result, expected);
+	});
+	it(`TP-7: Standalone FEs`, () => {
+		const code = '~function(iife1){}();~function(iife2){}();';
+		const expected = `(function func4(iife1){});\n(function func10(iife2){});\n`;
+		const ast = generateFlatAST(code);
+		const targetNodes = [
+			10, // function(iife2){}
+			4, // function(iife1){}
+		];
+		const result = targetModule(targetNodes.map(n => ast[n]), true);
+		assert.deepStrictEqual(result, expected);
+	});
+});
