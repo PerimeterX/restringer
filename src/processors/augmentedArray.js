@@ -63,5 +63,5 @@ function replaceArrayWithStaticAugmentedVersion(arb) {
 	return arb;
 }
 
-export const preprocessors = [replaceArrayWithStaticAugmentedVersion, resolveFunctionToArray];
+export const preprocessors = [replaceArrayWithStaticAugmentedVersion, resolveFunctionToArray.default];
 export const postprocessors = [];
