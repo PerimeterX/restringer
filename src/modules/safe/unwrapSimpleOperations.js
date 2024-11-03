@@ -1,7 +1,6 @@
-const operators = ['+', '-', '*', '/', '%', '&', '|', '&&', '||', '**', '^',
-	'<=', '>=', '<', '>', '==', '===', '!=',
+const operators = ['+', '-', '*', '/', '%', '&', '|', '&&', '||', '**', '^', '<=', '>=', '<', '>', '==', '===', '!=',
 	'!==', '<<', '>>', '>>>', 'in', 'instanceof', '??'];
-const fixes = ['!', '~', '-', '+', '--', '++', 'typeof'];
+const fixes = ['!', '~', '-', '+', 'typeof', 'void', 'delete', '--', '++']; // as in prefix and postfix operators
 
 /**
  * @param {ASTNode} n
@@ -21,10 +20,9 @@ function matchBinaryOrLogical(n) {
  * @param {Arborist} arb
  */
 function handleBinaryOrLogical(c, arb) {
-	// noinspection JSUnresolvedVariable
 	const refs = (c.scope.block?.id?.references || []).map(r => r.parentNode);
 	for (const ref of refs) {
-		if (ref.arguments.length === 2) arb.markNode(ref, {
+		if (ref.type === 'CallExpression' && ref.arguments.length === 2) arb.markNode(ref, {
 			type: c.type,
 			operator: c.operator,
 			left: ref.arguments[0],
@@ -37,8 +35,8 @@ function handleBinaryOrLogical(c, arb) {
  * @param {ASTNode} n
  * @return {boolean}
  */
-function matchUnary(n) {
-	return n.type === 'UnaryExpression' &&
+function matchUnaryOrUpdate(n) {
+	return ['UnaryExpression', 'UpdateExpression'].includes(n.type) &&
 		fixes.includes(n.operator) &&
 		n.parentNode.type === 'ReturnStatement' &&
 		n.parentNode.parentNode?.body?.length === 1 &&
@@ -49,10 +47,10 @@ function matchUnary(n) {
  * @param {ASTNode} c
  * @param {Arborist} arb
  */
-function handleUnary(c, arb) {
+function handleUnaryAndUpdate(c, arb) {
 	const refs = (c.scope.block?.id?.references || []).map(r => r.parentNode);
 	for (const ref of refs) {
-		if (ref.arguments.length === 1) arb.markNode(ref, {
+		if (ref.type === 'CallExpression' && ref.arguments.length === 1) arb.markNode(ref, {
 			type: c.type,
 			operator: c.operator,
 			prefix: c.prefix,
@@ -70,15 +68,15 @@ function handleUnary(c, arb) {
 function unwrapSimpleOperations(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
-		if ((matchBinaryOrLogical(n) || matchUnary(n)) &&
-		candidateFilter(n)) {
+		if ((matchBinaryOrLogical(n) || matchUnaryOrUpdate(n)) && candidateFilter(n)) {
 			switch (n.type) {
 				case 'BinaryExpression':
 				case 'LogicalExpression':
 					handleBinaryOrLogical(n, arb);
 					break;
 				case 'UnaryExpression':
-					handleUnary(n, arb);
+				case 'UpdateExpression':
+					handleUnaryAndUpdate(n, arb);
 					break;
 			}
 		}
