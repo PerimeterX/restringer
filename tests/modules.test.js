@@ -682,9 +682,21 @@ describe('SAFE: separateChainedDeclarators', async () => {
 });
 describe('SAFE: simplifyCalls', async () => {
 	const targetModule = (await import('../src/modules/safe/simplifyCalls.js')).default;
-	it('TP-1', () => {
+	it('TP-1: With args', () => {
 		const code = `func1.apply(this, [arg1, arg2]); func2.call(this, arg1, arg2);`;
 		const expected = `func1(arg1, arg2);\nfunc2(arg1, arg2);`;
+		const result = applyModuleToCode(code, targetModule);
+		assert.strictEqual(result, expected);
+	});
+	it('TP-2: Without args', () => {
+		const code = `func1.apply(this); func2.call(this);`;
+		const expected = `func1();\nfunc2();`;
+		const result = applyModuleToCode(code, targetModule);
+		assert.strictEqual(result, expected);
+	});
+	it('TN-1: Ignore calls without ThisExpression', () => {
+		const code = `func1.apply({}); func2.call(null);`;
+		const expected = code;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});

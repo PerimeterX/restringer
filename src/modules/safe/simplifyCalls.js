@@ -8,14 +8,13 @@ function simplifyCalls(arb, candidateFilter = () => true) {
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'CallExpression' &&
-		n.arguments.length &&
-		n.arguments[0].type === 'ThisExpression' &&
+		n.arguments?.[0]?.type === 'ThisExpression' &&
 		n.callee.type === 'MemberExpression' &&
 		['apply', 'call'].includes(n.callee.property?.name || n.callee.property?.value) &&
 		(n.callee.object?.name || n.callee?.value) !== 'Function' &&
 		!/function/i.test(n.callee.object.type) &&
 		candidateFilter(n)) {
-			const args = (n.callee.property?.name || n.callee.property?.value) === 'apply' ? n.arguments[1].elements : n.arguments.slice(1);
+			const args = (n.callee.property?.name || n.callee.property?.value) === 'apply' ? n.arguments?.[1]?.elements : n.arguments?.slice(1);
 			arb.markNode(n,  {
 				type: 'CallExpression',
 				callee: n.callee.object,
