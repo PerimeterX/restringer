@@ -5,8 +5,6 @@ import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {REstringer} from '../src/restringer.js';
 
-
-
 function getDeobfuscatedCode(code) {
 	const restringer = new REstringer(code);
 	restringer.logger.setLogLevel(restringer.logger.logLevels.NONE);
@@ -105,5 +103,4 @@ describe('Samples tests', () => {
 		const result = getDeobfuscatedCode(code);
 		assert.strictEqual(result, expected);
 	});
-	it.todo('Fix issue with multiple comments in Local Proxies sample');
 });
