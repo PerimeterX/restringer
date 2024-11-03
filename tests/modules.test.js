@@ -462,7 +462,7 @@ describe('SAFE: unwrapIIFEs', async () => {
 });
 describe('SAFE: unwrapSimpleOperations', async () => {
 	const targetModule = (await import('../src/modules/safe/unwrapSimpleOperations.js')).default;
-	it('TP-1', () => {
+	it('TP-1: Binary operations', () => {
 		const code = `function add(b,c){return b + c;}
 function minus(b,c){return b - c;}
 function mul(b,c){return b * c;}
@@ -620,6 +620,29 @@ function nullishCoalescingOp(b, c) {
 1 instanceof 2;
 typeof 1;
 1 ?? 2;`;
+		const result = applyModuleToCode(code, targetModule);
+		assert.strictEqual(result, expected);
+	});
+	it('TP-2 Unary operations', () => {
+		const code = `function unaryNegation(v) {return -v;}
+		function unaryPlus(v) {return +v;}
+		function logicalNot(v) {return !v;}
+		function bitwiseNot(v) {return ~v;}
+		function typeofOp(v) {return typeof v;}
+		function deleteOp(v) {return delete v;}
+		function voidOp(v) {return void v;}
+		(unaryNegation(1), unaryPlus(2), logicalNot(3), bitwiseNot(4), typeofOp(5), deleteOp(6), voidOp(7));
+		`;
+		const expected = `function unaryNegation(v) {\n  return -v;\n}\nfunction unaryPlus(v) {\n  return +v;\n}\nfunction logicalNot(v) {\n  return !v;\n}\nfunction bitwiseNot(v) {\n  return ~v;\n}\nfunction typeofOp(v) {\n  return typeof v;\n}\nfunction deleteOp(v) {\n  return delete v;\n}\nfunction voidOp(v) {\n  return void v;\n}\n-1, +2, !3, ~4, typeof 5, delete 6, void 7;`;
+		const result = applyModuleToCode(code, targetModule);
+		assert.strictEqual(result, expected);
+	});
+	it('TP-3 Update operations', () => {
+		const code = `function incrementPre(v) {return ++v;}
+		function decrementPost(v) {return v--;}
+		(incrementPre(a), decrementPost(b));
+		`;
+		const expected = `function incrementPre(v) {\n  return ++v;\n}\nfunction decrementPost(v) {\n  return v--;\n}\n++a, b--;`;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});
