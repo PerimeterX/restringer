@@ -116,7 +116,7 @@ describe('SAFE: rearrangeSwitches', async () => {
 	it('TP-1', () => {
 		const code = `(() => {let a = 1;\twhile (true) {switch (a) {case 3: return console.log(3); case 2: console.log(2); a = 3; break;
 case 1: console.log(1); a = 2; break;}}})();`;
-		const expected = `(() => {
+		const expected = `((() => {
   let a = 1;
   while (true) {
     {
@@ -127,7 +127,7 @@ case 1: console.log(1); a = 2; break;}}})();`;
       return console.log(3);
     }
   }
-})();`;
+})());`;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});
@@ -178,7 +178,7 @@ describe('SAFE: replaceEvalCallsWithLiteralContent', async () => {
 	});
 	it('TP-4: Replace eval call wrapped in a call expression', () => {
 		const code = `eval('()=>1')();`;
-		const expected = `(() => 1)();`;
+		const expected = `((() => 1)());`;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});
@@ -259,7 +259,7 @@ describe('SAFE: replaceNewFuncCallsWithLiteralContent', async () => {
 	const targetModule = (await import('../src/modules/safe/replaceNewFuncCallsWithLiteralContent.js')).default;
 	it('TP-1', () => {
 		const code = `new Function("!function() {console.log('hello world')}()")();`;
-		const expected = `!function () {\n  console.log('hello world');\n}();`;
+		const expected = `!(function () {\n  console.log('hello world');\n}());`;
 		const result = applyModuleToCode(code, targetModule);
 		assert.strictEqual(result, expected);
 	});
@@ -663,7 +663,7 @@ describe('SAFE: separateChainedDeclarators', async () => {
 	});
 	it('TP-3: A var and a let', () => {
 		const code = `!function() {var a, b = 2; let c, d = 3;}();`;
-		const expected = `!function () {\n  var a;\n  var b = 2;\n  let c;\n  let d = 3;\n}();`;
+		const expected = `!(function () {\n  var a;\n  var b = 2;\n  let c;\n  let d = 3;\n}());`;
 		const result = applyModuleToCode(code, targetModule, true);
 		assert.strictEqual(result, expected);
 	});

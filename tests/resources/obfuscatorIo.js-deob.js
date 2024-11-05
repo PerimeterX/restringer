@@ -127,7 +127,7 @@ var _yb = function (a, b) {
   }
   return c;
 };
-var _yg = function () {
+var _yg = (function () {
   var a = true;
   return function (b, c) {
     var d = a ? function () {
@@ -141,7 +141,7 @@ var _yg = function () {
     a = false;
     return d;
   };
-}();
+}());
 var _yh = _yg(this, function () {
   var a = function () {
     var b = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
@@ -150,7 +150,7 @@ var _yh = _yg(this, function () {
   return a();
 });
 _yh();
-var _yi = function () {
+var _yi = (function () {
   var a = true;
   return function (b, c) {
     var d = a ? function () {
@@ -164,7 +164,7 @@ var _yi = function () {
     a = false;
     return d;
   };
-}();
+}());
 (function () {
   _yi(this, function () {
     var a = new RegExp('function *\\( *\\)');

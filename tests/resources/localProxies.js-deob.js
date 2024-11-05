@@ -799,7 +799,7 @@ const _0x29754e = _0x41e312 => {
   return _0x41e312.charAt(0).toUpperCase() + _0x41e312.slice(1);
 };
 function _0x18585b(_0x39d250, _0x5b10a5, _0x5e9dc9) {
-  var _0x2dbea1 = function () {
+  var _0x2dbea1 = (function () {
     var _0x1dea60 = true;
     return function (_0x1094d5, _0x1b8cdc) {
       var _0x824ac8 = _0x1dea60 ? function () {
@@ -813,7 +813,7 @@ function _0x18585b(_0x39d250, _0x5b10a5, _0x5e9dc9) {
       _0x1dea60 = false;
       return _0x824ac8;
     };
-  }();
+  }());
   var _0x5d8b17 = _0x2dbea1(this, function () {
     var _0x5efb50 = function () {
       var _0x5d91f6 = /^([^ ]+( +[^ ]+)+)+[^ ]}/;
