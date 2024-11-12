@@ -1,7 +1,7 @@
-import globals from 'globals';
-import path from 'node:path';
-import {fileURLToPath} from 'node:url';
 import js from '@eslint/js';
+import path from 'node:path';
+import globals from 'globals';
+import {fileURLToPath} from 'node:url';
 import {FlatCompat} from '@eslint/eslintrc';
 import babelParser from "@babel/eslint-parser";
 
@@ -10,13 +10,13 @@ const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
 	baseDirectory: __dirname,
 	recommendedConfig: js.configs.recommended,
-	allConfig: js.configs.all
+	allConfig: js.configs.all,
 });
 
 export default [
 	{
 		ignores: [
-			'tests/resources',
+			'tests/resources/',
 			'**/jquery*.js',
 			'**/*tmp*.*',
 			'**/*tmp*/',
@@ -30,14 +30,10 @@ export default [
 			parser: babelParser,
 			parserOptions: {
 				requireConfigFile: false,
-				babelOptions: {
-					plugins: ['@babel/plugin-syntax-import-assertions'],
-				}
 			},
 			globals: {
 				...globals.browser,
-				...globals.node,
-				...globals.commonjs,
+				...globals.nodeBuiltin,
 			},
 			ecmaVersion: 'latest',
 			sourceType: 'module',

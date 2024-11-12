@@ -15,9 +15,12 @@ function areReferencesModified(ast, refs) {
 		(r.parentNode.type === 'VariableDeclarator' && r.parentKey === 'id') ||
 		// Verify no modifying calls are executed on any of the references
 		(r.parentNode.type === 'MemberExpression' &&
-			r.parentNode.parentNode.type === 'CallExpression' &&
+			(r.parentNode.parentNode.type === 'CallExpression' &&
 			r.parentNode.parentNode.callee?.object === r &&
 			propertiesThatModifyContent.includes(r.parentNode.property?.value || r.parentNode.property?.name)) ||
+			// Verify the object's properties aren't being assigned to
+			(r.parentNode.parentNode.type === 'AssignmentExpression' &&
+			r.parentNode.parentKey === 'left')) ||
 		// Verify there are no member expressions among the references which are being assigned to
 		(r.type === 'MemberExpression' &&
 			ast.some(n => n.type === 'AssignmentExpression' &&
