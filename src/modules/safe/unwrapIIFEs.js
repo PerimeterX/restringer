@@ -5,10 +5,12 @@
  * @return {Arborist}
  */
 function unwrapIIFEs(arb, candidateFilter = () => true) {
-	candidatesLoop: for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		!n.arguments.length &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	candidatesLoop: for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (!n.arguments.length &&
 		['ArrowFunctionExpression', 'FunctionExpression'].includes(n.callee.type) &&
 		!n.callee.id &&
 		// IIFEs with a single return statement
@@ -29,7 +31,7 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 			if (replacementNode.type === 'BlockStatement') {
 				let targetChild = replacementNode;
 				// IIFEs with a single return statement
-				if (replacementNode.body?.length === 1 && replacementNode.body[0].argument) replacementNode = replacementNode.body[0].argument;
+				if (replacementNode.body?.[0]?.argument) replacementNode = replacementNode.body[0].argument;
 				// IIFEs with multiple statements or expressions
 				else while (targetNode && !targetNode.body) {
 					// Skip cases where IIFE is used to initialize or set a value

@@ -8,10 +8,12 @@ import {generateFlatAST} from 'flast';
  * @return {Arborist}
  */
 function resolveFunctionConstructorCalls(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		n.callee?.type === 'MemberExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.callee?.type === 'MemberExpression' &&
 		(n.callee.property?.name || n.callee.property?.value) === 'constructor' &&
 		n.arguments.length && n.arguments.slice(-1)[0].type === 'Literal' &&
 		candidateFilter(n)) {let args = '';

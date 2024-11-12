@@ -8,10 +8,12 @@
  * @return {Arborist}
  */
 function replaceCallExpressionsWithUnwrappedIdentifier(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		((n.callee?.declNode?.parentNode?.type === 'VariableDeclarator' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (((n.callee?.declNode?.parentNode?.type === 'VariableDeclarator' &&
 				/FunctionExpression/.test(n.callee.declNode.parentNode?.init?.type)) ||
 			(n.callee?.declNode?.parentNode?.type === 'FunctionDeclaration' &&
 				n.callee.declNode.parentKey === 'id')) &&

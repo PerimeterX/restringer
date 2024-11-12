@@ -7,10 +7,12 @@
  * @return {Arborist}
  */
 function replaceBooleanExpressionsWithIf(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'ExpressionStatement' &&
-		(n.expression.operator === '&&' || n.expression.operator === '||') && candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.ExpressionStatement || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (['&&', '||'].includes(n.expression.operator) && candidateFilter(n)) {
 			// || requires inverted logic (only execute the consequent if all operands are false)
 			const testExpression =
 				n.expression.operator === '||'

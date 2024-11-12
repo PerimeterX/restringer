@@ -66,8 +66,14 @@ function handleUnaryAndUpdate(c, arb) {
  * @return {Arborist}
  */
 function unwrapSimpleOperations(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.BinaryExpression || []),
+		...(arb.ast[0].typeMap.LogicalExpression || []),
+		...(arb.ast[0].typeMap.UnaryExpression || []),
+		...(arb.ast[0].typeMap.UpdateExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if ((matchBinaryOrLogical(n) || matchUnaryOrUpdate(n)) && candidateFilter(n)) {
 			switch (n.type) {
 				case 'BinaryExpression':

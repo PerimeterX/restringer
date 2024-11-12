@@ -6,10 +6,12 @@
  * @return {Arborist}
  */
 function replaceSequencesWithExpressions(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'ExpressionStatement' &&
-		n.expression.type === 'SequenceExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.ExpressionStatement || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.expression.type === 'SequenceExpression' &&
 		candidateFilter(n)) {
 			const parent = n.parentNode;
 			const statements = n.expression.expressions.map(e => ({

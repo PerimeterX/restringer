@@ -9,11 +9,12 @@
  * @return {Arborist}
  */
 function resolveDeterministicIfStatements(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'IfStatement' &&
-		n.test.type === 'Literal' &&
-		candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.IfStatement || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.test.type === 'Literal' && candidateFilter(n)) {
 			if (n.test.value) {
 				if (n.consequent) arb.markNode(n, n.consequent);
 				else arb.markNode(n);

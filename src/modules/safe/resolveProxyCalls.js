@@ -16,11 +16,12 @@
  * @return {Arborist}
  */
 function resolveProxyCalls(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'FunctionDeclaration' &&
-		n.body?.body?.length === 1 &&
-		n.body.body[0].type === 'ReturnStatement' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.FunctionDeclaration || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n?.body?.body?.[0].type === 'ReturnStatement' &&
 		n.body.body[0].argument?.type === 'CallExpression' &&
 		n.body.body[0].argument.arguments?.length === n.params?.length &&
 		n.body.body[0].argument.callee.type === 'Identifier' &&

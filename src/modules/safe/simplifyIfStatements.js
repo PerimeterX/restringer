@@ -5,9 +5,12 @@
  * @return {Arborist}
  */
 function simplifyIfStatements(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'IfStatement' && candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.IfStatement || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (candidateFilter(n)) {
 			// Empty consequent
 			if (n.consequent.type === 'EmptyStatement' || (n.consequent.type === 'BlockStatement' && !n.consequent.body.length)) {
 				// Populated alternate

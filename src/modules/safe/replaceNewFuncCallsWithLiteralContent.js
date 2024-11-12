@@ -14,11 +14,13 @@ import {generateFlatAST, logger} from 'flast';
  */
 function replaceNewFuncCallsWithLiteralContent(arb, candidateFilter = () => true) {
 	const cache = getCache(arb.ast[0].scriptHash);
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'NewExpression' &&
-		n.parentKey === 'callee' &&
-		n.parentNode?.arguments?.length === 0 &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.NewExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.parentKey === 'callee' &&
+		!n.parentNode?.arguments?.length &&
 		n.callee?.name === 'Function' &&
 		n.arguments?.length === 1 &&
 		n.arguments[0].type === 'Literal' &&

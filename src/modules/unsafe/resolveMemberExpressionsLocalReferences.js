@@ -20,10 +20,12 @@ import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredO
  * @return {Arborist}
  */
 export default function resolveMemberExpressionsLocalReferences(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'MemberExpression' &&
-		['Identifier', 'Literal'].includes(n.property.type) &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.MemberExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (['Identifier', 'Literal'].includes(n.property.type) &&
 		!skipProperties.includes(n.property?.name || n.property?.value) &&
 		(!(n.parentKey === 'left' && n.parentNode.type === 'AssignmentExpression')) &&
 		candidateFilter(n)) {

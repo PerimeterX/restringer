@@ -14,9 +14,12 @@ import {doesBinaryExpressionContainOnlyLiterals} from '../utils/doesBinaryExpres
  */
 function resolveDefiniteBinaryExpressions(arb, candidateFilter = () => true) {
 	let sharedSb;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'BinaryExpression' && doesBinaryExpressionContainOnlyLiterals(n) && candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.BinaryExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (doesBinaryExpressionContainOnlyLiterals(n) && candidateFilter(n)) {
 			sharedSb = sharedSb || new Sandbox();
 			const replacementNode = evalInVm(n.src, sharedSb);
 			if (replacementNode !== badValue) {

@@ -161,7 +161,7 @@ if (res.script !== code) {
 
 ### Boilerplate code for starting from scratch
 ```javascript
-import {applyIteratively, treeModifier, logger} from 'flast';
+import {applyIteratively, logger} from 'flast';
 // Optional loading from file
 // import fs from 'node:fs';
 // const inputFilename = process.argv[2] || 'target.js';
@@ -173,22 +173,42 @@ const code = `(function() {
 })();`;
 
 logger.setLogLevelDebug();
+
+/**
+ * Replace specific strings with other strings
+ * @param {Arborist} arb
+ * @return {Arborist}
+ */
+function replaceSpecificLiterals(arb) {
+	const replacements = {
+        'Hello': 'General',
+        'there!': 'Kenobi!',
+    };
+    // Iterate over only the relevant nodes by targeting specific types using the typeMap property on the root node
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.Literal || []),
+        // ...(arb.ast.typeMap.TemplateLiteral || []), // unnecessary for this example, but this is how to add more types
+    ];
+    for (const n of relevantNodes) {
+        if (replacements[n.value]) {
+          // dynamically define a replacement node by creating an object with a type and value properties
+          // markNode(n) would delete the node, while markNode(n, {...}) would replace the node with the supplied node.
+          arb.markNode(n, {type: 'Literal', value: replacements[n.value]});
+        }
+    }
+  return arb;
+}
+
 let script = code;
-// Use this function to target the relevant nodes
-const f = n => n.type === 'Literal' && replacements[n.value];
-// Use this function to modify the nodes according to your needs.
-// markNode(n) would delete the node, while markNode(n, {...}) would replace the node with the supplied node.
-const m = (n, arb) => arb.markNode(n, {
-  type: 'Literal',
-  value: replacements[n.value],
-});
-const swc = treeModifier(f, m, 'StarWarsChanger');
-script = applyIteratively(script, [swc]);
+
+script = applyIteratively(script, [
+  replaceSpecificLiterals,
+]);
+
 if (code !== script) {
   console.log(script);
   // fs.writeFileSync(inputFilename + '-deob.js', script, 'utf-8');
 } else console.log(`No changes`);
-
 ```
 ***
 

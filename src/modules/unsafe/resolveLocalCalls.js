@@ -7,7 +7,7 @@ import {createOrderedSrc} from '../utils/createOrderedSrc.js';
 import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
 import {badValue, badArgumentTypes, skipIdentifiers, skipProperties} from '../config.js';
 
-let appearances = {};
+let appearances = new Map();
 const cacheLimit = 100;
 
 /**
@@ -15,9 +15,7 @@ const cacheLimit = 100;
  * @param {ASTNode} b
  */
 function sortByApperanceFrequency(a, b) {
-	a = getCalleeName(a);
-	b = getCalleeName(b);
-	return appearances[a] < appearances[b] ? 1 : appearances[b] < appearances[a] ? -1 : 0;
+	return appearances.get(getCalleeName(b)) - appearances.get(getCalleeName(a));
 }
 
 /**
@@ -26,8 +24,9 @@ function sortByApperanceFrequency(a, b) {
  */
 function countAppearances(node) {
 	const callee = getCalleeName(node);
-	if (!appearances[callee]) appearances[callee] = 0;
-	return ++appearances[callee];
+	const count = (appearances.get(callee) || 0) + 1;
+	appearances.set(callee, count);
+	return count;
 }
 
 /**
@@ -38,13 +37,15 @@ function countAppearances(node) {
  * @return {Arborist}
  */
 export default function resolveLocalCalls(arb, candidateFilter = () => true) {
-	appearances = {};
+	appearances = new Map();
 	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = [];
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		(n.callee?.declNode ||
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if ((n.callee?.declNode ||
 			(n.callee?.object?.declNode &&
 				!skipProperties.includes(n.callee.property?.value || n.callee.property?.name)) ||
 			n.callee?.object?.type === 'Literal') &&
@@ -61,7 +62,7 @@ export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 		if (c.arguments.some(a => badArgumentTypes.includes(a.type)) || isNodeInRanges(c, modifiedRanges)) continue;
 		const callee = c.callee?.object || c.callee;
 		const declNode = c.callee?.declNode || c.callee?.object?.declNode;
-		if (declNode?.parentNode?.body?.body?.length && declNode.parentNode?.body?.body[0].type === 'ReturnStatement') {
+		if (declNode?.parentNode?.body?.body?.[0]?.type === 'ReturnStatement') {
 			// Leave this replacement to a safe function
 			const returnArg = declNode.parentNode.body.body[0].argument;
 			if (['Literal', 'Identifier'].includes(returnArg.type) || /Function/.test(returnArg.type)) continue;   // Unwrap identifier
@@ -79,8 +80,7 @@ export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 			if (declNode) {
 				// Verify the declNode isn't a simple wrapper for an identifier
 				if (declNode.parentNode.type === 'FunctionDeclaration' &&
-					declNode.parentNode?.body?.body?.length &&
-					['Identifier', 'Literal'].includes(declNode.parentNode.body.body[0]?.argument?.type)) continue;
+					['Identifier', 'Literal'].includes(declNode.parentNode?.body?.body?.[0]?.argument?.type)) continue;
 				const contextSb = new Sandbox();
 				try {
 					contextSb.run(createOrderedSrc(getDeclarationWithContext(declNode.parentNode)));

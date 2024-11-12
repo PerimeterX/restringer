@@ -13,10 +13,12 @@ const relevantNodeTypes = ['Literal', 'ArrayExpression', 'ObjectExpression', 'Un
  */
 function normalizeRedundantNotOperator(arb, candidateFilter = () => true) {
 	let sharedSB;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.UnaryExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if (n.operator === '!' &&
-		n.type === 'UnaryExpression' &&
 		relevantNodeTypes.includes(n.argument.type) &&
 		candidateFilter(n)) {
 			if (canUnaryExpressionBeResolved(n.argument)) {
