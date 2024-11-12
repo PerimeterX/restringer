@@ -199,25 +199,25 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 				}
 			}
 		}
-		cached = [];
+		cached = new Set();
 		for (let i = 0; i < collected.length; i++) {
 			const n = collected[i];
 			if (!(
-				cached.includes(n) ||
+				cached.has(n) ||
 				irrelevantTypesToBeFilteredOut.includes(n.type)) &&
 				!(excludeOriginNode && isNodeInRanges(n, [originNode.range]))) {
 				// A fix to ignore reassignments in cases where functions are overwritten as part of an anti-debugging mechanism
-				if (n.type === 'FunctionDeclaration' && n.id && n.references?.length) {
-					for (let j = 0; j < n.references.length; j++) {
-						const ref = n.references[j];
+				if (n.type === 'FunctionDeclaration' && n.id && n.id.references?.length) {
+					for (let j = 0; j < n.id.references.length; j++) {
+						const ref = n.id.references[j];
 						if (!(ref.parentKey === 'left' && ref.parentNode.type === 'AssignmentExpression')) {
-							cached.push(n);
+							cached.add(n);
 						}
 					}
-				} else cached.push(n);
+				} else cached.add(n);
 			}
 		}
-		cached = removeRedundantNodes(cached);
+		cached = removeRedundantNodes([...cached]);
 		cache[cacheNameId] = cached;        // Caching context for the same node
 		cache[cacheNameSrc] = cached;       // Caching context for a different node with similar content
 	}
