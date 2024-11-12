@@ -27,10 +27,12 @@ const {createOrderedSrc, evalInVm, getDeclarationWithContext} = utils.default;
  * @return {Arborist}
  */
 function replaceArrayWithStaticAugmentedVersion(arb) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		n.callee.type === 'FunctionExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.callee.type === 'FunctionExpression' &&
 		n.arguments.length > 1 && n.arguments[0].type === 'Identifier' &&
 		n.arguments[1].type === 'Literal' && !Number.isNaN(parseInt(n.arguments[1].value))) {
 			let targetNode = n;

@@ -15,10 +15,12 @@ import {getDeclarationWithContext} from '../utils/getDeclarationWithContext.js';
  * @return {Arborist}
  */
 export default function resolveInjectedPrototypeMethodCalls(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'AssignmentExpression' &&
-		n.left.type === 'MemberExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.AssignmentExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.left.type === 'MemberExpression' &&
 		(n.left.object.property?.name || n.left.object.property?.value) === 'prototype' &&
 		n.operator === '=' &&
 		(/FunctionExpression|Identifier/.test(n.right?.type)) &&
@@ -28,8 +30,9 @@ export default function resolveInjectedPrototypeMethodCalls(arb, candidateFilter
 				const context = getDeclarationWithContext(n);
 				const contextSb = new Sandbox();
 				contextSb.run(createOrderedSrc(context));
-				for (let j = 0; j < arb.ast.length; j++) {
-					const ref = arb.ast[j];
+				const rlvntNodes = arb.ast[0].typeMap.CallExpression || [];
+				for (let j = 0; j < rlvntNodes.length; j++) {
+					const ref = rlvntNodes[j];
 					if (ref.type === 'CallExpression' &&
 						ref.callee.type === 'MemberExpression' &&
 						(ref.callee.property?.name || ref.callee.property?.value) === methodName) {

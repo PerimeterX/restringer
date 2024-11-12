@@ -10,9 +10,12 @@ import {areReferencesModified} from '../utils/areReferencesModified.js';
  * @return {Arborist}
  */
 function resolveProxyVariables(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'VariableDeclarator' && n?.init?.type === 'Identifier' && candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.VariableDeclarator || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n?.init?.type === 'Identifier' && candidateFilter(n)) {
 			const refs = n.id.references || [];
 			// Remove proxy assignments if there are no more references
 			if (!refs.length) arb.markNode(n);

@@ -9,10 +9,12 @@
  * @return {Arborist}
  */
 function separateChainedDeclarators(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'VariableDeclaration' &&
-		n.declarations.length > 1 &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.VariableDeclaration || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.declarations.length > 1 &&
 		!n.parentNode.type.match(/For.*Statement/) &&
 		candidateFilter(n)) {
 			const decls = [];

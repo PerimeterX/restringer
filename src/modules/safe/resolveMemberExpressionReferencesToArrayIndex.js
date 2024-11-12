@@ -13,10 +13,12 @@ const minArrayLength = 20;
  * @return {Arborist}
  */
 function resolveMemberExpressionReferencesToArrayIndex(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'VariableDeclarator' &&
-		n.init?.type === 'ArrayExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.VariableDeclarator || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.init?.type === 'ArrayExpression' &&
 		n.id?.references &&
 		n.init.elements.length > minArrayLength &&
 		candidateFilter(n)) {

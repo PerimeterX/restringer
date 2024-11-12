@@ -5,10 +5,12 @@
  * @return {Arborist}
  */
 function simplifyCalls(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		n.arguments?.[0]?.type === 'ThisExpression' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.arguments?.[0]?.type === 'ThisExpression' &&
 		n.callee.type === 'MemberExpression' &&
 		['apply', 'call'].includes(n.callee.property?.name || n.callee.property?.value) &&
 		(n.callee.object?.name || n.callee?.value) !== 'Function' &&

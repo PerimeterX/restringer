@@ -13,10 +13,12 @@ import {generateHash} from '../utils/generateHash.js';
  */
 function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 	const cache = getCache(arb.ast[0].scriptHash);
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		n.callee?.name === 'eval' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.callee?.name === 'eval' &&
 		n.arguments[0]?.type === 'Literal' &&
 		candidateFilter(n)) {
 			const cacheName = `replaceEval-${generateHash(n.src)}`;

@@ -11,11 +11,12 @@ import {evalInVm} from '../utils/evalInVm.js';
  */
 function resolveDeterministicConditionalExpressions(arb, candidateFilter = () => true) {
 	let sharedSb;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'ConditionalExpression' &&
-		n.test.type === 'Literal' &&
-		candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.ConditionalExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.test.type === 'Literal' && candidateFilter(n)) {
 			sharedSb = sharedSb || new Sandbox();
 			const replacementNode = evalInVm(`Boolean(${n.test.src});`, sharedSb);
 			if (replacementNode.type === 'Literal') {

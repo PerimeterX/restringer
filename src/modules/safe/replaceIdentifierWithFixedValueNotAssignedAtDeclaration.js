@@ -9,11 +9,13 @@ import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredO
  * @return {Arborist}
  */
 function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.Identifier || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if (n.parentNode?.type === 'VariableDeclarator' &&
 		!n.parentNode.init &&
-		// n?.references?.length &&
 		n.references?.filter(r =>
 			r.parentNode.type === 'AssignmentExpression' &&
 			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r).length === 1 &&

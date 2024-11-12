@@ -14,10 +14,12 @@ const freezeReplacementString = 'function () {return "bypassed!"}';
  * @return {Arborist}
  */
 function freezeUnbeautifiedValues(arb) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'Literal' &&
-		['newState', 'removeCookie'].includes(n.value)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.Literal || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (['newState', 'removeCookie'].includes(n.value)) {
 			let targetNode;
 			switch (n.value) {
 				case 'newState':

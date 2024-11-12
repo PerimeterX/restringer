@@ -12,10 +12,12 @@ import {getDescendants} from '../utils/getDescendants.js';
  * @return {Arborist}
  */
 export default function resolveAugmentedFunctionWrappedArrayReplacements(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'FunctionDeclaration' && n.id &&
-		candidateFilter(n)) {
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.FunctionDeclaration || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.id && candidateFilter(n)) {
 			const descendants = getDescendants(n);
 			if (descendants.find(d =>
 				d.type === 'AssignmentExpression' &&
@@ -38,7 +40,7 @@ export default function resolveAugmentedFunctionWrappedArrayReplacements(arb, ca
 						arrRef = ac.declNode.parentNode.init.callee?.declNode?.parentNode;
 					}
 					if (arrRef) {
-						const iife = arb.ast.find(c =>
+						const iife = (arb.ast[0].typeMap.ExpressionStatement || []).find(c =>
 							c.type === 'ExpressionStatement' &&
 							c.expression.type === 'CallExpression' &&
 							c.expression.callee.type === 'FunctionExpression' &&
@@ -48,7 +50,7 @@ export default function resolveAugmentedFunctionWrappedArrayReplacements(arb, ca
 						if (iife) {
 							const context = [arrRef.src, arrDecryptor.src, iife.src].join('\n');
 							const skipScopes = [arrRef.scope, arrDecryptor.scope, iife.expression.callee.scope];
-							const replacementCandidates = arb.ast.filter(c =>
+							const replacementCandidates = (arb.ast[0].typeMap.CallExpression || []).filter(c =>
 								c?.callee?.name === arrDecryptor.id.name &&
 								!skipScopes.includes(c.scope));
 							const sb = new Sandbox();

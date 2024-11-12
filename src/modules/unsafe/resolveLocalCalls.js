@@ -40,10 +40,12 @@ export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 	appearances = new Map();
 	const cache = getCache(arb.ast[0].scriptHash);
 	const candidates = [];
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		(n.callee?.declNode ||
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if ((n.callee?.declNode ||
 			(n.callee?.object?.declNode &&
 				!skipProperties.includes(n.callee.property?.value || n.callee.property?.name)) ||
 			n.callee?.object?.type === 'Literal') &&

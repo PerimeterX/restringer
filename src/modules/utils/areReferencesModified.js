@@ -23,7 +23,7 @@ function areReferencesModified(ast, refs) {
 			r.parentNode.parentKey === 'left')) ||
 		// Verify there are no member expressions among the references which are being assigned to
 		(r.type === 'MemberExpression' &&
-			ast.some(n => n.type === 'AssignmentExpression' &&
+			(ast[0].typeMap.AssignmentExpression || []).some(n =>
 				n.left.type === 'MemberExpression' &&
 				n.left.object?.name === r.object?.name &&
 				(n.left.property?.name || n.left.property?.value === r.property?.name || r.property?.value) &&

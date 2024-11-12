@@ -13,11 +13,13 @@ import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredO
  * @return {Arborist}
  */
 function resolveProxyReferences(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if ((n.type === 'VariableDeclarator' &&
-			['Identifier', 'MemberExpression'].includes(n.id.type) &&
-			['Identifier', 'MemberExpression'].includes(n.init?.type)) &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.VariableDeclarator || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (['Identifier', 'MemberExpression'].includes(n.id.type) &&
+			['Identifier', 'MemberExpression'].includes(n.init?.type) &&
 		!/For.*Statement/.test(n.parentNode?.parentNode?.type) &&
 		candidateFilter(n)) {
 			const relevantIdentifier = getMainDeclaredObjectOfMemberExpression(n.id)?.declNode || n.id;

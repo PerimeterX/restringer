@@ -9,8 +9,13 @@ import {badIdentifierCharsRegex, validIdentifierBeginning} from '../config.js';
  * @return {Arborist}
  */
 function normalizeComputed(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.MemberExpression || []),
+		...(arb.ast[0].typeMap.MethodDefinition || []),
+		...(arb.ast[0].typeMap.Property || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if (n.computed &&   // Filter for only member expressions using bracket notation
 			// Ignore member expressions with properties which can't be non-computed, like arr[2] or window['!obj']
 			// or those having another variable reference as their property like window[varHoldingFuncName]

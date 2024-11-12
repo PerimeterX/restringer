@@ -7,8 +7,11 @@ import {areReferencesModified} from '../utils/areReferencesModified.js';
  * @return {Arborist}
  */
 function replaceIdentifierWithFixedAssignedValue(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.Identifier || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if (n?.declNode?.parentNode?.init?.type === 'Literal' &&
 		!(n.parentKey === 'property' && n.parentNode.type === 'ObjectExpression') &&
 		candidateFilter(n)) {

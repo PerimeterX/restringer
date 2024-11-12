@@ -21,9 +21,12 @@ import {badValue} from '../config.js';
  */
 export default function resolveFunctionToArray(arb,  candidateFilter = () => true) {
 	let sharedSb;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'VariableDeclarator' && n.init?.type === 'CallExpression' && n.id?.references &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.VariableDeclarator || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.init?.type === 'CallExpression' && n.id?.references &&
 		!n.id.references.some(r => r.parentNode.type !== 'MemberExpression') &&
 		candidateFilter(n)) {
 			const targetNode = n.init.callee?.declNode?.parentNode || n.init;

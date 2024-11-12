@@ -14,10 +14,12 @@ const relevantParents = [
  * @return {Arborist}
  */
 function removeDeadNodes(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'Identifier' &&
-		relevantParents.includes(n.parentNode.type) &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.Identifier || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (relevantParents.includes(n.parentNode.type) &&
 		(!n?.declNode?.references?.length && !n?.references?.length) &&
 		candidateFilter(n)) {
 			const parent = n.parentNode;

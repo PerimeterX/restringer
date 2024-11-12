@@ -10,10 +10,12 @@
  * @return {Arborist}
  */
 function resolveMemberExpressionsWithDirectAssignment(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'MemberExpression' &&
-			n.object.declNode &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.MemberExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.object.declNode &&
 			n.parentNode.type === 'AssignmentExpression' &&
 			n.parentNode.right.type === 'Literal' &&
 			candidateFilter(n)) {

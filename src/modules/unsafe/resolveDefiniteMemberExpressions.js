@@ -13,10 +13,12 @@ import {evalInVm} from '../utils/evalInVm.js';
  */
 function resolveDefiniteMemberExpressions(arb, candidateFilter = () => true) {
 	let sharedSb;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'MemberExpression' &&
-		!['UpdateExpression'].includes(n.parentNode.type) && // Prevent replacing (++[[]][0]) with (++1)
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.MemberExpression || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (!['UpdateExpression'].includes(n.parentNode.type) && // Prevent replacing (++[[]][0]) with (++1)
 		!(n.parentKey === 'callee') &&    // Prevent replacing obj.method() with undefined()
 		(n.property.type === 'Literal' ||
 			(n.property.name && !n.computed)) &&

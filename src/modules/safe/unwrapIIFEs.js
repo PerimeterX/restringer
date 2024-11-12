@@ -5,10 +5,12 @@
  * @return {Arborist}
  */
 function unwrapIIFEs(arb, candidateFilter = () => true) {
-	candidatesLoop: for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'CallExpression' &&
-		!n.arguments.length &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.CallExpression || []),
+	];
+	candidatesLoop: for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (!n.arguments.length &&
 		['ArrowFunctionExpression', 'FunctionExpression'].includes(n.callee.type) &&
 		!n.callee.id &&
 		// IIFEs with a single return statement

@@ -9,10 +9,12 @@ const maxRepetition = 50;
  * @return {Arborist}
  */
 function rearrangeSwitches(arb, candidateFilter = () => true) {
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
-		if (n.type === 'SwitchStatement' &&
-		n.discriminant.type === 'Identifier' &&
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.SwitchStatement || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
+		if (n.discriminant.type === 'Identifier' &&
 		n?.discriminant.declNode?.parentNode?.init?.type === 'Literal' &&
 		candidateFilter(n)) {
 			let ordered = [];

@@ -43,8 +43,13 @@ function isUnwantedNode(node) {
  */
 function resolveBuiltinCalls(arb, candidateFilter = () => true) {
 	let sharedSb;
-	for (let i = 0; i < arb.ast.length; i++) {
-		const n = arb.ast[i];
+	const relevantNodes = [
+		...(arb.ast[0].typeMap.MemberExpression || []),
+		...(arb.ast[0].typeMap.CallExpression || []),
+		...(arb.ast[0].typeMap.Identifier || []),
+	];
+	for (let i = 0; i < relevantNodes.length; i++) {
+		const n = relevantNodes[i];
 		if (!isUnwantedNode(n) && candidateFilter(n) && (isSafeCall(n) ||
 			(isCallWithOnlyLiteralArguments(n) && (isBuiltinIdentifier(n.callee) || isBuiltinMemberExpression(n.callee)))
 		)) {
