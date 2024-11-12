@@ -1,6 +1,6 @@
 import {getCache} from '../utils/getCache.js';
-import {generateHash} from '../utils/generateHash.js';
 import {generateFlatAST, logger} from 'flast';
+import {generateHash} from '../utils/generateHash.js';
 
 /**
  * Extract string values of eval call expressions, and replace calls with the actual code, without running it through eval.
@@ -23,21 +23,16 @@ function replaceEvalCallsWithLiteralContent(arb, candidateFilter = () => true) {
 			try {
 				if (!cache[cacheName]) {
 					let body;
-					if (n.arguments[0].value) {
-						body = generateFlatAST(n.arguments[0].value, {detailed: false, includeSrc: false})[0].body;
-						if (body.length > 1) {
-							body = {
-								type: 'BlockStatement',
-								body,
-							};
-						} else {
-							body = body[0];
-							if (body.type === 'ExpressionStatement') body = body.expression;
-						}
-					} else body = {
-						type: 'Literal',
-						value: n.arguments[0].value,
-					};
+					body = generateFlatAST(n.arguments[0].value, {detailed: false, includeSrc: false})[0].body;
+					if (body.length > 1) {
+						body = {
+							type: 'BlockStatement',
+							body,
+						};
+					} else {
+						body = body[0];
+						if (body.type === 'ExpressionStatement') body = body.expression;
+					}
 					cache[cacheName] = body;
 				}
 				let replacementNode = cache[cacheName];
