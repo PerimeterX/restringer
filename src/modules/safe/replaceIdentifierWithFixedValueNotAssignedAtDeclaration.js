@@ -13,8 +13,8 @@ function replaceIdentifierWithFixedValueNotAssignedAtDeclaration(arb, candidateF
 		const n = arb.ast[i];
 		if (n.parentNode?.type === 'VariableDeclarator' &&
 		!n.parentNode.init &&
-		n?.references?.length &&
-		n.references.filter(r =>
+		// n?.references?.length &&
+		n.references?.filter(r =>
 			r.parentNode.type === 'AssignmentExpression' &&
 			getMainDeclaredObjectOfMemberExpression(r.parentNode.left) === r).length === 1 &&
 		!n.references.some(r =>

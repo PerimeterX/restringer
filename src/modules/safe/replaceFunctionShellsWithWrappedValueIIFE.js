@@ -10,8 +10,7 @@ function replaceFunctionShellsWithWrappedValueIIFE(arb, candidateFilter = () => 
 		if (n.type === 'FunctionExpression' &&
 		n.parentKey === 'callee' &&
 		!n.parentNode.arguments.length &&
-		n.body?.body?.length &&
-		n.body.body[0].type === 'ReturnStatement' &&
+		n.body.body?.[0]?.type === 'ReturnStatement' &&
 		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type) &&
 		candidateFilter(n)) {
 			arb.markNode(n.parentNode, n.parentNode.callee.body.body[0].argument);

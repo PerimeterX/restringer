@@ -8,9 +8,8 @@ function replaceFunctionShellsWithWrappedValue(arb, candidateFilter = () => true
 	for (let i = 0; i < arb.ast.length; i++) {
 		const n = arb.ast[i];
 		if (n.type === 'FunctionDeclaration' &&
-		n.body?.body?.length &&
-		n.body.body[0].type === 'ReturnStatement' &&
-		['Literal', 'Identifier'].includes(n.body.body[0].argument?.type) &&
+		n.body.body?.[0]?.type === 'ReturnStatement' &&
+		['Literal', 'Identifier'].includes(n.body.body[0]?.argument?.type) &&
 		candidateFilter(n)) {
 			const replacementNode = n.body.body[0].argument;
 			for (const ref of (n.id?.references || [])) {

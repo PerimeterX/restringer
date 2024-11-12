@@ -29,7 +29,7 @@ function unwrapIIFEs(arb, candidateFilter = () => true) {
 			if (replacementNode.type === 'BlockStatement') {
 				let targetChild = replacementNode;
 				// IIFEs with a single return statement
-				if (replacementNode.body?.length === 1 && replacementNode.body[0].argument) replacementNode = replacementNode.body[0].argument;
+				if (replacementNode.body?.[0]?.argument) replacementNode = replacementNode.body[0].argument;
 				// IIFEs with multiple statements or expressions
 				else while (targetNode && !targetNode.body) {
 					// Skip cases where IIFE is used to initialize or set a value

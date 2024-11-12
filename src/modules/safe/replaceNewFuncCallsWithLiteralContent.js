@@ -18,7 +18,7 @@ function replaceNewFuncCallsWithLiteralContent(arb, candidateFilter = () => true
 		const n = arb.ast[i];
 		if (n.type === 'NewExpression' &&
 		n.parentKey === 'callee' &&
-		n.parentNode?.arguments?.length === 0 &&
+		!n.parentNode?.arguments?.length &&
 		n.callee?.name === 'Function' &&
 		n.arguments?.length === 1 &&
 		n.arguments[0].type === 'Literal' &&
