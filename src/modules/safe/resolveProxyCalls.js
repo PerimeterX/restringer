@@ -21,7 +21,7 @@ function resolveProxyCalls(arb, candidateFilter = () => true) {
 	];
 	for (let i = 0; i < relevantNodes.length; i++) {
 		const n = relevantNodes[i];
-		if (n?.body?.body?.[0].type === 'ReturnStatement' &&
+		if (n?.body?.body?.[0]?.type === 'ReturnStatement' &&
 		n.body.body[0].argument?.type === 'CallExpression' &&
 		n.body.body[0].argument.arguments?.length === n.params?.length &&
 		n.body.body[0].argument.callee.type === 'Identifier' &&
