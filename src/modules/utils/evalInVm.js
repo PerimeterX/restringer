@@ -1,13 +1,11 @@
-import {logger} from 'flast';
 import {Sandbox} from './sandbox.js';
 import {badValue} from '../config.js';
 import {getObjType} from './getObjType.js';
 import {generateHash} from './generateHash.js';
 import {createNewNode} from './createNewNode.js';
 
-const badTypes = [        // Types of objects which can't be resolved in the deobfuscation context.
-	'Promise',
-];
+// Types of objects which can't be resolved in the deobfuscation context.
+const badTypes = ['Promise'];
 
 const matchingObjectKeys = {
 	[Object.keys(console).sort().join('')]: {type: 'Identifier', name: 'console'},
@@ -59,9 +57,7 @@ function evalInVm(stringToEval, sb) {
 				if (matchingObjectKeys[objKeys]) cache[cacheName] = matchingObjectKeys[objKeys];
 				else cache[cacheName] = createNewNode(res);
 			}
-		} catch (e) {
-			logger.debug(`[-] Error in _evalInVm: ${e.message}`);
-		}
+		} catch {}
 	}
 	return cache[cacheName];
 }
