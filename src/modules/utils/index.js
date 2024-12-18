@@ -5,7 +5,6 @@ export default {
 	createOrderedSrc: (await import('./createOrderedSrc.js')).createOrderedSrc,
 	doesBinaryExpressionContainOnlyLiterals: (await import('./doesBinaryExpressionContainOnlyLiterals.js')).doesBinaryExpressionContainOnlyLiterals,
 	evalInVm: (await import('./evalInVm.js')).evalInVm,
-	evalWithDom: (await import('./evalWithDom.js')).evalWithDom,
 	generateHash: (await import('./generateHash.js')).generateHash,
 	getCache: (await import('./getCache.js')).getCache,
 	getCalleeName: (await import('./getCalleeName.js')).getCalleeName,

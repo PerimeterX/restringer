@@ -14,7 +14,6 @@
   "dependencies": {
     "flast": "2.2.1",
     "isolated-vm": "^5.0.3",
-    "jsdom": "^25.0.1",
     "obfuscation-detector": "^2.0.5"
   },
   "scripts": {

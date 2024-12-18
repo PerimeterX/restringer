@@ -1,7 +1,6 @@
 import {Arborist} from 'flast';
-import {safe, utils} from '../modules/index.js';
+import {safe} from '../modules/index.js';
 const {removeDeadNodes} = safe;
-const {evalWithDom} = utils.default;
 
 const lineWithFinalAssignmentRegex = /(\w{3})\[.*]\s*=.*\((\w{3})\).*=\s*\1\s*\+\s*['"]/ms;
 const variableContainingTheInnerLayerRegex = /\(((\w{3}\()+(\w{3})\)*)\)/gms;
@@ -46,7 +45,7 @@ function extractInnerLayer(arb) {
 		const innerLayerVarMatches = variableContainingTheInnerLayerRegex.exec(lineToReplace);
 		const variableContainingTheInnerLayer = innerLayerVarMatches ? innerLayerVarMatches[0] : matches[2];
 		script = script.replace(lineToReplace, `console.log(${variableContainingTheInnerLayer}.toString());})();\n`);
-		script = evalWithDom(script);
+		// script = evalWithDom(script);
 		if (script) arb = new Arborist(script);
 	}
 	return arb;

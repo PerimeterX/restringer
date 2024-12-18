@@ -25,11 +25,6 @@ describe('UTILS: evalInVm', async () => {
 		assert.deepStrictEqual(result, expected);
 	});
 });
-describe.todo('UTILS: evalWithDom', async () => {
-	// Load the module even though there are no tests for it - to include it in the coverage report
-	// noinspection JSUnusedLocalSymbols
-	const targetModule = (await import('../src/modules/utils/evalWithDom.js')).evalWithDom;
-});
 describe('UTILS: areReferencesModified', async () => {
 	const targetModule = (await import('../src/modules/utils/areReferencesModified.js')).areReferencesModified;
 	it('TP-1: Update expression', () => {
