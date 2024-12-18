@@ -36,7 +36,7 @@ describe('UNSAFE: normalizeRedundantNotOperator', async () => {
 describe('UNSAFE: resolveAugmentedFunctionWrappedArrayReplacements', async () => {
 	// Load the module even though there are no tests for it - to include it in the coverage report
 	// noinspection JSUnusedLocalSymbols
-	const targetModule = (await import('../src/modules/unsafe/resolveAugmentedFunctionWrappedArrayReplacements.js')).evalWithDom;
+	const targetModule = (await import('../src/modules/unsafe/resolveAugmentedFunctionWrappedArrayReplacements.js')).default;
 	it.todo('TODO: Write tests for function', () => {});
 });
 describe('UNSAFE: resolveBuiltinCalls', async () => {
