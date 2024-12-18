@@ -15,7 +15,9 @@ const defaultMaxIterations = {
 	valueOf() {return this.value--;},
 };
 
-const propertiesThatModifyContent = ['push', 'forEach', 'pop', 'insert', 'add', 'set', 'delete'];
+const propertiesThatModifyContent = [
+	'push', 'forEach', 'pop', 'insert', 'add', 'set', 'delete', 'shift', 'unshift', 'splice'
+];
 
 // Builtin functions that shouldn't be resolved in the deobfuscation context.
 const skipBuiltinFunctions = [
