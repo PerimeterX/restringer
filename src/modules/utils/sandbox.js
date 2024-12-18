@@ -1,16 +1,12 @@
 import pkg from 'isolated-vm';
 const {Isolate, Reference} = pkg;
 
-/**
- *
- */
 export class Sandbox {
 	constructor() {
 		// Objects that shouldn't be available when running scripts in eval to avoid security issues or inconsistencies.
 		const replacedItems = {
-			Date: class {},
-			debugger: null,
-			WebAssembly: class {},
+			debugger: undefined,
+			WebAssembly: undefined,
 		};
 		this.replacedItems = replacedItems;
 		this.replacedItemsNames = Object.keys(replacedItems);
@@ -33,7 +29,9 @@ export class Sandbox {
 	 * @return {Reference}
 	 */
 	run(code) {
-		const script = this.vm.compileScriptSync(code);
+		// Delete some properties that add randomness to the result
+		const script = this.vm.compileScriptSync('delete Math.random; delete Date;\n\n' + code);
+		// const script = this.vm.compileScriptSync(code);
 		return script.runSync(this.context, {
 			timeout: this.timeout,
 			reference: true,
