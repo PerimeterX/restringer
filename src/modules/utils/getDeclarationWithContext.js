@@ -189,10 +189,6 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 						// noinspection JSUnresolvedReference
 						addToStack(targetNode.scope.through[j].identifier);
 					}
-				} else if (targetNode.scope.scopeId && originNode.scope !== targetNode.scope) {
-					// Collect the scope itself instead of just the node, if the scope isn't the global scope
-					// noinspection JSUnresolvedVariable
-					addToStack(targetNode.scope.block);
 				}
 				for (let j = 0; j < targetNode?.childNodes.length; j++) {
 					addToStack(targetNode.childNodes[j]);
