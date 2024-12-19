@@ -111,12 +111,9 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 	 * @param {ASTNode} node
 	 */
 	function addToStack(node) {
-		if (!(
-			seenNodes.includes(node) ||
+		if (seenNodes.includes(node) ||
 			stack.includes(node) ||
-			irrelevantTypesToAvoidIteratingOver.includes(node.type))) {
-			stack.push(node);
-		}
+			irrelevantTypesToAvoidIteratingOver.includes(node.type)) {} else stack.push(node);
 	}
 	const cache = getCache(originNode.scriptHash);
 	const srcHash = generateHash(originNode.src);
