@@ -38,9 +38,11 @@ const standaloneNodeTypes = ['ExpressionStatement', 'AssignmentExpression', 'Var
  * @return {boolean} True if any of the descendants are marked for modification; false otherwise.
  */
 function areDescendantsModified(targetNode) {
-	const descendants = getDescendants(targetNode);
-	for (let i = 0; i < descendants.length; i++) {
-		if (descendants[i].isMarked) return true;
+	const stack = [targetNode];
+	while (stack.length) {
+		const node = stack.pop();
+		if (node.isMarked) return true;
+		if (node.childNodes?.length) stack.push(...node.childNodes);
 	}
 	return false;
 }
