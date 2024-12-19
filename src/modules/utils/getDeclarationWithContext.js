@@ -1,8 +1,8 @@
 import {getCache} from './getCache.js';
 import {generateHash} from './generateHash.js';
 import {isNodeInRanges} from './isNodeInRanges.js';
-import {getDescendants} from './getDescendants.js';
 import {propertiesThatModifyContent} from '../config.js';
+import {doesDescendantMatchCondition} from './doesDescendantMatchCondition.js';
 
 // Types that give no context by themselves
 const irrelevantTypesToBeFilteredOut = [
@@ -129,7 +129,7 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 			if (seenNodes.includes(node)) continue;
 			seenNodes.push(node);
 			// Do not collect any context if one of the relevant nodes is marked to be replaced or deleted
-			if (node.isMarked || areDescendantsModified(node)) {
+			if (node.isMarked || doesDescendantMatchCondition(node, n => n.isMarked)) {
 				collected.length = 0;
 				break;
 			}

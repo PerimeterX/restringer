@@ -2,6 +2,7 @@ import {badValue} from '../config.js';
 import {Sandbox} from '../utils/sandbox.js';
 import {evalInVm} from '../utils/evalInVm.js';
 import {getDescendants} from '../utils/getDescendants.js';
+import {doesDescendantMatchCondition} from '../utils/doesDescendantMatchCondition.js';
 
 /**
  * A special case of function array replacement where the function is wrapped in another function, the array is
@@ -17,7 +18,11 @@ export default function resolveAugmentedFunctionWrappedArrayReplacements(arb, ca
 	];
 	for (let i = 0; i < relevantNodes.length; i++) {
 		const n = relevantNodes[i];
-		if (n.id && candidateFilter(n)) {
+		if (n.id  &&
+			doesDescendantMatchCondition(n, d =>
+				d.type === 'AssignmentExpression' &&
+				d.left?.name === n.id?.name) &&
+			candidateFilter(n)) {
 			const descendants = getDescendants(n);
 			if (descendants.find(d =>
 				d.type === 'AssignmentExpression' &&
