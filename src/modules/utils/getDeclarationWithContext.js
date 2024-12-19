@@ -35,20 +35,6 @@ const standaloneNodeTypes = ['ExpressionStatement', 'AssignmentExpression', 'Var
 
 /**
  * @param {ASTNode} targetNode
- * @return {boolean} True if any of the descendants are marked for modification; false otherwise.
- */
-function areDescendantsModified(targetNode) {
-	const stack = [targetNode];
-	while (stack.length) {
-		const node = stack.pop();
-		if (node.isMarked) return true;
-		if (node.childNodes?.length) stack.push(...node.childNodes);
-	}
-	return false;
-}
-
-/**
- * @param {ASTNode} targetNode
  * @return {boolean} True if the target node is directly under an if statement; false otherwise
  */
 function isConsequentOrAlternate(targetNode) {
