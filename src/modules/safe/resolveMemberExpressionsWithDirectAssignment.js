@@ -13,20 +13,26 @@ function resolveMemberExpressionsWithDirectAssignment(arb, candidateFilter = () 
 	const relevantNodes = [
 		...(arb.ast[0].typeMap.MemberExpression || []),
 	];
-	for (let i = 0; i < relevantNodes.length; i++) {
+	rnLoop: for (let i = 0; i < relevantNodes.length; i++) {
 		const n = relevantNodes[i];
 		if (n.object.declNode &&
 			n.parentNode.type === 'AssignmentExpression' &&
 			n.parentNode.right.type === 'Literal' &&
 			candidateFilter(n)) {
 			const prop = n.property?.value || n.property?.name;
-			const valueUses = n.object.declNode.references.filter(ref =>
-				ref.parentNode !== n && ref.parentNode.type === 'MemberExpression' &&
-				prop === ref.parentNode.property[ref.parentNode.property.computed ? 'value' : 'name']);
+			const valueUses = [];
+			for (let j = 0; j < n.object.declNode.references.length; j++) {
+				/** @type {ASTNode} */
+				const ref = n.object.declNode.references[j];
+				if (ref.parentNode !== n && ref.parentNode.type === 'MemberExpression' &&
+					prop === ref.parentNode.property[ref.parentNode.property.computed ? 'value' : 'name']) {
+					// Skip if the value is reassigned
+					if (ref.parentNode.parentNode.type === 'UpdateExpression' ||
+						(ref.parentNode.parentNode.type === 'AssignmentExpression' && ref.parentNode.parentKey === 'left')) continue rnLoop;
+					valueUses.push(ref);
+				}
+			}
 			if (valueUses.length) {
-				// Skip if the value is reassigned
-				if (valueUses.some(v => v.parentNode.parentNode.type === 'UpdateExpression' ||
-					(v.parentNode.parentNode.type === 'AssignmentExpression' && v.parentNode.parentKey === 'left'))) continue;
 				const replacementNode = n.parentNode.right;
 				for (let j = 0; j < valueUses.length; j++) {
 					arb.markNode(valueUses[j].parentNode, replacementNode);

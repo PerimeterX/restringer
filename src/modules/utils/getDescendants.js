@@ -3,6 +3,7 @@
  * @return {ASTNode[]} A flat array of all decendants of the target node
  */
 function getDescendants(targetNode) {
+	if (targetNode?.['decendants']) return targetNode['decendants'];
 	/** @type {ASTNode[]} */
 	const offsprings = [];
 	/** @type {ASTNode[]} */
@@ -18,7 +19,7 @@ function getDescendants(targetNode) {
 			}
 		}
 	}
-	return offsprings;
+	return targetNode['decendants'] = offsprings;
 }
 
 export {getDescendants};

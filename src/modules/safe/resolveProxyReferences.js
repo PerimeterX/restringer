@@ -1,5 +1,5 @@
-import {getDescendants} from '../utils/getDescendants.js';
 import {areReferencesModified} from '../utils/areReferencesModified.js';
+import {doesDescendantMatchCondition} from '../utils/doesDescendantMatchCondition.js';
 import {getMainDeclaredObjectOfMemberExpression} from '../utils/getMainDeclaredObjectOfMemberExpression.js';
 
 /**
@@ -28,7 +28,7 @@ function resolveProxyReferences(arb, candidateFilter = () => true) {
 			const replacementMainIdentifier = getMainDeclaredObjectOfMemberExpression(n.init)?.declNode;
 			if (replacementMainIdentifier && replacementMainIdentifier === relevantIdentifier) continue;
 			// Exclude changes in the identifier's own init
-			if (getDescendants(n.init).find(n => n.declNode === relevantIdentifier)) continue;
+			if (doesDescendantMatchCondition(n.init, n => n === relevantIdentifier)) continue;
 			if (refs.length && !areReferencesModified(arb.ast, refs) && !areReferencesModified(arb.ast, [replacementNode])) {
 				for (const ref of refs) {
 					arb.markNode(ref, replacementNode);

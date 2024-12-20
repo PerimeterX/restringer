@@ -36,8 +36,14 @@ function createOrderedSrc(nodes, preserveOrder = false) {
 				nodes[i] = n.parentNode;
 				if (!preserveOrder && n.callee.type === 'FunctionExpression') {
 					// Set nodeId to place IIFE just after its argument's declaration
-					const argDeclNodeId = n.arguments.find(a => a.nodeId === Math.max(...n.arguments.filter(arg => arg?.declNode?.nodeId).map(arg => arg.nodeId)))?.nodeId;
-					nodes[i].nodeId = argDeclNodeId ? argDeclNodeId + 1 : nodes[i].nodeId + largeNumber;
+					let maxArgNodeId = 0;
+					for (let j = 0; j < n.arguments.length; j++) {
+						const arg = n.arguments[j];
+						if (arg?.declNode?.nodeId > maxArgNodeId) {
+							maxArgNodeId = arg.declNode.nodeId;
+						}
+					}
+					nodes[i].nodeId = maxArgNodeId ? maxArgNodeId + 1 : nodes[i].nodeId + largeNumber;
 				}
 			} else if (n.callee.type === 'FunctionExpression') {
 				if (!preserveOrder) {

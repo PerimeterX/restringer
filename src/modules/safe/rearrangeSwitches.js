@@ -23,16 +23,32 @@ function rearrangeSwitches(arb, candidateFilter = () => true) {
 			let counter = 0;
 			while (currentVal !== undefined && counter < maxRepetition) {
 				// A matching case or the default case
-				let currentCase = cases.find(c => c.test?.value === currentVal) || cases.find(c => !c.test);
+				let currentCase;
+				for (let j = 0; j < cases.length; j++) {
+					if (cases[j].test?.value === currentVal || !cases[j].test) {
+						currentCase = cases[j];
+						break;
+					}
+				}
 				if (!currentCase) break;
-				ordered.push(...currentCase.consequent.filter(c => c.type !== 'BreakStatement'));
-
+				for (let j = 0; j < currentCase.consequent.length; j++) {
+					if (currentCase.consequent[j].type !== 'BreakStatement') {
+						ordered.push(currentCase.consequent[j]);
+					}
+				}
 				let allDescendants = [];
-				currentCase.consequent.forEach(c => allDescendants.push(...getDescendants(c)));
-				const assignments2Next = allDescendants.filter(d =>
-					d.declNode === n.discriminant.declNode &&
-					d.parentKey === 'left' &&
-					d.parentNode.type === 'AssignmentExpression');
+				for (let j = 0; j < currentCase.consequent.length; j++) {
+					allDescendants.push(...getDescendants(currentCase.consequent[j]));
+				}
+				const assignments2Next = [];
+				for (let j = 0; j < allDescendants.length; j++) {
+					const d = allDescendants[j];
+					if (d.declNode === n.discriminant.declNode &&
+						d.parentKey === 'left' &&
+						d.parentNode.type === 'AssignmentExpression') {
+						assignments2Next.push(d);
+					}
+				}
 				if (assignments2Next.length === 1) {
 					currentVal = assignments2Next[0].parentNode.right.value;
 				} else {

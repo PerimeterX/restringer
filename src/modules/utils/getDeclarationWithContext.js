@@ -1,8 +1,8 @@
 import {getCache} from './getCache.js';
 import {generateHash} from './generateHash.js';
 import {isNodeInRanges} from './isNodeInRanges.js';
-import {getDescendants} from './getDescendants.js';
 import {propertiesThatModifyContent} from '../config.js';
+import {doesDescendantMatchCondition} from './doesDescendantMatchCondition.js';
 
 // Types that give no context by themselves
 const irrelevantTypesToBeFilteredOut = [
@@ -32,18 +32,6 @@ const ifKeys = ['consequent', 'alternate'];
 
 // Node types which are acceptable when wrapping an anonymous function
 const standaloneNodeTypes = ['ExpressionStatement', 'AssignmentExpression', 'VariableDeclarator'];
-
-/**
- * @param {ASTNode} targetNode
- * @return {boolean} True if any of the descendants are marked for modification; false otherwise.
- */
-function areDescendantsModified(targetNode) {
-	const descendants = getDescendants(targetNode);
-	for (let i = 0; i < descendants.length; i++) {
-		if (descendants[i].isMarked) return true;
-	}
-	return false;
-}
 
 /**
  * @param {ASTNode} targetNode
@@ -109,12 +97,9 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 	 * @param {ASTNode} node
 	 */
 	function addToStack(node) {
-		if (!(
-			seenNodes.includes(node) ||
+		if (seenNodes.includes(node) ||
 			stack.includes(node) ||
-			irrelevantTypesToAvoidIteratingOver.includes(node.type))) {
-			stack.push(node);
-		}
+			irrelevantTypesToAvoidIteratingOver.includes(node.type)) {} else stack.push(node);
 	}
 	const cache = getCache(originNode.scriptHash);
 	const srcHash = generateHash(originNode.src);
@@ -127,7 +112,7 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 			if (seenNodes.includes(node)) continue;
 			seenNodes.push(node);
 			// Do not collect any context if one of the relevant nodes is marked to be replaced or deleted
-			if (node.isMarked || areDescendantsModified(node)) {
+			if (node.isMarked || doesDescendantMatchCondition(node, n => n.isMarked)) {
 				collected.length = 0;
 				break;
 			}
@@ -189,10 +174,6 @@ export function getDeclarationWithContext(originNode, excludeOriginNode = false)
 						// noinspection JSUnresolvedReference
 						addToStack(targetNode.scope.through[j].identifier);
 					}
-				} else if (targetNode.scope.scopeId && originNode.scope !== targetNode.scope) {
-					// Collect the scope itself instead of just the node, if the scope isn't the global scope
-					// noinspection JSUnresolvedVariable
-					addToStack(targetNode.scope.block);
 				}
 				for (let j = 0; j < targetNode?.childNodes.length; j++) {
 					addToStack(targetNode.childNodes[j]);

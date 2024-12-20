@@ -57,15 +57,19 @@ export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 	candidates.sort(sortByApperanceFrequency);
 
 	const modifiedRanges = [];
-	for (let i = 0; i < candidates.length; i++) {
+	candidateLoop: for (let i = 0; i < candidates.length; i++) {
 		const c = candidates[i];
-		if (c.arguments.some(a => badArgumentTypes.includes(a.type)) || isNodeInRanges(c, modifiedRanges)) continue;
+		if (isNodeInRanges(c, modifiedRanges)) continue;
+		for (let j = 0; j < c.arguments.length; j++) {
+			const arg = c.arguments[j];
+			if (badArgumentTypes.includes(arg.type)) continue candidateLoop;
+		}
 		const callee = c.callee?.object || c.callee;
 		const declNode = c.callee?.declNode || c.callee?.object?.declNode;
 		if (declNode?.parentNode?.body?.body?.[0]?.type === 'ReturnStatement') {
 			// Leave this replacement to a safe function
 			const returnArg = declNode.parentNode.body.body[0].argument;
-			if (['Literal', 'Identifier'].includes(returnArg.type) || /Function/.test(returnArg.type)) continue;   // Unwrap identifier
+			if (['Literal', 'Identifier'].includes(returnArg.type) || returnArg.type.includes('unction')) continue;   // Unwrap identifier
 			else if (returnArg.type === 'CallExpression' &&
 				returnArg.callee?.object?.type === 'FunctionExpression' &&
 				(returnArg.callee.property?.name || returnArg.callee.property?.value) === 'apply') continue;    // Unwrap function shells
@@ -96,7 +100,7 @@ export default function resolveLocalCalls(arb, candidateFilter = () => true) {
 			// Prevent resolving a function's toString as it might be an anti-debugging mechanism
 			// which will spring if the code is beautified
 			if (c.callee.type === 'MemberExpression' && (c.callee.property?.name || c.callee.property?.value) === 'toString' &&
-				(new RegExp('^function ')).test(replacementNode?.value)) continue;
+				replacementNode?.value.substring(0, 8) === 'function') continue;
 			arb.markNode(c, replacementNode);
 			modifiedRanges.push(c.range);
 		}

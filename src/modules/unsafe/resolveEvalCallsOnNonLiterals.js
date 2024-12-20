@@ -27,8 +27,9 @@ function resolveEvalCallsOnNonLiterals(arb, candidateFilter = () => true) {
 			// The code inside the eval might contain references to outside code that should be included.
 			const contextNodes = getDeclarationWithContext(n, true);
 			// In case any of the target candidate is included in the context it should be removed.
-			for (const redundantNode in [n, n?.parentNode, n?.parentNode?.parentNode]) {
-				if (contextNodes.includes(redundantNode)) contextNodes.splice(contextNodes.indexOf(redundantNode), 1);
+			const possiblyRedundantNodes = [n, n?.parentNode, n?.parentNode?.parentNode];
+			for (let i = 0; i < possiblyRedundantNodes.length; i++) {
+				if (contextNodes.includes(possiblyRedundantNodes[i])) contextNodes.splice(contextNodes.indexOf(possiblyRedundantNodes[i]), 1);
 			}
 			const context = contextNodes.length ? createOrderedSrc(contextNodes) : '';
 			const src = `${context}\n;var __a_ = ${createOrderedSrc([n.arguments[0]])}\n;__a_`;
