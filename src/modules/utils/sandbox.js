@@ -9,6 +9,7 @@ export class Sandbox {
 			WebAssembly: undefined,
 			fetch: undefined,
 			XMLHttpRequest: undefined,
+			WebSocket: undefined,
 		};
 		this.replacedItems = replacedItems;
 		this.replacedItemsNames = Object.keys(replacedItems);
