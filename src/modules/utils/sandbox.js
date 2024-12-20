@@ -13,7 +13,7 @@ export class Sandbox {
 		};
 		this.replacedItems = replacedItems;
 		this.replacedItemsNames = Object.keys(replacedItems);
-		this.timeout = 1.5 * 1000;
+		this.timeout = 1.0 * 1000;
 
 		this.vm = new Isolate({memoryLimit: 128});
 		this.context = this.vm.createContextSync();
