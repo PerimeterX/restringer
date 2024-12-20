@@ -7,10 +7,12 @@ export class Sandbox {
 		const replacedItems = {
 			debugger: undefined,
 			WebAssembly: undefined,
+			fetch: undefined,
+			XMLHttpRequest: undefined,
 		};
 		this.replacedItems = replacedItems;
 		this.replacedItemsNames = Object.keys(replacedItems);
-		this.timeout = 5 * 1000;
+		this.timeout = 1.5 * 1000;
 
 		this.vm = new Isolate({memoryLimit: 128});
 		this.context = this.vm.createContextSync();
