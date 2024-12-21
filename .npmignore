@@ -1,0 +1,6 @@
+tests/
+.github/
+.husky/
+CONTIBUTING.md
+eslint.config.js
+.gitignore
